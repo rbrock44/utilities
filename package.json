@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "gh-pages": "gh-pages -d dist/utilities",
+    "deploy": "ng build --base-href=https://utilities.ryan-brock.com",
+    "prod": "npm run deploy && npm run gh-pages"
   },
   "prettier": {
     "printWidth": 100,
@@ -31,6 +34,7 @@
     "@angular/material": "~21.1.1",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "angular-cli-ghpages": "^3.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
