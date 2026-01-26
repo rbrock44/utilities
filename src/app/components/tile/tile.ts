@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Tile } from '../../objects/tile';
+import { SettingsService } from '../../services/settings';
 
 @Component({
   selector: 'app-tile',
@@ -9,14 +11,20 @@ import { CommonModule } from '@angular/common';
   styleUrl: './tile.scss',
 })
 export class TileComponent {
-  @Input() tile: any;
+  @Input() tile: Tile = {
+    title: '',
+    description: '',
+    icon: '',
+    param: ''
+  };
+
+  constructor(
+    private settingsService: SettingsService
+  ) {
+  }
 
   handleClick() {
-    if (this.tile.action) {
-      this.tile.action();
-    } else if (this.tile.route) {
-      // Handle routing if needed
-      console.log('Navigate to:', this.tile.route);
-    }
+    this.settingsService.setSelectedTile(this.tile.param);
+    this.settingsService.resetUrl();
   }
 }

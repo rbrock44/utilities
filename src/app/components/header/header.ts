@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SettingsService } from '../../services/settings';
 
 @Component({
   selector: 'app-header',
@@ -9,7 +10,13 @@ import { CommonModule } from '@angular/common';
   styleUrl: './header.scss',
 })
 export class HeaderComponent {
+  constructor(
+    private settingsService: SettingsService
+  ) {
+  }
+
   goHome() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.settingsService.setSelectedTile();
+    this.settingsService.resetUrl();
   }
 }

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TileComponent } from '../tile/tile';
+import { Category } from '../../objects/category';
 
 @Component({
   selector: 'app-category',
@@ -10,5 +11,8 @@ import { TileComponent } from '../tile/tile';
   styleUrl: './category.scss',
 })
 export class CategoryComponent {
-  @Input() category: any;
+  @Input() category: Category = {
+    name: '',
+    tiles: []
+  };
 }

@@ -1,3 +1,12 @@
 <router-outlet />
 <app-header></app-header>
-<app-tile-grid></app-tile-grid>
+
+@if (this.settingsService.getSelectedTile() !== null) {
+  @if (this.settingsService.getSelectedTile() === "pm") {
+    <app-precious-metals></app-precious-metals>
+  }
+}
+
+@if (this.settingsService.getSelectedTile() === null) {
+  <app-tile-grid></app-tile-grid>
+}
