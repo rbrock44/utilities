@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TileComponent } from '../tile/tile';
 
 @Component({
   selector: 'app-category',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, TileComponent],
   templateUrl: './category.html',
   styleUrl: './category.scss',
 })
-export class Category {
-
+export class CategoryComponent {
+  @Input() category: any;
 }
