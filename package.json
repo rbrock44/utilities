@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "gh-pages": "gh-pages -d dist/utilities",
+    "gh-pages": "gh-pages -d dist/utilities/browser",
     "deploy": "ng build --base-href=https://utilities.ryan-brock.com",
     "prod": "npm run deploy && npm run gh-pages"
   },

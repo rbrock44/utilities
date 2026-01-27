@@ -8,7 +8,7 @@ import { catchError, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SpotPriceService {
-  private apiUrl = 'https://home-page-api.ryan-brock.com/spot-prices';
+  private apiUrl = 'https://home-page-api.ryan-brock.com/spot-price';
 
   constructor(private http: HttpClient) {}
 
