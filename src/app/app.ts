@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { TileGridComponent } from './components/tile-grid/tile-grid';
@@ -17,7 +17,8 @@ import { PreciousMetalsComponent } from './components/calculators/precious-metal
     CommonModule,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App {
   protected readonly title = signal('utilities');

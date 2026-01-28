@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SpotPrices } from '../../../objects/spot-prices';
 import { MetalRow } from '../../../objects/metal-row';
@@ -12,6 +12,7 @@ import { SpotPriceService } from '../../../services/spot-price';
   imports: [CommonModule, FormsModule],
   templateUrl: './precious-metals.html',
   styleUrl: './precious-metals.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PreciousMetalsComponent implements OnInit {
   spotPrices: SpotPrices = {

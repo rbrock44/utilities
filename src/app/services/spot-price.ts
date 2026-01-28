@@ -15,8 +15,8 @@ export class SpotPriceService {
   getSpotPrices(): Observable<SpotPrices> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => ({
-        gold: response.gold || response.goldPrice,
-        silver: response.silver || response.silverPrice,
+        gold: response.gold,
+        silver: response.silver,
         timestamp: new Date(response.timestamp || Date.now())
       })),
       catchError(error => {
