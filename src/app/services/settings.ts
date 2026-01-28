@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Location } from "@angular/common";
-import { ActivatedRoute } from "@angular/router";
-import { Category } from "../objects/category";
+import { CATEGORIES } from "../constants/categories";
 
 @Injectable({
     providedIn: 'root'
@@ -9,59 +8,7 @@ import { Category } from "../objects/category";
 export class SettingsService {
     private selectedTile: string | null = null;
     tileUrlParam: string = 'tile';
-    categories: Category[] = [
-    // {
-    //   name: 'Productivity',
-    //   tiles: [
-    //     {
-    //       title: 'Calculator',
-    //       description: 'Basic calculator utility',
-    //       icon: '🧮',
-    //       param: ''
-    //     },
-    //     {
-    //       title: 'Timer',
-    //       description: 'Countdown and stopwatch',
-    //       icon: '⏱️',
-    //       param: ''
-    //     },
-    //     {
-    //       title: 'Notes',
-    //       description: 'Quick note taking',
-    //       icon: '📝',
-    //       param: ''
-    //     }
-    //   ]
-    // },
-    // {
-    //   name: 'Converters',
-    //   tiles: [
-    //     {
-    //       title: 'Unit Converter',
-    //       description: 'Convert between units',
-    //       icon: '📏',
-    //       param: ''
-    //     },
-    //     {
-    //       title: 'Currency',
-    //       description: 'Exchange rates',
-    //       icon: '💱',
-    //       param: ''
-    //     }
-    //   ]
-    // },
-    {
-      name: 'Calculators',
-      tiles: [
-        {
-          title: 'Precious Metals',
-          description: 'Convert weight and type to spot price',
-          icon: '📏',
-          param: 'pm'
-        }
-      ]
-    }
-  ];
+    categories: Category[] = CATEGORIES;
 
     constructor(
         private location: Location,

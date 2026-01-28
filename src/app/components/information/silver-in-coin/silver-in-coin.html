@@ -1,0 +1,140 @@
+<div class="silver-reference">
+  <div class="header">
+    <h2>Silver Coin Reference Guide</h2>
+    <div class="spot-price" *ngIf="spotPrices && !loading && spotPrices.silver > 0">
+      <span class="label">Silver Spot:</span>
+      <span class="price">\${{ spotPrices.silver.toFixed(2) }}/oz</span>
+      <span class="timestamp">{{ spotPrices.timestamp | date:'short' }}</span>
+    </div>
+    <div *ngIf="loading" class="loading">Loading prices...</div>
+    <div *ngIf="!loading && (!spotPrices || spotPrices.silver <= 0)" class="error">
+      Unable to load spot prices. Values will not be displayed.
+    </div>
+  </div>
+
+  <!-- Filter/Search -->
+  <div class="controls">
+    <input type="text" [(ngModel)]="searchTerm" (input)="filterCoins()" placeholder="Search coins..."
+      class="search-input">
+    <select [(ngModel)]="filterPurity" (change)="filterCoins()" class="filter-select">
+      <option value="all">All Silver Content</option>
+      <option value="0.999">99.9% (Bullion)</option>
+      <option value="0.925">92.5% (Sterling)</option>
+      <option value="0.900">90% (US Junk)</option>
+      <option value="0.800">80% (Canadian)</option>
+      <option value="0.400">40% (US Clad)</option>
+      <option value="0.350">35% (War Nickels)</option>
+      <option value="0">No Silver</option>
+    </select>
+  </div>
+
+  <!-- Mobile Card View -->
+  <div class="mobile-view">
+    <div class="coin-card" *ngFor="let coin of filteredCoins">
+      <div class="coin-header">
+        <h3>{{ coin.name }}</h3>
+        <span class="silver-badge" [class.no-silver]="coin.silverPurity === 0">
+          {{ coin.silverPurity * 100 }}% Silver
+        </span>
+      </div>
+      <div class="coin-details">
+        <p class="description">{{ coin.description }}</p>
+        <div class="specs">
+          <div class="spec-row">
+            <span class="label">Weight:</span>
+            <span class="value">{{ coin.weightGrams.toFixed(2) }}g</span>
+          </div>
+          <div class="spec-row" *ngIf="coin.silverPurity > 0">
+            <span class="label">Pure Silver:</span>
+            <span class="value">{{ coin.pureSilverGrams.toFixed(2) }}g ({{ coin.pureSilverToz.toFixed(3) }} oz)</span>
+          </div>
+        </div>
+        <div class="values" *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
+          <div class="value-row spot">
+            <span class="label">Spot Value:</span>
+            <span class="amount">\${{ coin.spotValue.toFixed(2) }}</span>
+          </div>
+          <div class="value-row good">
+            <span class="label">Good Deal (90%):</span>
+            <span class="amount">\${{ coin.value90.toFixed(2) }}</span>
+          </div>
+          <div class="value-row great">
+            <span class="label">Great Deal (80%):</span>
+            <span class="amount">\${{ coin.value80.toFixed(2) }}</span>
+          </div>
+        </div>
+        <div class="no-silver-msg" *ngIf="coin.silverPurity === 0">
+          <em>No silver content - collectible value only</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="desktop-view">
+    <div class="table-wrapper">
+      <table class="coin-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('name')" class="sortable col-name">
+              Coin {{ getSortIcon('name') }}
+            </th>
+            <th class="col-description">Description</th>
+            <th (click)="sortBy('weightGrams')" class="sortable text-right col-weight">
+              Wt (g) {{ getSortIcon('weightGrams') }}
+            </th>
+            <th (click)="sortBy('silverPurity')" class="sortable text-center col-purity">
+              Ag% {{ getSortIcon('silverPurity') }}
+            </th>
+            <th class="text-right col-oz">Toz %</th>
+            <th (click)="sortBy('spotValue')" class="sortable text-right col-value">
+              Spot {{ getSortIcon('spotValue') }}
+            </th>
+            <th class="text-right col-value good-deal">90%</th>
+            <th class="text-right col-value great-deal">80%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let coin of filteredCoins" [class.no-silver-row]="coin.silverPurity === 0">
+            <td class="coin-name">{{ coin.name }}</td>
+            <td class="description">{{ coin.description }}</td>
+            <td class="text-right">{{ coin.weightGrams.toFixed(2) }}</td>
+            <td class="text-center">
+              <span class="silver-badge" [class.no-silver]="coin.silverPurity === 0">
+                {{ (coin.silverPurity * 100).toFixed(1) }}%
+              </span>
+            </td>
+            <td class="text-right">
+              <span *ngIf="coin.silverPurity > 0">{{ coin.pureSilverToz.toFixed(4) }}</span>
+              <span *ngIf="coin.silverPurity === 0" class="no-silver">—</span>
+            </td>
+            <td class="text-right spot-value">
+              <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
+                \${{ coin.spotValue.toFixed(2) }}
+              </span>
+              <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
+                —
+              </span>
+            </td>
+            <td class="text-right good-deal">
+              <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
+                \${{ coin.value90.toFixed(2) }}
+              </span>
+              <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
+                —
+              </span>
+            </td>
+            <td class="text-right great-deal">
+              <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
+                \${{ coin.value80.toFixed(2) }}
+              </span>
+              <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
+                —
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SpotPrices } from '../objects/spot-prices';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 

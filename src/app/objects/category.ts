@@ -1,6 +1,4 @@
-import { Tile } from "./tile";
-
-export interface Category {
+interface Category {
   name: string;
   tiles: Tile[];
 }

@@ -1,4 +1,4 @@
-export interface MetalRow {
+interface MetalRow {
   id: number;
   type: string;
   weight: number;

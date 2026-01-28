@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Tile } from '../../objects/tile';
 import { SettingsService } from '../../services/settings';
 
 @Component({

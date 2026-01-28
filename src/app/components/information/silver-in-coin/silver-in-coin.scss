@@ -1,0 +1,289 @@
+.silver-reference {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.spot-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.spot-price .label {
+  opacity: 0.9;
+}
+
+.spot-price .price {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.spot-price .timestamp {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.loading {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input,
+.filter-select {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* Mobile Card View */
+.mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-view {
+    display: block;
+  }
+
+  .desktop-view {
+    display: none;
+  }
+}
+
+.coin-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.coin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.coin-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.silver-badge {
+  padding: 0.25rem 0.5rem;
+  background: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.silver-badge.no-silver {
+  background: #999;
+}
+
+.coin-details .description {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.specs {
+  margin-bottom: 0.75rem;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.spec-row .label {
+  color: #666;
+}
+
+.spec-row .value {
+  font-weight: 600;
+  color: #333;
+}
+
+.values {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.75rem;
+}
+
+.value-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.value-row.spot {
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.value-row.good .amount {
+  color: #FF9800;
+  font-weight: 600;
+}
+
+.value-row.great .amount {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.no-silver-msg {
+  text-align: center;
+  color: #999;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Desktop Table View */
+.desktop-view {
+  display: block;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+}
+
+.coin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.coin-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.coin-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.coin-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.coin-table th.sortable:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.coin-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.coin-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.coin-table tbody tr.no-silver-row {
+  opacity: 0.6;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.coin-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.description {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.spot-value {
+  font-weight: 600;
+}
+
+.good-deal {
+  color: #FF9800;
+  font-weight: 600;
+}
+
+.great-deal {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.no-silver {
+  color: #999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .coin-table {
+    font-size: 0.9rem;
+  }
+
+  .coin-table th,
+  .coin-table td {
+    padding: 0.75rem 0.5rem;
+  }
+}

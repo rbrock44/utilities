@@ -5,6 +5,10 @@
   @if (this.settingsService.getSelectedTile() === "pm") {
     <app-precious-metals></app-precious-metals>
   }
+
+  @if (this.settingsService.getSelectedTile() === "sic") {
+    <app-silver-in-coin></app-silver-in-coin>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

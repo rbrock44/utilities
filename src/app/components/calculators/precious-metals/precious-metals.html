@@ -30,7 +30,7 @@
     <div class="rows-container">
       <div class="row" *ngFor="let row of goldRows">
         <select [(ngModel)]="row.type" class="type-select">
-          <option *ngFor="let type of goldTypes" [value]="type.name">
+          <option *ngFor="let type of goldMetalTypes" [value]="type.name">
             {{ type.name }}
           </option>
         </select>
@@ -122,7 +122,7 @@
     <div class="rows-container">
       <div class="row" *ngFor="let row of silverRows">
         <select [(ngModel)]="row.type" class="type-select">
-          <option *ngFor="let type of silverTypes" [value]="type.name">
+          <option *ngFor="let type of silverMetalTypes" [value]="type.name">
             {{ type.name }}
           </option>
         </select>

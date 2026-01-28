@@ -1,4 +1,4 @@
-export interface PreciousMetalBreakdown {
+interface PreciousMetalBreakdown {
   type: string;
   weightGrams: number;
   weightToz: number;

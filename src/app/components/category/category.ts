@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TileComponent } from '../tile/tile';
-import { Category } from '../../objects/category';
 
 @Component({
   selector: 'app-category',
