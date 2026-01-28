@@ -69,4 +69,6 @@ export const emptyMetalTotal: MetalTotals = {
     value80: 0
 };
 
+export const ASC: 'asc' = 'asc';
+export const DESC: 'desc' = 'desc';
 export const TROY_OZ_IN_GRAMS: number = 31.1035;

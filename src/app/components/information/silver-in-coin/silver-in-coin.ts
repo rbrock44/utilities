@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { SILVER_COIN_DATABASE } from '../../../constants/constants';
+import { ASC, DESC, SILVER_COIN_DATABASE } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -23,7 +23,7 @@ export class SilverInCoinComponent implements OnInit {
   filterPurity: string = 'all';
   
   sortColumn: string = 'name';
-  sortDirection: 'asc' | 'desc' = 'asc';
+  sortDirection: 'asc' | 'desc' = ASC;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -105,10 +105,10 @@ export class SilverInCoinComponent implements OnInit {
 
   sortBy(column: string) {
     if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      this.sortDirection = this.sortDirection === ASC ? DESC : ASC;
     } else {
       this.sortColumn = column;
-      this.sortDirection = 'asc';
+      this.sortDirection = ASC;
     }
     this.sortCoins();
   }
@@ -123,14 +123,14 @@ export class SilverInCoinComponent implements OnInit {
         bVal = bVal.toLowerCase();
       }
       
-      if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
-      if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
+      if (aVal < bVal) return this.sortDirection === ASC ? -1 : 1;
+      if (aVal > bVal) return this.sortDirection === ASC ? 1 : -1;
       return 0;
     });
   }
 
   getSortIcon(column: string): string {
     if (this.sortColumn !== column) return '⇅';
-    return this.sortDirection === 'asc' ? '↑' : '↓';
+    return this.sortDirection === ASC ? '↑' : '↓';
   }
 }

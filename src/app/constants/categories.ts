@@ -45,7 +45,7 @@ export const CATEGORIES: Category[] = [
             {
                 title: 'Precious Metals',
                 description: 'Convert weight and type to spot price',
-                icon: '📏',
+                icon: '🥇🥈',
                 param: 'pm'
             }
         ]
@@ -56,7 +56,7 @@ export const CATEGORIES: Category[] = [
             {
                 title: 'Silver in Coins',
                 description: 'Show silver content and spot price of coins',
-                icon: '📏',
+                icon: '🥈',
                 param: 'sic'
             }
         ]

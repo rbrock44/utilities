@@ -110,7 +110,7 @@
             </td>
             <td class="text-right spot-value">
               <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
-                \${{ coin.spotValue.toFixed(2) }}
+                ${{ coin.spotValue.toFixed(2) }}
               </span>
               <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
                 —
@@ -118,7 +118,7 @@
             </td>
             <td class="text-right good-deal">
               <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
-                \${{ coin.value90.toFixed(2) }}
+                ${{ coin.value90.toFixed(2) }}
               </span>
               <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
                 —
@@ -126,7 +126,7 @@
             </td>
             <td class="text-right great-deal">
               <span *ngIf="spotPrices && spotPrices.silver > 0 && coin.silverPurity > 0">
-                \${{ coin.value80.toFixed(2) }}
+                ${{ coin.value80.toFixed(2) }}
               </span>
               <span *ngIf="!spotPrices || spotPrices.silver <= 0 || coin.silverPurity === 0" class="no-silver">
                 —
