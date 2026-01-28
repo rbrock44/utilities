@@ -39,8 +39,8 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'British Sixpence', weightGrams: 2.83, silverPurity: 0.925, description: 'Pre-1947' },
 
     // Other
-    { name: 'Generic Silver Round', weightGrams: 31.103, silverPurity: 0.999, description: '1 oz' },
-    { name: '90% Junk Silver (per $1 face)', weightGrams: 25.00, silverPurity: 0.900, description: 'US coins' },
+    // { name: 'Generic Silver Round', weightGrams: 31.103, silverPurity: 0.999, description: '1 oz' },
+    // { name: '90% Junk Silver (per $1 face)', weightGrams: 25.00, silverPurity: 0.900, description: 'US coins' },
 ];
 
 export const goldTypes: MetalType[] = [
