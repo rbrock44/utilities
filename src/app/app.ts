@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, signal } from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { TileGridComponent } from './components/tile-grid/tile-grid';
@@ -25,6 +25,7 @@ export class App {
 
   constructor(
     public settingsService: SettingsService,
+    private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
   ) { }
 
@@ -35,6 +36,7 @@ export class App {
       if (tileParam !== null && tileParam !== undefined && tileParam !== "") {
         console.log('GOOD PATH')
         this.settingsService.setSelectedTile(tileParam);
+        this.cdr.markForCheck();
       } 
     });
   }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SpotPrices } from '../../../objects/spot-prices';
 import { MetalRow } from '../../../objects/metal-row';
@@ -72,7 +72,10 @@ export class PreciousMetalsComponent implements OnInit {
   private nextGoldId = 2;
   private nextSilverId = 2;
 
-  constructor(private spotPriceService: SpotPriceService) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private spotPriceService: SpotPriceService
+  ) { }
 
   ngOnInit() {
     this.loadSpotPrices();
@@ -82,12 +85,15 @@ export class PreciousMetalsComponent implements OnInit {
     this.loading = true;
     this.spotPriceService.getSpotPrices().subscribe({
       next: (prices) => {
+        console.log('SPOT PRICE: ', prices)
         this.spotPrices = prices;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error loading spot prices:', error);
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
