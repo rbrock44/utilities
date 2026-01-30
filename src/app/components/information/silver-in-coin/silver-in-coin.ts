@@ -138,8 +138,4 @@ export class SilverInCoinComponent implements OnInit {
   shouldShowValue(coin: CoinSpec): boolean {
     return !!this.spotPrices && this.spotPrices.silver > 0 && coin.purity > 0;
   }
-
-  shouldNotShowValue(coin: CoinSpec): boolean {
-    return !this.spotPrices || this.spotPrices.silver <= 0 || coin.purity === 0;
-  }
 }
