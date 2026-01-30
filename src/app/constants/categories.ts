@@ -45,7 +45,7 @@ export const CATEGORIES: Category[] = [
             {
                 title: 'Precious Metals',
                 description: 'Convert weight and type to spot price',
-                icon: '🥇🥈',
+                icon: '⚖',
                 param: 'pm'
             }
         ]
