@@ -1,17 +1,17 @@
-<div class="silver-reference">
+<div class="gold-reference">
   <div class="header">
-    <h2>Silver Coin Reference Guide</h2>
-    @if (spotPrices && !loading && spotPrices.silver > 0) {
+    <h2>Gold Coin Reference Guide</h2>
+    @if (spotPrices && !loading && spotPrices.gold > 0) {
       <div class="spot-price">
-        <span class="label">Silver Spot:</span>
-        <span class="price">${{ spotPrices.silver.toFixed(2) }}/toz</span>
+        <span class="label">Gold Spot:</span>
+        <span class="price">${{ spotPrices.gold.toFixed(2) }}/toz</span>
         <span class="timestamp">{{ spotPrices.timestamp | date:'short' }}</span>
       </div>
     }
     @if (loading) {
       <div class="loading">Loading prices...</div>
     }
-    @if (!loading && (!spotPrices || spotPrices.silver <= 0)) {
+    @if (!loading && (!spotPrices || spotPrices.gold <= 0)) {
       <div class="error">
         Unable to load spot prices. Values will not be displayed.
       </div>
@@ -23,14 +23,14 @@
     <input type="text" [(ngModel)]="searchTerm" (input)="filterCoins()" placeholder="Search coins..."
       class="search-input">
     <select [(ngModel)]="filterPurity" (change)="filterCoins()" class="filter-select">
-      <option value="all">All Silver Content</option>
+      <option value="all">All Gold Content</option>
       <option value="0.999">99.9% (Bullion)</option>
       <option value="0.925">92.5% (Sterling)</option>
       <option value="0.900">90% (US Junk)</option>
       <option value="0.800">80% (Canadian)</option>
       <option value="0.400">40% (US Clad)</option>
       <option value="0.350">35% (War Nickels)</option>
-      <option value="0">No Silver</option>
+      <option value="0">No Gold</option>
     </select>
   </div>
 
@@ -39,8 +39,8 @@
     <div class="coin-card" *ngFor="let coin of filteredCoins">
       <div class="coin-header">
         <h3>{{ coin.name }}</h3>
-        <span class="silver-badge" [class.no-silver]="coin.purity === 0">
-          {{ coin.purity * 100 }}% Silver
+        <span class="gold-badge" [class.no-gold]="coin.purity === 0">
+          {{ coin.purity * 100 }}% Gold
         </span>
       </div>
       <div class="coin-details">
@@ -52,12 +52,12 @@
           </div>
           @if (coin.purity > 0) {
             <div class="spec-row">
-              <span class="label">Pure Silver:</span>
+              <span class="label">Pure Gold:</span>
               <span class="value">{{ coin.pureGrams.toFixed(2) }}g ({{ coin.pureToz.toFixed(3) }} toz)</span>
             </div>
           } 
         </div>
-        @if (spotPrices && spotPrices.silver > 0 && coin.purity > 0) {
+        @if (spotPrices && spotPrices.gold > 0 && coin.purity > 0) {
           <div class="values">
             <div class="value-row spot">
               <span class="label">Spot Value:</span>
@@ -74,8 +74,8 @@
           </div>
         }
         @if (coin.purity === 0) {
-          <div class="no-silver-msg">
-            <em>No silver content - collectible value only</em>
+          <div class="no-gold-msg">
+            <em>No gold content - collectible value only</em>
           </div>
         }  
       </div>
@@ -107,12 +107,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let coin of filteredCoins" [class.no-silver-row]="coin.purity === 0">
+          <tr *ngFor="let coin of filteredCoins" [class.no-gold-row]="coin.purity === 0">
             <td class="coin-name">{{ coin.name }}</td>
             <td class="description">{{ coin.description }}</td>
             <td class="text-right">{{ coin.weightGrams.toFixed(2) }}</td>
             <td class="text-center">
-              <span class="silver-badge" [class.no-silver]="coin.purity === 0">
+              <span class="gold-badge" [class.no-gold]="coin.purity === 0">
                 {{ (coin.purity * 100).toFixed(1) }}%
               </span>
             </td>
@@ -121,7 +121,7 @@
                 <span>{{ coin.pureToz.toFixed(4) }}</span>
               }
               @if (coin.purity === 0) {
-                <span class="no-silver">—</span>
+                <span class="no-gold">—</span>
               }    
             </td>
             <td class="text-right spot-value">
@@ -130,7 +130,7 @@
                   ${{ coin.spotValue.toFixed(2) }}
                 </span>
               } @else {
-                <span class="no-silver">
+                <span class="no-gold">
                   —
                 </span>
               }
@@ -141,7 +141,7 @@
                   ${{ coin.value90.toFixed(2) }}
                 </span>
               } @else {
-                <span class="no-silver">
+                <span class="no-gold">
                   —
                 </span>
               }
@@ -152,7 +152,7 @@
                   ${{ coin.value80.toFixed(2) }}
                 </span>
               } @else {
-                <span class="no-silver">
+                <span class="no-gold">
                   —
                 </span>
               }

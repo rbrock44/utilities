@@ -54,11 +54,17 @@ export const CATEGORIES: Category[] = [
         name: 'Information',
         tiles: [
             {
+                title: 'Gold in Coins',
+                description: 'Show gold content and spot price of coins',
+                icon: '🥇',
+                param: 'gic'
+            },
+            {
                 title: 'Silver in Coins',
                 description: 'Show silver content and spot price of coins',
                 icon: '🥈',
                 param: 'sic'
-            }
+            },
         ]
     }
 ];

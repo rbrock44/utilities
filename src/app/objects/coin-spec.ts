@@ -1,6 +1,6 @@
 interface CoinSpec {
   name: string;
   weightGrams: number;
-  silverPurity: number; // decimal (e.g., 0.900 for 90% silver)
+  purity: number; // decimal (e.g., 0.900 for 90% of metal (gold/silver))
   description?: string;
 }

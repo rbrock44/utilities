@@ -9,6 +9,10 @@
   @if (this.settingsService.getSelectedTile() === "sic") {
     <app-silver-in-coin></app-silver-in-coin>
   }
+
+  @if (this.settingsService.getSelectedTile() === "gic") {
+    <app-gold-in-coin></app-gold-in-coin>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

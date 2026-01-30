@@ -1,19 +1,19 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ASC, DESC } from '../../../constants/constants';
-import { SILVER_COIN_DATABASE } from '../../../constants/coins';
 import { SpotPriceService } from '../../../services/spot-price';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { GOLD_COIN_DATABASE } from '../../../constants/coins';
 
 @Component({
-  selector: 'app-silver-in-coin',
+  selector: 'app-gold-in-coin',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './silver-in-coin.html',
-  styleUrl: './silver-in-coin.scss',
+  templateUrl: './gold-in-coin.html',
+  styleUrl: './gold-in-coin.scss',
 })
-export class SilverInCoinComponent implements OnInit {
-  coinDatabase: CoinSpec[] = SILVER_COIN_DATABASE;
+export class GoldInCoinComponent implements OnInit {
+  coinDatabase: CoinSpec[] = GOLD_COIN_DATABASE;
   displayCoins: CoinDisplay[] = [];
   filteredCoins: CoinDisplay[] = [];
   
@@ -64,7 +64,7 @@ export class SilverInCoinComponent implements OnInit {
       let value80 = 0;
       
       if (this.spotPrices && coin.purity > 0) {
-        spotValue = pureToz * this.spotPrices.silver;
+        spotValue = pureToz * this.spotPrices.gold;
         value90 = spotValue * 0.90;
         value80 = spotValue * 0.80;
       }
@@ -136,10 +136,10 @@ export class SilverInCoinComponent implements OnInit {
   }
 
   shouldShowValue(coin: CoinSpec): boolean {
-    return !!this.spotPrices && this.spotPrices.silver > 0 && coin.purity > 0;
+    return !!this.spotPrices && this.spotPrices.gold > 0 && coin.purity > 0;
   }
 
   shouldNotShowValue(coin: CoinSpec): boolean {
-    return !this.spotPrices || this.spotPrices.silver <= 0 || coin.purity === 0;
+    return !this.spotPrices || this.spotPrices.gold <= 0 || coin.purity === 0;
   }
 }

@@ -1,6 +1,6 @@
 interface CoinDisplay extends CoinSpec {
-  pureSilverGrams: number;
-  pureSilverToz: number;
+  pureGrams: number;
+  pureToz: number;
   spotValue: number;
   value90: number;
   value80: number;

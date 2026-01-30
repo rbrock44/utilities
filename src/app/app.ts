@@ -6,17 +6,19 @@ import { HeaderComponent } from './components/header/header';
 import { SettingsService } from './services/settings';
 import { PreciousMetalsComponent } from './components/calculators/precious-metals/precious-metals';
 import { SilverInCoinComponent } from "./components/information/silver-in-coin/silver-in-coin";
+import { GoldInCoinComponent } from "./components/information/gold-in-coin/gold-in-coin";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     HeaderComponent,
-    TileGridComponent,
+    GoldInCoinComponent,
     PreciousMetalsComponent,
+    SilverInCoinComponent,
+    TileGridComponent,
     RouterOutlet,
     CommonModule,
-    SilverInCoinComponent
 ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -40,6 +42,4 @@ export class App {
       } 
     });
   }
-
-  
 }
