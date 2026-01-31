@@ -116,6 +116,8 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'British Shilling', weightGrams: 5.66, purity: 0.925, description: 'Pre-1947' },
     { name: 'British Sixpence', weightGrams: 2.83, purity: 0.925, description: 'Pre-1947' },
 
+    { name: 'Mexican Libertad Set (6 coins)', weightGrams: 121.302, purity: 0.999, description: '2 oz + 1 oz + 1/2 oz + 1/4 oz + 1/10 oz + 1/20 oz' },
+    { name: 'Mexican Libertad Set (7 coins)', weightGrams: 276.817, purity: 0.999, description: '5 oz + 2 oz + 1 oz + 1/2 oz + 1/4 oz + 1/10 oz + 1/20 oz' },
     // Other
     // { name: 'Generic Silver Round', weightGrams: 31.103, purity: 0.999, description: '1 oz' },
     // { name: '90% Junk Silver (per $1 face)', weightGrams: 25.00, purity: 0.900, description: 'US coins' },
