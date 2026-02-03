@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SpotPriceService } from '../../../services/spot-price';
+import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
 import { emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
 
 @Component({
   selector: 'app-precious-metals',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PreciousMetalBreakdownComponent],
   templateUrl: './precious-metals.html',
   styleUrl: './precious-metals.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,7 +34,8 @@ export class PreciousMetalsComponent implements OnInit {
   grandTotals = {
     spotValue: 0,
     value90: 0,
-    value80: 0
+    value80: 0,
+    value70: 0
   };
 
   goldMetalTypes: MetalType[] = goldTypes;
@@ -128,7 +130,8 @@ export class PreciousMetalsComponent implements OnInit {
     this.grandTotals = {
       spotValue: this.goldTotals.spotValue + this.silverTotals.spotValue,
       value90: this.goldTotals.value90 + this.silverTotals.value90,
-      value80: this.goldTotals.value80 + this.silverTotals.value80
+      value80: this.goldTotals.value80 + this.silverTotals.value80,
+      value70: this.goldTotals.value70 + this.silverTotals.value70
     };
   }
 }

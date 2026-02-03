@@ -6,4 +6,5 @@ interface MetalTotals {
     spotValue: number;
     value90: number;
     value80: number;  
+    value70: number;  
 };

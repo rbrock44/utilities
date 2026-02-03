@@ -6,7 +6,8 @@
     </button>
   </div>
 
-  <div class="spot-prices" *ngIf="spotPrices">
+  @if (spotPrices) {
+  <div class="spot-prices">
     <div class="spot-price-card">
       <span class="metal-name">Gold</span>
       <span class="price">${{ spotPrices.gold.toFixed(2) }}/oz</span>
@@ -19,6 +20,7 @@
       Updated: {{ spotPrices.timestamp | date:'short' }}
     </div>
   </div>
+  }
 
   <!-- GOLD SECTION -->
   <div class="metal-section">
@@ -35,81 +37,22 @@
           </option>
         </select>
 
-        <input 
-          type="number" 
-          [(ngModel)]="row.weight" 
-          placeholder="Weight"
-          class="weight-input"
-          step="0.01"
-          min="0">
+        <input type="number" [(ngModel)]="row.weight" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
         <select [(ngModel)]="row.unit" class="unit-select">
           <option value="grams">g</option>
           <option value="toz">oz t</option>
         </select>
 
-        <button 
-          class="remove-btn" 
-          (click)="removeGoldRow(row.id)"
-          [disabled]="goldRows.length === 1">
+        <button class="remove-btn" (click)="removeGoldRow(row.id)" [disabled]="goldRows.length === 1">
           ×
         </button>
       </div>
     </div>
 
-    <!-- Gold Breakdowns -->
-    <div class="breakdowns" *ngIf="goldBreakdowns.length > 0">
-      <h4>Gold Breakdown</h4>
-      <div class="breakdown-item" *ngFor="let item of goldBreakdowns">
-        <div class="breakdown-header">{{ item.type }}</div>
-        <div class="breakdown-details">
-          <div class="detail-row">
-            <span>Total Weight:</span>
-            <span>{{ item.weightGrams.toFixed(2) }}g ({{ item.weightToz.toFixed(3) }} oz t)</span>
-          </div>
-          <div class="detail-row">
-            <span>Pure Weight:</span>
-            <span>{{ item.pureWeightGrams.toFixed(2) }}g ({{ item.pureWeightToz.toFixed(3) }} oz t)</span>
-          </div>
-          <div class="detail-row highlight">
-            <span>Spot Value:</span>
-            <span>${{ item.spotValue.toFixed(2) }}</span>
-          </div>
-          <div class="detail-row">
-            <span>90% Value:</span>
-            <span>${{ item.value90.toFixed(2) }}</span>
-          </div>
-          <div class="detail-row">
-            <span>80% Value:</span>
-            <span>${{ item.value80.toFixed(2) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="totals-card gold-totals">
-        <h5>Gold Totals</h5>
-        <div class="detail-row">
-          <span>Total Weight:</span>
-          <span>{{ goldTotals.totalWeightGrams.toFixed(2) }}g ({{ goldTotals.totalWeightToz.toFixed(3) }} oz t)</span>
-        </div>
-        <div class="detail-row">
-          <span>Pure Weight:</span>
-          <span>{{ goldTotals.totalPureGrams.toFixed(2) }}g ({{ goldTotals.totalPureToz.toFixed(3) }} oz t)</span>
-        </div>
-        <div class="detail-row highlight">
-          <span>Spot Value:</span>
-          <span>${{ goldTotals.spotValue.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row">
-          <span>90% Value:</span>
-          <span>${{ goldTotals.value90.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row">
-          <span>80% Value:</span>
-          <span>${{ goldTotals.value80.toFixed(2) }}</span>
-        </div>
-      </div>
-    </div>
+    <app-precious-metal-breakdown [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
+      totalsTitle="Gold Totals" totalsClass="gold-totals">
+    </app-precious-metal-breakdown>
   </div>
 
   <!-- SILVER SECTION -->
@@ -127,81 +70,22 @@
           </option>
         </select>
 
-        <input 
-          type="number" 
-          [(ngModel)]="row.weight" 
-          placeholder="Weight"
-          class="weight-input"
-          step="0.01"
-          min="0">
+        <input type="number" [(ngModel)]="row.weight" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
         <select [(ngModel)]="row.unit" class="unit-select">
           <option value="grams">g</option>
           <option value="toz">oz t</option>
         </select>
 
-        <button 
-          class="remove-btn" 
-          (click)="removeSilverRow(row.id)"
-          [disabled]="silverRows.length === 1">
+        <button class="remove-btn" (click)="removeSilverRow(row.id)" [disabled]="silverRows.length === 1">
           ×
         </button>
       </div>
     </div>
 
-    <!-- Silver Breakdowns -->
-    <div class="breakdowns" *ngIf="silverBreakdowns.length > 0">
-      <h4>Silver Breakdown</h4>
-      <div class="breakdown-item" *ngFor="let item of silverBreakdowns">
-        <div class="breakdown-header">{{ item.type }}</div>
-        <div class="breakdown-details">
-          <div class="detail-row">
-            <span>Total Weight:</span>
-            <span>{{ item.weightGrams.toFixed(2) }}g ({{ item.weightToz.toFixed(3) }} oz t)</span>
-          </div>
-          <div class="detail-row">
-            <span>Pure Weight:</span>
-            <span>{{ item.pureWeightGrams.toFixed(2) }}g ({{ item.pureWeightToz.toFixed(3) }} oz t)</span>
-          </div>
-          <div class="detail-row highlight">
-            <span>Spot Value:</span>
-            <span>${{ item.spotValue.toFixed(2) }}</span>
-          </div>
-          <div class="detail-row">
-            <span>90% Value:</span>
-            <span>${{ item.value90.toFixed(2) }}</span>
-          </div>
-          <div class="detail-row">
-            <span>80% Value:</span>
-            <span>${{ item.value80.toFixed(2) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="totals-card silver-totals">
-        <h5>Silver Totals</h5>
-        <div class="detail-row">
-          <span>Total Weight:</span>
-          <span>{{ silverTotals.totalWeightGrams.toFixed(2) }}g ({{ silverTotals.totalWeightToz.toFixed(3) }} oz t)</span>
-        </div>
-        <div class="detail-row">
-          <span>Pure Weight:</span>
-          <span>{{ silverTotals.totalPureGrams.toFixed(2) }}g ({{ silverTotals.totalPureToz.toFixed(3) }} oz t)</span>
-        </div>
-        <div class="detail-row highlight">
-          <span>Spot Value:</span>
-          <span>${{ silverTotals.spotValue.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row">
-          <span>90% Value:</span>
-          <span>${{ silverTotals.value90.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row">
-          <span>80% Value:</span>
-          <span>${{ silverTotals.value80.toFixed(2) }}</span>
-        </div>
-      </div>
-    </div>
+    <app-precious-metal-breakdown [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
+      totalsTitle="Silver Totals" totalsClass="silver-totals">
+    </app-precious-metal-breakdown>
   </div>
 
   <!-- CALCULATE BUTTON -->
@@ -210,6 +94,7 @@
   </button>
 
   <!-- GRAND TOTALS -->
+  @if (grandTotals.spotValue > 0) {
   <div class="grand-totals" *ngIf="grandTotals.spotValue > 0">
     <h3>Combined Totals</h3>
     <div class="detail-row highlight large">
@@ -224,5 +109,10 @@
       <span>Total 80% Value:</span>
       <span>${{ grandTotals.value80.toFixed(2) }}</span>
     </div>
+    <div class="detail-row large">
+      <span>Total 70% Value:</span>
+      <span>${{ grandTotals.value70.toFixed(2) }}</span>
+    </div>
   </div>
+  }
 </div>

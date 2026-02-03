@@ -21,7 +21,8 @@ export const emptyMetalTotal: MetalTotals = {
     totalPureToz: 0,
     spotValue: 0,
     value90: 0,
-    value80: 0
+    value80: 0,
+    value70: 0,
 };
 
 export const ASC: 'asc' = 'asc';

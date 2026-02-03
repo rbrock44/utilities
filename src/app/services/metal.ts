@@ -32,6 +32,7 @@ export class MetalService {
       const spotValue = pureWeightToz * spotPriceForMetal;
       const value90 = spotValue * 0.9;
       const value80 = spotValue * 0.8;
+      const value70 = spotValue * 0.7;
 
       breakdowns.push({
         type: row.type,
@@ -58,7 +59,8 @@ export class MetalService {
       totalPureToz,
       spotValue: totalPureToz * spotPriceForMetal,
       value90: totalPureToz * spotPriceForMetal * 0.9,
-      value80: totalPureToz * spotPriceForMetal * 0.8
+      value80: totalPureToz * spotPriceForMetal * 0.8,
+      value70: totalPureToz * spotPriceForMetal * 0.7,
     };
 
     return {
