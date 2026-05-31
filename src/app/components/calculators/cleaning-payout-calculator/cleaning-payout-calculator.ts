@@ -3,38 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CleaningScheduleService } from '../../../services/cleaning-schedule';
 
-type BillingMode = 'perMeeting' | 'perHour';
-
-type MeetingViewModel = Meeting & {
-  isPaid: boolean;
-  durationHours: number;
-  parsedDate: Date | null;
-};
-
-type TitleRateConfig = {
-  amount: number;
-  billingMode: BillingMode;
-};
-
-type TitleSummary = {
-  title: string;
-  meetingCount: number;
-  totalHours: number;
-  paidMeetingCount: number;
-  totalOwed: number;
-  totalPaid: number;
-  remainingBalance: number;
-};
-
-type PersonSummary = {
-  person: string;
-  titleSummaries: TitleSummary[];
-  meetings: MeetingViewModel[];
-  totalOwed: number;
-  totalPaid: number;
-  remainingBalance: number;
-};
-
 @Component({
   selector: 'app-cleaning-payout-calculator',
   standalone: true,
@@ -76,7 +44,14 @@ export class CleaningPayoutCalculatorComponent implements OnInit {
 
   titleRateConfigs: Record<string, TitleRateConfig> = {
     // TODO: Fill out your title defaults here.
-    Bo: { amount: 100, billingMode: 'perMeeting' }
+    Bo: {
+      amount: 100,
+      billingMode: 'perMeeting',
+      // datedRates: [
+      //   // Supports single effective date or date range overrides.
+      //   { startDate: '2026-06-01', amount: 120, billingMode: 'perMeeting' }
+      // ]
+    }
   };
 
   grandTotals = {
@@ -178,21 +153,17 @@ export class CleaningPayoutCalculatorComponent implements OnInit {
       for (const [title, titleMeetings] of titleMap.entries()) {
         this.ensureSingleTitleConfig(title);
 
-        const rateConfig = this.titleRateConfigs[title];
         const totalHours = titleMeetings.reduce((total, meeting) => total + meeting.durationHours, 0);
         const paidMeetings = titleMeetings.filter((meeting) => meeting.isPaid);
         const paidMeetingCount = paidMeetings.length;
-        const paidHours = paidMeetings.reduce((total, meeting) => total + meeting.durationHours, 0);
 
-        const totalOwed =
-          rateConfig.billingMode === 'perMeeting'
-            ? titleMeetings.length * rateConfig.amount
-            : totalHours * rateConfig.amount;
+        const totalOwed = titleMeetings.reduce((sum, meeting) => {
+          return sum + this.getMeetingPayoutAmount(title, meeting);
+        }, 0);
 
-        const totalPaid =
-          rateConfig.billingMode === 'perMeeting'
-            ? paidMeetingCount * rateConfig.amount
-            : paidHours * rateConfig.amount;
+        const totalPaid = paidMeetings.reduce((sum, meeting) => {
+          return sum + this.getMeetingPayoutAmount(title, meeting);
+        }, 0);
 
         titleSummaries.push({
           title,
@@ -433,6 +404,76 @@ export class CleaningPayoutCalculatorComponent implements OnInit {
         billingMode: 'perMeeting'
       };
     }
+  }
+
+  private getMeetingPayoutAmount(title: string, meeting: MeetingViewModel): number {
+    const resolvedRate = this.resolveRateForMeeting(title, meeting);
+
+    if (resolvedRate.billingMode === 'perMeeting') {
+      return resolvedRate.amount;
+    }
+
+    return meeting.durationHours * resolvedRate.amount;
+  }
+
+  private resolveRateForMeeting(
+    title: string,
+    meeting: MeetingViewModel
+  ): { amount: number; billingMode: BillingMode } {
+    const titleConfig = this.titleRateConfigs[title];
+    const defaultRate = {
+      amount: titleConfig.amount,
+      billingMode: titleConfig.billingMode
+    };
+
+    if (!meeting.parsedDate || !titleConfig.datedRates || titleConfig.datedRates.length === 0) {
+      return defaultRate;
+    }
+
+    const meetingTime = meeting.parsedDate.getTime();
+    let bestMatch: { amount: number; billingMode: BillingMode; startTime: number } | null = null;
+
+    for (const datedRate of titleConfig.datedRates) {
+      const startTime = this.toDateBoundaryTime(datedRate.startDate, false);
+      const endTime = this.toDateBoundaryTime(datedRate.endDate, true);
+
+      if (meetingTime < startTime || meetingTime > endTime) {
+        continue;
+      }
+
+      const candidate = {
+        amount: datedRate.amount,
+        billingMode: datedRate.billingMode ?? defaultRate.billingMode,
+        startTime
+      };
+
+      if (!bestMatch || candidate.startTime > bestMatch.startTime) {
+        bestMatch = candidate;
+      }
+    }
+
+    if (!bestMatch) {
+      return defaultRate;
+    }
+
+    return {
+      amount: bestMatch.amount,
+      billingMode: bestMatch.billingMode
+    };
+  }
+
+  private toDateBoundaryTime(dateValue: string | undefined, endOfDay: boolean): number {
+    if (!dateValue || dateValue.trim() === '') {
+      return endOfDay ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    }
+
+    const normalized = endOfDay ? `${dateValue}T23:59:59.999` : `${dateValue}T00:00:00.000`;
+    const parsed = new Date(normalized);
+    if (Number.isNaN(parsed.getTime())) {
+      return endOfDay ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    }
+
+    return parsed.getTime();
   }
 
   private compareMeetings(a: MeetingViewModel, b: MeetingViewModel): number {
