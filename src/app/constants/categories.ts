@@ -53,6 +53,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Calculate missing triangle side length',
                 icon: '📐',
                 param: 'rac'
+            },
+            {
+                title: 'Divider Spacing Calculator',
+                description: 'Equal spacing for divider material along a total width',
+                icon: '📏',
+                param: 'dsc'
             }
         ]
     },

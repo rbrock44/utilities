@@ -21,6 +21,10 @@
   @if (this.settingsService.getSelectedTile() === "cpc") {
     <app-cleaning-payout-calculator></app-cleaning-payout-calculator>
   }
+
+  @if (this.settingsService.getSelectedTile() === "dsc") {
+    <app-divider-spacing-calculator></app-divider-spacing-calculator>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

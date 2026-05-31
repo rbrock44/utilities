@@ -1,0 +1,175 @@
+<section class="calculator-container">
+  <h2>Divider Spacing Calculator</h2>
+  <p class="description">
+    Enter an overall width, divider material width, divider count, and whether dividers should be flush to each end.
+  </p>
+
+  <div class="inputs-grid">
+    <label for="overallWidthInput">
+      Overall Width
+      <input
+        id="overallWidthInput"
+        type="number"
+        min="0.01"
+        step="0.01"
+        [(ngModel)]="overallWidth"
+      />
+    </label>
+
+    <label for="materialWidthInput">
+      Divider Material Width
+      <input
+        id="materialWidthInput"
+        type="number"
+        min="0.01"
+        step="0.01"
+        [(ngModel)]="materialWidth"
+      />
+    </label>
+
+    <label for="dividerCountInput">
+      Divider Count
+      <input
+        id="dividerCountInput"
+        type="number"
+        min="1"
+        step="1"
+        [(ngModel)]="dividerCount"
+      />
+    </label>
+  </div>
+
+  <label class="toggle-row" for="includeEndsInput">
+    <input
+      id="includeEndsInput"
+      type="checkbox"
+      [(ngModel)]="includeEnds"
+    />
+    Flush dividers at both ends
+  </label>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (!errorMessage && spacingResult; as result) {
+    <div class="results" aria-live="polite">
+      <div class="illustration" aria-label="Divider spacing illustration">
+        <svg viewBox="0 0 560 180" role="img">
+          <title>Divider spacing layout</title>
+
+          <rect x="20" y="50" width="520" height="80" class="frame" />
+
+          @for (placement of svgDividerPlacements; track placement.index) {
+            <rect
+              [attr.x]="placement.start"
+              y="50"
+              [attr.width]="svgMaterialWidth"
+              height="80"
+              class="divider"
+            />
+
+            <line
+              [attr.x1]="placement.start"
+              y1="40"
+              [attr.x2]="placement.start"
+              y2="48"
+              class="start-tick"
+            />
+
+            <text
+              [attr.x]="placement.start"
+              y="35"
+              text-anchor="middle"
+              class="start-tick-label"
+            >
+              {{ formatNumber(viewDividerPlacements[$index].start) }}
+            </text>
+          }
+
+          @if (svgDividerPlacements.length > 0) {
+            <line
+              [attr.x1]="firstDividerStart"
+              y1="86"
+              [attr.x2]="firstDividerEnd"
+              y2="86"
+              class="dimension-line material"
+            />
+            <text [attr.x]="firstDividerCenter" y="80" text-anchor="middle" class="dimension-label">
+              Material: {{ materialMeasurementLabel }}
+            </text>
+          }
+
+          @if (showGapMeasurement) {
+            <line
+              [attr.x1]="gapStart"
+              y1="108"
+              [attr.x2]="gapEnd"
+              y2="108"
+              class="dimension-line gap"
+            />
+            <text [attr.x]="gapCenter" y="102" text-anchor="middle" class="dimension-label">
+              Gap: {{ gapMeasurementLabel }}
+            </text>
+          }
+
+          <line x1="20" y1="140" x2="540" y2="140" class="axis" />
+          <text x="18" y="158" class="axis-label">0</text>
+          <text x="516" y="158" class="axis-label">{{ formatNumber(overallWidth ?? 0) }}</text>
+        </svg>
+      </div>
+
+      <div class="result-row">
+        <span>Clear spacing between dividers:</span>
+        <strong>{{ formatNumber(result.clearGap) }}</strong>
+      </div>
+
+      @if (!includeEnds) {
+        <div class="result-row">
+          <span>Outer edge spacing:</span>
+          <strong>{{ formatNumber(result.clearGap) }}</strong>
+        </div>
+      }
+
+      @if (includeEnds && dividerCount === 1) {
+        <p class="note">
+          With a single divider, flush-at-both-ends is not possible. The divider is placed at the start edge.
+        </p>
+      }
+
+      <button
+        type="button"
+        class="table-toggle"
+        (click)="togglePlacementTable()"
+        [attr.aria-expanded]="isPlacementTableExpanded"
+      >
+        {{ isPlacementTableExpanded ? 'Hide placement table' : 'Show placement table' }}
+      </button>
+
+      @if (isPlacementTableExpanded) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Start</th>
+                <th>Center</th>
+                <th>End</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (placement of viewDividerPlacements; track placement.index) {
+                <tr>
+                  <td>{{ placement.index }}</td>
+                  <td>{{ formatNumber(placement.start) }}</td>
+                  <td>{{ formatNumber(placement.center) }}</td>
+                  <td>{{ formatNumber(placement.end) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</section>

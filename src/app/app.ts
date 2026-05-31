@@ -9,6 +9,7 @@ import { SilverInCoinComponent } from "./components/information/silver-in-coin/s
 import { GoldInCoinComponent } from "./components/information/gold-in-coin/gold-in-coin";
 import { RightAngleCalculatorComponent } from './components/calculators/right-angle-calculator/right-angle-calculator';
 import { CleaningPayoutCalculatorComponent } from './components/calculators/cleaning-payout-calculator/cleaning-payout-calculator';
+import { DividerSpacingCalculatorComponent } from './components/calculators/divider-spacing-calculator/divider-spacing-calculator';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ import { CleaningPayoutCalculatorComponent } from './components/calculators/clea
     PreciousMetalsComponent,
     RightAngleCalculatorComponent,
     CleaningPayoutCalculatorComponent,
+    DividerSpacingCalculatorComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,
