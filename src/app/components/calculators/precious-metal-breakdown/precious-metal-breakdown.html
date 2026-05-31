@@ -1,61 +1,32 @@
 @if (breakdowns && breakdowns.length > 0) {
 <div class="breakdowns">
   <h4>{{ title }}</h4>
-  <div class="breakdown-item" *ngFor="let item of breakdowns">
-    <div class="breakdown-header">{{ item.type }}</div>
-    <div class="breakdown-details">
-      <div class="detail-row">
-        <span>Total Weight:</span>
-        <span>{{ item.weightGrams.toFixed(2) }}g ({{ item.weightToz.toFixed(3) }} oz t)</span>
-      </div>
-      <div class="detail-row">
-        <span>Pure Weight:</span>
-        <span>{{ item.pureWeightGrams.toFixed(2) }}g ({{ item.pureWeightToz.toFixed(3) }} oz t)</span>
-      </div>
-      <div class="detail-row highlight">
-        <span>Spot Value:</span>
-        <span>${{ item.spotValue.toFixed(2) }}</span>
-      </div>
-      <div class="detail-row">
-        <span>90% Value:</span>
-        <span>${{ item.value90.toFixed(2) }}</span>
-      </div>
-      <div class="detail-row">
-        <span>80% Value:</span>
-        <span>${{ item.value80.toFixed(2) }}</span>
-      </div>
-      <div class="detail-row">
-        <span>70% Value:</span>
-        <span>${{ totals.value70.toFixed(2) }}</span>
-      </div>
+  <div class="breakdown-table">
+    <div class="breakdown-table-header">
+      <span>Type</span>
+      <span>Total Wt</span>
+      <span>Pure Wt</span>
+      <span class="highlight-col">Spot</span>
+      <span>90%</span>
+      <span>80%</span>
     </div>
-  </div>
 
-  <div class="totals-card" [ngClass]="totalsClass">
-    <h5>{{ totalsTitle }}</h5>
-    <div class="detail-row">
-      <span>Total Weight:</span>
-      <span>{{ totals.totalWeightGrams.toFixed(2) }}g ({{ totals.totalWeightToz.toFixed(3) }} oz t)</span>
+    <div class="breakdown-table-row" *ngFor="let item of breakdowns">
+      <span class="row-label">{{ item.type }}</span>
+      <span>{{ item.weightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span>{{ item.pureWeightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span class="highlight-col">${{ item.spotValue.toFixed(2) }}</span>
+      <span>${{ item.value90.toFixed(2) }}</span>
+      <span>${{ item.value80.toFixed(2) }}</span>
     </div>
-    <div class="detail-row">
-      <span>Pure Weight:</span>
-      <span>{{ totals.totalPureGrams.toFixed(2) }}g ({{ totals.totalPureToz.toFixed(3) }} oz t)</span>
-    </div>
-    <div class="detail-row highlight">
-      <span>Spot Value:</span>
-      <span>${{ totals.spotValue.toFixed(2) }}</span>
-    </div>
-    <div class="detail-row">
-      <span>90% Value:</span>
+
+    <div class="breakdown-table-row totals-row" [ngClass]="totalsClass">
+      <span class="row-label">{{ totalsTitle }}</span>
+      <span>{{ totals.totalWeightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span>{{ totals.totalPureToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span class="highlight-col">${{ totals.spotValue.toFixed(2) }}</span>
       <span>${{ totals.value90.toFixed(2) }}</span>
-    </div>
-    <div class="detail-row">
-      <span>80% Value:</span>
       <span>${{ totals.value80.toFixed(2) }}</span>
-    </div>
-    <div class="detail-row">
-      <span>70% Value:</span>
-      <span>${{ totals.value70.toFixed(2) }}</span>
     </div>
   </div>
 </div>

@@ -6,6 +6,10 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html {
   height: 100%;
   @include mat.theme((
