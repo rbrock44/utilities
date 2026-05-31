@@ -20,7 +20,8 @@ h2 {
 .inputs-grid {
   margin-top: 0.75rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 220px));
+  justify-content: start;
   gap: 0.75rem;
 }
 
@@ -33,6 +34,7 @@ h2 {
 }
 
 input[type='number'] {
+  width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
@@ -197,9 +199,10 @@ svg {
   font-size: 12px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .inputs-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 220px));
+    justify-content: start;
   }
 }
 
@@ -269,6 +272,11 @@ svg {
 }
 
 @media (max-width: 480px) {
+  .inputs-grid {
+    grid-template-columns: minmax(0, 220px);
+    justify-content: start;
+  }
+
   .calculator-container {
     margin: 0.45rem auto;
     padding: 0.7rem;
