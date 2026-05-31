@@ -48,6 +48,11 @@ input[type='number'] {
   color: #0f172a;
 }
 
+.toggle-row input[type='checkbox'] {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .error {
   margin-top: 0.75rem;
   color: #b91c1c;
@@ -83,6 +88,7 @@ input[type='number'] {
 .table-wrap {
   margin-top: 0.65rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid #bfdbfe;
   border-radius: 8px;
   background: #ffffff;
@@ -127,7 +133,8 @@ tr:last-child td {
   color: #1d4ed8;
   font-size: 0.9rem;
   font-weight: 700;
-  padding: 0.45rem 0.7rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.8rem;
   cursor: pointer;
 }
 
@@ -193,5 +200,118 @@ svg {
 @media (max-width: 900px) {
   .inputs-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .calculator-container {
+    margin: 0.65rem auto;
+    padding: 0.85rem;
+    border-radius: 9px;
+  }
+
+  .description {
+    font-size: 0.94rem;
+    line-height: 1.35;
+  }
+
+  .inputs-grid {
+    gap: 0.6rem;
+  }
+
+  .inputs-grid label {
+    font-size: 0.92rem;
+  }
+
+  input[type='number'] {
+    min-height: 2.5rem;
+    font-size: 1rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .toggle-row {
+    margin-top: 0.7rem;
+    font-size: 0.94rem;
+  }
+
+  .results {
+    margin-top: 0.7rem;
+    padding: 0.7rem;
+  }
+
+  .illustration {
+    padding: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  svg {
+    min-width: 540px;
+  }
+
+  .result-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.18rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .table-toggle {
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.55rem;
+    font-size: 0.89rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .calculator-container {
+    margin: 0.45rem auto;
+    padding: 0.7rem;
+    border-radius: 8px;
+  }
+
+  h2 {
+    font-size: 1.12rem;
+  }
+
+  .description {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  .inputs-grid label {
+    font-size: 0.88rem;
+  }
+
+  input[type='number'] {
+    min-height: 2.35rem;
+    font-size: 0.95rem;
+  }
+
+  .toggle-row {
+    font-size: 0.9rem;
+  }
+
+  .results {
+    padding: 0.6rem;
+  }
+
+  .table-toggle {
+    font-size: 0.88rem;
+  }
+
+  th,
+  td {
+    font-size: 0.84rem;
+    padding: 0.45rem 0.48rem;
+  }
+
+  .note {
+    font-size: 0.87rem;
   }
 }
