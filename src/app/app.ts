@@ -7,6 +7,8 @@ import { SettingsService } from './services/settings';
 import { PreciousMetalsComponent } from './components/calculators/precious-metals/precious-metals';
 import { SilverInCoinComponent } from "./components/information/silver-in-coin/silver-in-coin";
 import { GoldInCoinComponent } from "./components/information/gold-in-coin/gold-in-coin";
+import { RightAngleCalculatorComponent } from './components/calculators/right-angle-calculator/right-angle-calculator';
+import { CleaningPayoutCalculatorComponent } from './components/calculators/cleaning-payout-calculator/cleaning-payout-calculator';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +17,8 @@ import { GoldInCoinComponent } from "./components/information/gold-in-coin/gold-
     HeaderComponent,
     GoldInCoinComponent,
     PreciousMetalsComponent,
+    RightAngleCalculatorComponent,
+    CleaningPayoutCalculatorComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

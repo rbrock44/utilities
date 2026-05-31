@@ -13,6 +13,14 @@
   @if (this.settingsService.getSelectedTile() === "gic") {
     <app-gold-in-coin></app-gold-in-coin>
   }
+
+  @if (this.settingsService.getSelectedTile() === "rac") {
+    <app-right-angle-calculator></app-right-angle-calculator>
+  }
+
+  @if (this.settingsService.getSelectedTile() === "cpc") {
+    <app-cleaning-payout-calculator></app-cleaning-payout-calculator>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

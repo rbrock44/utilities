@@ -1,0 +1,185 @@
+<section class="calculator-container">
+  <h2>Cleaning Payout Calculator</h2>
+  <p class="description">
+    Totals are grouped by person, then by title.
+  </p>
+
+  <div class="controls">
+    <div class="filter-group">
+      <label for="yearFilter">Year</label>
+      <select
+        id="yearFilter"
+        [(ngModel)]="selectedYearFilter"
+        (ngModelChange)="onSelectedYearChange()"
+        aria-label="Select year filter"
+      >
+        <option [ngValue]="null">All Years</option>
+        @for (year of availableYears; track year) {
+          <option [ngValue]="year">{{ year }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="monthFilter">Month</label>
+      <select
+        id="monthFilter"
+        [(ngModel)]="selectedMonthFilterMonth"
+        (ngModelChange)="onSelectedMonthChange()"
+        aria-label="Select month"
+      >
+        <option [ngValue]="null">All Months</option>
+        @for (month of availableMonthOptions; track month.value) {
+          <option [ngValue]="month.value">{{ month.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="personFilter">Person</label>
+      <select
+        id="personFilter"
+        [(ngModel)]="selectedPersonFilter"
+        (ngModelChange)="onSelectedPersonChange()"
+        aria-label="Select person"
+      >
+        <option [ngValue]="null">All People</option>
+        @for (person of availablePeople; track person) {
+          <option [ngValue]="person">{{ person }}</option>
+        }
+      </select>
+    </div>
+
+    <button type="button" class="secondary" (click)="loadMeetings()">Reload</button>
+  </div>
+
+  <div class="grand-totals" aria-live="polite">
+    <div><span>Total Owed</span><strong>{{ toCurrency(grandTotals.totalOwed) }}</strong></div>
+    <div><span>Total Paid</span><strong>{{ toCurrency(grandTotals.totalPaid) }}</strong></div>
+    <div><span>Remaining Balance</span><strong>{{ toCurrency(grandTotals.remainingBalance) }}</strong></div>
+  </div>
+
+  @if (loading) {
+    <p class="status">Loading meetings...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && personSummaries.length === 0) {
+    <p class="status">No meetings found for the selected date filter.</p>
+  }
+
+  @for (personSummary of personSummaries; track personSummary.person) {
+    <article class="person-card">
+      <header>
+        <h3>{{ personSummary.person }}</h3>
+        <div class="person-totals">
+          <span>Owed: {{ toCurrency(personSummary.totalOwed) }}</span>
+          <span>Paid: {{ toCurrency(personSummary.totalPaid) }}</span>
+          <span>Remaining: {{ toCurrency(personSummary.remainingBalance) }}</span>
+        </div>
+      </header>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Meetings</th>
+              <th>Total Hours</th>
+              <th>Rate</th>
+              <th>Billing</th>
+              <th>Paid</th>
+              <th>Total Owed</th>
+              <th>Remaining</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (titleSummary of personSummary.titleSummaries; track titleSummary.title) {
+              <tr>
+                <td data-label="Title">{{ titleSummary.title }}</td>
+                <td data-label="Meetings">{{ titleSummary.meetingCount }}</td>
+                <td data-label="Total Hours">{{ titleSummary.totalHours.toFixed(2) }}</td>
+                <td data-label="Rate">
+                  <input
+                    class="rate-input"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [(ngModel)]="titleRateConfigs[titleSummary.title].amount"
+                    (ngModelChange)="updateRateAmount(titleSummary.title, $event)"
+                    [attr.aria-label]="titleSummary.title + ' rate amount'"
+                  />
+                </td>
+                <td data-label="Billing">
+                  <label class="billing-toggle" [attr.aria-label]="titleSummary.title + ' billing mode'">
+                    <input
+                      type="checkbox"
+                      [checked]="titleRateConfigs[titleSummary.title].billingMode === 'perMeeting'"
+                      (change)="updateBillingModeFromCheckbox(titleSummary.title, $any($event.target).checked)"
+                    />
+                    <span>
+                      {{ titleRateConfigs[titleSummary.title].billingMode === 'perMeeting' ? 'Per Meeting' : 'Per Hour' }}
+                    </span>
+                  </label>
+                </td>
+                <td data-label="Paid">{{ toCurrency(titleSummary.totalPaid) }}</td>
+                <td data-label="Total Owed">{{ toCurrency(titleSummary.totalOwed) }}</td>
+                <td data-label="Remaining">{{ toCurrency(titleSummary.remainingBalance) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meetings-toggle-row">
+        <button
+          type="button"
+          class="expand-meetings-btn"
+          (click)="toggleMeetings(personSummary.person)"
+          [attr.aria-expanded]="isMeetingsExpanded(personSummary.person)"
+        >
+          {{ isMeetingsExpanded(personSummary.person) ? 'Hide meetings' : 'Show meetings' }} ({{ personSummary.meetings.length }})
+        </button>
+      </div>
+
+      @if (isMeetingsExpanded(personSummary.person)) {
+        <div class="table-wrap meetings">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Title</th>
+                <th>Hours</th>
+                <th>Paid?</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (meeting of personSummary.meetings; track meeting.id ?? (meeting.date + '-' + meeting.startTime + '-' + meeting.title)) {
+                <tr>
+                  <td data-label="Date">{{ meeting.date }}</td>
+                  <td data-label="Start">{{ meeting.startTime }}</td>
+                  <td data-label="End">{{ meeting.endTime }}</td>
+                  <td data-label="Title">{{ meeting.title }}</td>
+                  <td data-label="Hours">{{ meeting.durationHours.toFixed(2) }}</td>
+                  <td data-label="Paid?">
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="meeting.isPaid"
+                      (ngModelChange)="recalculate()"
+                      [attr.aria-label]="'Paid status for ' + meeting.title + ' on ' + meeting.date"
+                    />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  }
+</section>

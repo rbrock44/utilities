@@ -47,6 +47,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert weight and type to spot price',
                 icon: '⚖',
                 param: 'pm'
+            },
+            {
+                title: 'Right Angle Calculator',
+                description: 'Calculate missing triangle side length',
+                icon: '📐',
+                param: 'rac'
             }
         ]
     },
