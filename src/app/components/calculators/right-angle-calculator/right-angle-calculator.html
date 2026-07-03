@@ -1,6 +1,6 @@
 <section class="calculator-container">
   <h2>Right-Angle Calculator</h2>
-  <p class="description">Enter values for exactly two sides. Leave the side you want to solve as 0.</p>
+  <p class="description">Enter <strong>two sides</strong>, or <strong>one side and one angle</strong>. Leave unknowns as <strong>0</strong>.</p>
 
   <div class="illustration" aria-hidden="true">
     <svg viewBox="0 0 220 160" class="triangle-svg">
@@ -10,25 +10,48 @@
 
       <path d="M 25 130 L 25 105 L 50 105 L 50 130" class="right-angle-mark"></path>
 
+      <!-- Angle A arc at top-left vertex (25, 25) -->
+      <path d="M 45.9 38.7 A 25 25 0 0 1 25 50" class="angle-arc"></path>
+      <!-- Angle B arc at bottom-right vertex (185, 130) -->
+      <path d="M 164.1 116.3 A 25 25 0 0 0 160 130" class="angle-arc"></path>
+
       <text x="95" y="148" class="label">a</text>
       <text x="10" y="78" class="label">b</text>
       <text x="108" y="68" class="label">c</text>
+
+      <text x="38" y="63" class="label angle-label">A</text>
+      <text x="145" y="121" class="label angle-label">B</text>
+      <text x="52" y="143" class="label right-angle-label">90°</text>
     </svg>
   </div>
 
+  <div class="inputs-section-label">Sides</div>
   <div class="inputs-grid">
-    <label [class.solved]="solvedSide === 'a'">
+    <label [class.solved]="isSolved('a')">
       Side a
-      <input type="number" [(ngModel)]="sideA" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="solvedSide === 'a'" />
+      <input type="number" [(ngModel)]="sideA" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="isSolved('a')" />
     </label>
-    <label [class.solved]="solvedSide === 'b'">
+    <label [class.solved]="isSolved('b')">
       Side b
-      <input type="number" [(ngModel)]="sideB" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="solvedSide === 'b'" />
+      <input type="number" [(ngModel)]="sideB" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="isSolved('b')" />
     </label>
-    <label [class.solved]="solvedSide === 'c'">
+    <label [class.solved]="isSolved('c')">
       Side c (hypotenuse)
-      <input type="number" [(ngModel)]="sideC" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="solvedSide === 'c'" />
+      <input type="number" [(ngModel)]="sideC" (ngModelChange)="onInputChange()" min="0" step="0.01" [class.solved]="isSolved('c')" />
     </label>
+  </div>
+
+  <div class="inputs-section-label">Angles</div>
+  <div class="inputs-grid">
+    <label [class.solved]="isSolved('A')">
+      Angle A (°)
+      <input type="number" [(ngModel)]="angleA" (ngModelChange)="onInputChange()" min="0" max="89.99" step="0.01" [class.solved]="isSolved('A')" />
+    </label>
+    <label [class.solved]="isSolved('B')">
+      Angle B (°)
+      <input type="number" [(ngModel)]="angleB" (ngModelChange)="onInputChange()" min="0" max="89.99" step="0.01" [class.solved]="isSolved('B')" />
+    </label>
+    <div class="fixed-angle-info">∠C = 90°</div>
   </div>
 
   <button type="button" class="calculate-btn" (click)="calculate()">Calculate</button>
@@ -37,12 +60,16 @@
     <p class="error" role="alert">{{ errorMessage }}</p>
   }
 
-  @if (result !== null) {
+  @if (solution !== null) {
     <div class="result-box" aria-live="polite">
-      <p>
-        Solved side <strong>{{ solvedSide }}</strong>: <strong>{{ result.toFixed(4) }}</strong>
-      </p>
-      <p class="formula">{{ solvedFormula }}</p>
+      <div class="result-grid">
+        <span>Side <strong>a</strong></span><span [class.solved-value]="isSolved('a')">{{ solution.a.toFixed(4) }}</span>
+        <span>Side <strong>b</strong></span><span [class.solved-value]="isSolved('b')">{{ solution.b.toFixed(4) }}</span>
+        <span>Side <strong>c</strong> (hypotenuse)</span><span [class.solved-value]="isSolved('c')">{{ solution.c.toFixed(4) }}</span>
+        <span>Angle <strong>A</strong></span><span [class.solved-value]="isSolved('A')">{{ solution.angleA.toFixed(4) }}°</span>
+        <span>Angle <strong>B</strong></span><span [class.solved-value]="isSolved('B')">{{ solution.angleB.toFixed(4) }}°</span>
+        <span>Angle <strong>C</strong></span><span>90°</span>
+      </div>
     </div>
   }
 </section>

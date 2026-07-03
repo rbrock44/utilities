@@ -124,9 +124,54 @@ input[type='number']:disabled {
   border: 1px solid #99f6e4;
 }
 
-.formula {
-  margin: 0;
-  color: #0f172a;
+.angle-arc {
+  stroke: #7c3aed;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.angle-label {
+  fill: #6d28d9;
+  font-size: 15px;
+}
+
+.right-angle-label {
+  font-size: 11px;
+  fill: #374151;
+}
+
+.inputs-section-label {
+  margin: 0.75rem 0 0.35rem;
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fixed-angle-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 0.6rem;
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.3rem 1.5rem;
+  align-items: baseline;
+}
+
+.solved-value {
+  color: #0369a1;
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {
