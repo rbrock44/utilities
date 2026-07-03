@@ -40,6 +40,17 @@ export const CATEGORIES: Category[] = [
     //   ]
     // },
     {
+        name: 'Utilities',
+        tiles: [
+            {
+                title: 'Image to PDF',
+                description: 'Convert one or more images into a downloadable PDF',
+                icon: '📄',
+                param: 'itp'
+            }
+        ]
+    },
+    {
         name: 'Calculators',
         tiles: [
             {
