@@ -36,6 +36,7 @@
     "@angular/router": "^21.1.0",
     "angular-cli-ghpages": "^3.0.2",
     "jspdf": "^4.2.1",
+    "pdf-lib": "^1.17.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

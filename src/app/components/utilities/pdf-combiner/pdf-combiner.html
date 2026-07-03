@@ -1,0 +1,106 @@
+<section class="widget-container">
+  <h2>PDF Combiner</h2>
+  <p class="description">Upload multiple PDFs, arrange them in order, then download as a single merged file.</p>
+
+  <div
+    class="drop-zone"
+    [class.dragging]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    role="button"
+    tabindex="0"
+    aria-label="Upload PDF files"
+    (keydown.enter)="fileInput.click()"
+    (keydown.space)="fileInput.click()"
+  >
+    <span class="drop-icon">📑</span>
+    <span class="drop-text">Drag &amp; drop PDFs here, or click to browse</span>
+    <span class="drop-hint">Only PDF files are accepted</span>
+    <input
+      #fileInput
+      type="file"
+      accept="application/pdf"
+      multiple
+      hidden
+      (change)="onFileInputChange($event)"
+    />
+  </div>
+
+  @if (pdfs.length > 0) {
+    <div class="list-header">
+      <span class="list-count">
+        {{ pdfs.length }} file{{ pdfs.length !== 1 ? 's' : '' }}
+        @if (totalPages > 0) {
+          &nbsp;·&nbsp;{{ totalPages }} page{{ totalPages !== 1 ? 's' : '' }} total
+        }
+      </span>
+      <button type="button" class="btn-clear" (click)="pdfs = []">Clear all</button>
+    </div>
+
+    <ul class="pdf-list" aria-label="PDF list">
+      @for (pdf of pdfs; track pdf.id; let i = $index) {
+        <li class="pdf-item">
+          <span class="pdf-icon">📄</span>
+          <span class="pdf-info">
+            <span class="pdf-name" [title]="pdf.name">{{ pdf.name }}</span>
+            <span class="pdf-pages">
+              @if (pdf.pageCount !== null) {
+                {{ pdf.pageCount }} page{{ pdf.pageCount !== 1 ? 's' : '' }}
+              } @else {
+                loading…
+              }
+            </span>
+          </span>
+          <div class="item-actions">
+            <button
+              type="button"
+              class="btn-icon"
+              [disabled]="i === 0"
+              (click)="moveUp(i)"
+              aria-label="Move up"
+              title="Move up"
+            >▲</button>
+            <button
+              type="button"
+              class="btn-icon"
+              [disabled]="i === pdfs.length - 1"
+              (click)="moveDown(i)"
+              aria-label="Move down"
+              title="Move down"
+            >▼</button>
+            <button
+              type="button"
+              class="btn-icon btn-remove"
+              (click)="removeFile(pdf.id)"
+              aria-label="Remove file"
+              title="Remove"
+            >✕</button>
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (pdfs.length < 2) {
+      <p class="hint">Add at least one more PDF to enable merging.</p>
+    }
+
+    <button
+      type="button"
+      class="btn-merge"
+      [disabled]="!canMerge"
+      (click)="mergePdfs()"
+    >
+      @if (isMerging) {
+        Merging…
+      } @else {
+        ⬇ Download Combined PDF
+      }
+    </button>
+  }
+</section>

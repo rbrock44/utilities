@@ -44,9 +44,15 @@ export const CATEGORIES: Category[] = [
         tiles: [
             {
                 title: 'Image to PDF',
-                description: 'Convert one or more images into a downloadable PDF',
+                description: 'Convert image(s) into  PDF',
                 icon: '📄',
                 param: 'itp'
+            },
+            {
+                title: 'PDF Combiner',
+                description: 'Merge multiple PDFs into one',
+                icon: '📑',
+                param: 'pmc'
             }
         ]
     },
