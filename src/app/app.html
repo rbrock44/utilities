@@ -25,6 +25,10 @@
   @if (this.settingsService.getSelectedTile() === "dsc") {
     <app-divider-spacing-calculator></app-divider-spacing-calculator>
   }
+
+  @if (this.settingsService.getSelectedTile() === "itp") {
+    <app-image-to-pdf></app-image-to-pdf>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

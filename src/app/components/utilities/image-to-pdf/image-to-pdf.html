@@ -1,0 +1,113 @@
+<section class="widget-container">
+  <h2>Image to PDF</h2>
+  <p class="description">Upload images, arrange them, then download as a single PDF.</p>
+
+  <div
+    class="drop-zone"
+    [class.dragging]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    role="button"
+    tabindex="0"
+    aria-label="Upload images"
+    (keydown.enter)="fileInput.click()"
+    (keydown.space)="fileInput.click()"
+  >
+    <span class="drop-icon">🖼️</span>
+    <span class="drop-text">Drag &amp; drop images here, or click to browse</span>
+    <span class="drop-hint">PNG, JPG, WEBP, GIF, BMP supported</span>
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      multiple
+      hidden
+      (change)="onFileInputChange($event)"
+    />
+  </div>
+
+  @if (images.length > 0) {
+    <div class="preview-header">
+      <span class="preview-count">{{ images.length }} image{{ images.length !== 1 ? 's' : '' }}</span>
+      <button type="button" class="btn-clear" (click)="images = []">Clear all</button>
+    </div>
+
+    <ul class="preview-list" aria-label="Image list">
+      @for (img of images; track img.id; let i = $index) {
+        <li class="preview-item">
+          <img [src]="img.dataUrl" [alt]="img.name" class="thumbnail" />
+          <span class="img-name" [title]="img.name">{{ img.name }}</span>
+          <div class="item-actions">
+            <button
+              type="button"
+              class="btn-icon"
+              [disabled]="i === 0"
+              (click)="moveUp(i)"
+              aria-label="Move up"
+              title="Move up"
+            >▲</button>
+            <button
+              type="button"
+              class="btn-icon"
+              [disabled]="i === images.length - 1"
+              (click)="moveDown(i)"
+              aria-label="Move down"
+              title="Move down"
+            >▼</button>
+            <button
+              type="button"
+              class="btn-icon btn-remove"
+              (click)="removeImage(img.id)"
+              aria-label="Remove image"
+              title="Remove"
+            >✕</button>
+          </div>
+        </li>
+      }
+    </ul>
+
+    <div class="options-grid">
+      <label for="pageSizeSelect">
+        Page Size
+        <select id="pageSizeSelect" [(ngModel)]="pageSize">
+          @for (opt of pageSizes; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label for="orientationSelect">
+        Orientation
+        <select id="orientationSelect" [(ngModel)]="orientation">
+          @for (opt of orientations; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label for="fitModeSelect">
+        Image Fit
+        <select id="fitModeSelect" [(ngModel)]="fitMode">
+          @for (opt of fitModes; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <button
+      type="button"
+      class="btn-generate"
+      [disabled]="!canGenerate"
+      (click)="generatePdf()"
+    >
+      @if (isGenerating) {
+        Generating…
+      } @else {
+        ⬇ Download PDF
+      }
+    </button>
+  }
+</section>
