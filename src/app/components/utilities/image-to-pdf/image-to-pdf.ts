@@ -27,6 +27,7 @@ export class ImageToPdfComponent {
   pageSize: PageSize = 'a4';
   orientation: Orientation = 'portrait';
   fitMode: FitMode = 'fit';
+  fileName = 'images';
   isDragging = false;
   isGenerating = false;
   private nextId = 1;
@@ -136,7 +137,8 @@ export class ImageToPdfComponent {
         pdf.addImage(entry.dataUrl, 'JPEG', x, y, w, h);
       }
 
-      pdf.save('images.pdf');
+      const name = (this.fileName.trim() || 'images').replace(/\.pdf$/i, '');
+      pdf.save(`${name}.pdf`);
     } finally {
       this.isGenerating = false;
       this.cdr.markForCheck();
