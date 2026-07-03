@@ -11,6 +11,7 @@ import { RightAngleCalculatorComponent } from './components/calculators/right-an
 import { CleaningPayoutCalculatorComponent } from './components/calculators/cleaning-payout-calculator/cleaning-payout-calculator';
 import { DividerSpacingCalculatorComponent } from './components/calculators/divider-spacing-calculator/divider-spacing-calculator';
 import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-to-pdf';
+import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-combiner';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-t
     CleaningPayoutCalculatorComponent,
     DividerSpacingCalculatorComponent,
     ImageToPdfComponent,
+    PdfCombinerComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

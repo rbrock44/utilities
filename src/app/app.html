@@ -29,6 +29,10 @@
   @if (this.settingsService.getSelectedTile() === "itp") {
     <app-image-to-pdf></app-image-to-pdf>
   }
+
+  @if (this.settingsService.getSelectedTile() === "pmc") {
+    <app-pdf-combiner></app-pdf-combiner>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

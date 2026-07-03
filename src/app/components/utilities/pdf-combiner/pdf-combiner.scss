@@ -1,0 +1,225 @@
+.widget-container {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: #4b5563;
+}
+
+/* ── Drop Zone ─────────────────────────────────────────── */
+.drop-zone {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2rem 1rem;
+  border: 2px dashed #93c5fd;
+  border-radius: 10px;
+  background: #f0f9ff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+
+.drop-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.drop-text {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 1rem;
+}
+
+.drop-hint {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* ── List Header ───────────────────────────────────────── */
+.list-header {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-count {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.93rem;
+}
+
+.btn-clear {
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.btn-clear:hover {
+  background: #fee2e2;
+}
+
+/* ── PDF List ──────────────────────────────────────────── */
+.pdf-list {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pdf-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.pdf-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.pdf-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.pdf-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-pages {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-remove {
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.btn-remove:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+/* ── Hint / Error ──────────────────────────────────────── */
+.hint {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: 0.93rem;
+}
+
+/* ── Merge Button ──────────────────────────────────────── */
+.btn-merge {
+  margin-top: 1rem;
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-merge:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-merge:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .pdf-name {
+    font-size: 0.84rem;
+  }
+}
