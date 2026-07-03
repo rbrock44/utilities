@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PDFDocument } from 'pdf-lib';
 
 interface PdfEntry {
@@ -12,7 +13,7 @@ interface PdfEntry {
 @Component({
   selector: 'app-pdf-combiner',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './pdf-combiner.html',
   styleUrl: './pdf-combiner.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +22,7 @@ export class PdfCombinerComponent {
   pdfs: PdfEntry[] = [];
   isDragging = false;
   isMerging = false;
+  fileName = 'combined';
   errorMessage: string | null = null;
   private nextId = 1;
 
@@ -126,7 +128,8 @@ export class PdfCombinerComponent {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'combined.pdf';
+      const name = (this.fileName.trim() || 'combined').replace(/\.pdf$/i, '');
+      a.download = `${name}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {

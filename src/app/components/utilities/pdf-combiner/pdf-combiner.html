@@ -90,6 +90,21 @@
       <p class="hint">Add at least one more PDF to enable merging.</p>
     }
 
+    <div class="filename-row">
+      <label for="fileNameInput">
+        Output filename
+        <div class="filename-input-wrap">
+          <input
+            id="fileNameInput"
+            type="text"
+            [(ngModel)]="fileName"
+            placeholder="combined"
+          />
+          <span class="filename-ext">.pdf</span>
+        </div>
+      </label>
+    </div>
+
     <button
       type="button"
       class="btn-merge"
