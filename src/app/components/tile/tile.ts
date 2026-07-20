@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SettingsService } from '../../services/settings';
 
@@ -7,6 +7,7 @@ import { SettingsService } from '../../services/settings';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './tile.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile.scss',
 })
 export class TileComponent {

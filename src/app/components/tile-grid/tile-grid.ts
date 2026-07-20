@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoryComponent } from '../category/category';
 import { SettingsService } from '../../services/settings';
@@ -8,6 +8,7 @@ import { SettingsService } from '../../services/settings';
   standalone: true,
   imports: [CommonModule, CategoryComponent],
   templateUrl: './tile-grid.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile-grid.scss',
 })
 export class TileGridComponent {
