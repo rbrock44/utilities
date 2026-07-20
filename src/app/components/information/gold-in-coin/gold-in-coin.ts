@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ASC, DESC } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { GOLD_COIN_DATABASE } from '../../../constants/coins';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './gold-in-coin.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gold-in-coin.scss',
 })
 export class GoldInCoinComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TileComponent } from '../tile/tile';
 
@@ -7,6 +7,7 @@ import { TileComponent } from '../tile/tile';
   standalone: true,
   imports: [CommonModule, TileComponent],
   templateUrl: './category.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './category.scss',
 })
 export class CategoryComponent {
