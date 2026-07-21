@@ -1,13 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { SpotPrice } from './spot-price';
+import { SpotPriceService } from './spot-price';
 
-describe('SpotPrice', () => {
-  let service: SpotPrice;
+describe('SpotPriceService', () => {
+  let service: SpotPriceService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(SpotPrice);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
+    service = TestBed.inject(SpotPriceService);
   });
 
   it('should be created', () => {
