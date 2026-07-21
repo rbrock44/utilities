@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TileGrid } from './tile-grid';
+import { TileGridComponent } from './tile-grid';
 
-describe('TileGrid', () => {
-  let component: TileGrid;
-  let fixture: ComponentFixture<TileGrid>;
+describe('TileGridComponent', () => {
+  let component: TileGridComponent;
+  let fixture: ComponentFixture<TileGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TileGrid]
+      imports: [TileGridComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TileGrid);
+    fixture = TestBed.createComponent(TileGridComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
