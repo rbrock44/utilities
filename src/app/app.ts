@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { TileGridComponent } from './components/tile-grid/tile-grid';
 import { HeaderComponent } from './components/header/header';
+import { BackButtonComponent } from './components/back-button/back-button';
 import { SettingsService } from './services/settings';
 import { PreciousMetalsComponent } from './components/calculators/precious-metals/precious-metals';
 import { SilverInCoinComponent } from "./components/information/silver-in-coin/silver-in-coin";
@@ -18,6 +19,7 @@ import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-co
   standalone: true,
   imports: [
     HeaderComponent,
+    BackButtonComponent,
     GoldInCoinComponent,
     PreciousMetalsComponent,
     RightAngleCalculatorComponent,
