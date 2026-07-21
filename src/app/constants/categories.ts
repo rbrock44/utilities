@@ -46,13 +46,13 @@ export const CATEGORIES: Category[] = [
                 title: 'Image to PDF',
                 description: 'Convert image(s) into  PDF',
                 icon: '📄',
-                param: 'itp'
+                param: 'image-to-pdf'
             },
             {
                 title: 'PDF Combiner',
                 description: 'Merge multiple PDFs into one',
                 icon: '📑',
-                param: 'pmc'
+                param: 'pdf-combiner'
             }
         ]
     },
@@ -63,19 +63,19 @@ export const CATEGORIES: Category[] = [
                 title: 'Precious Metals',
                 description: 'Convert weight and type to spot price',
                 icon: '⚖',
-                param: 'pm'
+                param: 'precious-metals'
             },
             {
                 title: 'Right Angle Calculator',
                 description: 'Calculate missing triangle side length',
                 icon: '📐',
-                param: 'rac'
+                param: 'right-angle-calculator'
             },
             {
                 title: 'Divider Spacing Calculator',
                 description: 'Equal spacing for divider material along a total width',
                 icon: '📏',
-                param: 'dsc'
+                param: 'divider-spacing-calculator'
             }
         ]
     },
@@ -86,13 +86,13 @@ export const CATEGORIES: Category[] = [
                 title: 'Gold in Coins',
                 description: 'Show gold content and spot price of coins',
                 icon: '🥇',
-                param: 'gic'
+                param: 'gold-in-coins'
             },
             {
                 title: 'Silver in Coins',
                 description: 'Show silver content and spot price of coins',
                 icon: '🥈',
-                param: 'sic'
+                param: 'silver-in-coins'
             },
         ]
     }
