@@ -13,6 +13,7 @@ import { CleaningPayoutCalculatorComponent } from './components/calculators/clea
 import { DividerSpacingCalculatorComponent } from './components/calculators/divider-spacing-calculator/divider-spacing-calculator';
 import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-to-pdf';
 import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-combiner';
+import { EmailLinkGeneratorComponent } from './components/utilities/email-link-generator/email-link-generator';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-co
     DividerSpacingCalculatorComponent,
     ImageToPdfComponent,
     PdfCombinerComponent,
+    EmailLinkGeneratorComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

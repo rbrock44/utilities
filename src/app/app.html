@@ -59,6 +59,13 @@
   ) {
     <app-pdf-combiner></app-pdf-combiner>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'elg' ||
+    this.settingsService.getSelectedTile() === 'email-link-generator'
+  ) {
+    <app-email-link-generator></app-email-link-generator>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

@@ -1,0 +1,107 @@
+.widget-container {
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: #4b5563;
+}
+
+.inputs {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+input[type='email'],
+input[type='text'],
+textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.generated-link {
+  margin-top: 1rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+  padding: 0.8rem;
+}
+
+.generated-link h3 {
+  margin: 0 0 0.5rem;
+  color: #1e3a8a;
+  font-size: 1rem;
+}
+
+.link-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-row input[type='text'] {
+  flex: 1;
+  background: #ffffff;
+  min-width: 0;
+}
+
+.btn-copy {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-copy:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 480px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .link-row {
+    flex-direction: column;
+  }
+
+  .btn-copy {
+    width: 100%;
+  }
+}

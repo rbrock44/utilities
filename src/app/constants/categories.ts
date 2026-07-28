@@ -95,5 +95,16 @@ export const CATEGORIES: Category[] = [
                 param: 'silver-in-coins'
             },
         ]
-    }
+    },
+    {
+        name: 'Email',
+        tiles: [
+            {
+                title: 'Email Link Generator',
+                description: 'Create a mailto: link',
+                icon: '✉️',
+                param: 'email-link-generator'
+            }
+        ]
+    },
 ];

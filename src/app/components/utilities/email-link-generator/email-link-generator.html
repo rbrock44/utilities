@@ -1,0 +1,57 @@
+<section class="widget-container">
+  <h2>Email Link Generator</h2>
+  <p class="description">Fill out the fields below to create a mailto: link with a prefilled subject and body.</p>
+
+  <div class="inputs">
+    <label for="emailInput">
+      To
+      <input
+        id="emailInput"
+        type="email"
+        placeholder="someone@example.com"
+        [(ngModel)]="email"
+        (ngModelChange)="generateLink()"
+      />
+    </label>
+
+    <label for="subjectInput">
+      Subject
+      <input
+        id="subjectInput"
+        type="text"
+        placeholder="Subject line"
+        [(ngModel)]="subject"
+        (ngModelChange)="generateLink()"
+      />
+    </label>
+
+    <label for="bodyInput">
+      Body
+      <textarea
+        id="bodyInput"
+        rows="5"
+        placeholder="Email body"
+        [(ngModel)]="body"
+        (ngModelChange)="generateLink()"
+      ></textarea>
+    </label>
+  </div>
+
+  @if (generatedLink) {
+    <div class="generated-link">
+      <h3>Generated Link</h3>
+      <div class="link-row">
+        <input type="text" [value]="generatedLink" readonly />
+        <button
+          type="button"
+          class="btn-copy"
+          (click)="copyToClipboard()"
+          aria-label="Copy link to clipboard"
+          title="Copy to clipboard"
+        >
+          {{ justCopied ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+    </div>
+  }
+</section>
