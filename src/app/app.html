@@ -66,6 +66,45 @@
   ) {
     <app-email-link-generator></app-email-link-generator>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'lc' ||
+    this.settingsService.getSelectedTile() === 'length-converter'
+  ) {
+    <app-unit-converter title="Length Converter" [units]="lengthUnits"></app-unit-converter>
+  }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'wc' ||
+    this.settingsService.getSelectedTile() === 'weight-converter'
+  ) {
+    <app-unit-converter title="Weight Converter" [units]="weightUnits"></app-unit-converter>
+  }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'vc' ||
+    this.settingsService.getSelectedTile() === 'volume-converter'
+  ) {
+    <app-unit-converter
+      title="Volume Converter"
+      description="Includes cooking measurements like teaspoons, tablespoons, and cups."
+      [units]="volumeUnits"
+    ></app-unit-converter>
+  }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'tc' ||
+    this.settingsService.getSelectedTile() === 'temperature-converter'
+  ) {
+    <app-unit-converter title="Temperature Converter" [units]="temperatureUnits"></app-unit-converter>
+  }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'cc' ||
+    this.settingsService.getSelectedTile() === 'currency-converter'
+  ) {
+    <app-currency-converter></app-currency-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

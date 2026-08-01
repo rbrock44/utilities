@@ -22,25 +22,43 @@ export const CATEGORIES: Category[] = [
     //     }
     //   ]
     // },
-    // {
-    //   name: 'Converters',
-    //   tiles: [
-    //     {
-    //       title: 'Unit Converter',
-    //       description: 'Convert between units',
-    //       icon: '📏',
-    //       param: ''
-    //     },
-    //     {
-    //       title: 'Currency',
-    //       description: 'Exchange rates',
-    //       icon: '💱',
-    //       param: ''
-    //     }
-    //   ]
-    // },
     {
-        name: 'Utilities',
+        name: 'Converters',
+        tiles: [
+            {
+                title: 'Length Converter',
+                description: 'Convert between metric and imperial lengths',
+                icon: '📏',
+                param: 'length-converter'
+            },
+            {
+                title: 'Weight Converter',
+                description: 'Convert between metric and imperial weights',
+                icon: '⚖️',
+                param: 'weight-converter'
+            },
+            {
+                title: 'Volume Converter',
+                description: 'Convert cooking and liquid volumes, like teaspoons to cups',
+                icon: '🥄',
+                param: 'volume-converter'
+            },
+            {
+                title: 'Temperature Converter',
+                description: 'Convert between Celsius, Fahrenheit, and Kelvin',
+                icon: '🌡️',
+                param: 'temperature-converter'
+            },
+            {
+                title: 'Currency Converter',
+                description: 'Convert between world currencies using live rates',
+                icon: '💱',
+                param: 'currency-converter'
+            }
+        ]
+    },
+    {
+        name: 'PDF Utilities',
         tiles: [
             {
                 title: 'Image to PDF',

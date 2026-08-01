@@ -1,0 +1,35 @@
+<div class="combo-box">
+  <input
+    type="text"
+    class="combo-input"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-label]="ariaLabel"
+    [placeholder]="placeholder"
+    [(ngModel)]="query"
+    (focus)="onFocus($event)"
+    (input)="onInput()"
+    (keydown)="onKeydown($event)"
+  />
+  @if (isOpen) {
+    <ul class="combo-list" role="listbox">
+      @if (filteredOptions.length === 0) {
+        <li class="combo-empty">No matches</li>
+      }
+      @for (option of filteredOptions; track option.id; let i = $index) {
+        <li
+          class="combo-option"
+          [class.highlighted]="i === highlightedIndex"
+          [class.selected]="option.id === value"
+          role="option"
+          [attr.aria-selected]="option.id === value"
+          (mousedown)="$event.preventDefault()"
+          (click)="selectOption(option)"
+        >
+          {{ option.label }}
+        </li>
+      }
+    </ul>
+  }
+</div>

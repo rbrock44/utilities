@@ -1,0 +1,54 @@
+<section class="widget-container">
+  <h2>{{ title }}</h2>
+  @if (description) {
+    <p class="description">{{ description }}</p>
+  }
+
+  <div class="converter-row">
+    <label class="converter-field">
+      From
+      <app-combo-box
+        [options]="comboOptions"
+        [value]="fromId"
+        placeholder="Search units…"
+        ariaLabel="From unit"
+        (valueChange)="onFromUnitChange($event)"
+      ></app-combo-box>
+      <input type="number" [(ngModel)]="fromValue" (ngModelChange)="onFromValueChange()" />
+    </label>
+
+    <button type="button" class="swap-btn" (click)="swap()" aria-label="Swap units" title="Swap units">⇄</button>
+
+    <label class="converter-field">
+      To
+      <app-combo-box
+        [options]="comboOptions"
+        [value]="toId"
+        placeholder="Search units…"
+        ariaLabel="To unit"
+        (valueChange)="onToUnitChange($event)"
+      ></app-combo-box>
+      <input type="number" [(ngModel)]="toValue" (ngModelChange)="onToValueChange()" />
+    </label>
+  </div>
+
+  <label class="show-all-toggle">
+    <input type="checkbox" [(ngModel)]="showAllConversions" />
+    Show all conversions
+  </label>
+
+  @if (showAllConversions) {
+    <div class="all-conversions">
+      @for (conversion of allConversions; track conversion.label) {
+        <div class="conversion-row">
+          <span class="conversion-label">{{ conversion.label }}</span>
+          <span class="conversion-value">{{ conversion.value }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (footnote) {
+    <p class="footnote">{{ footnote }}</p>
+  }
+</section>

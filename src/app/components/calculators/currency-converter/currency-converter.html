@@ -1,0 +1,18 @@
+@if (loading) {
+  <section class="widget-container">
+    <h2>Currency Converter</h2>
+    <p class="description">Loading exchange rates…</p>
+  </section>
+} @else if (errorMessage) {
+  <section class="widget-container">
+    <h2>Currency Converter</h2>
+    <p class="error">{{ errorMessage }}</p>
+  </section>
+} @else {
+  <app-unit-converter
+    title="Currency Converter"
+    description="Convert between world currencies using live exchange rates."
+    [footnote]="updatedAt ? ('Rates last updated ' + (updatedAt | date: 'medium')) : ''"
+    [units]="units"
+  ></app-unit-converter>
+}

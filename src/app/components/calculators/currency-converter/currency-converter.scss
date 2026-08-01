@@ -1,0 +1,24 @@
+.widget-container {
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: var(--error-text);
+  font-weight: 600;
+}

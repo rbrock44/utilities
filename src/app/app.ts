@@ -14,6 +14,12 @@ import { DividerSpacingCalculatorComponent } from './components/calculators/divi
 import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-to-pdf';
 import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-combiner';
 import { EmailLinkGeneratorComponent } from './components/utilities/email-link-generator/email-link-generator';
+import { UnitConverterComponent } from './components/calculators/unit-converter/unit-converter';
+import { CurrencyConverterComponent } from './components/calculators/currency-converter/currency-converter';
+import { LENGTH_UNITS } from './constants/units/length-units';
+import { WEIGHT_UNITS } from './constants/units/weight-units';
+import { VOLUME_UNITS } from './constants/units/volume-units';
+import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +35,8 @@ import { EmailLinkGeneratorComponent } from './components/utilities/email-link-g
     ImageToPdfComponent,
     PdfCombinerComponent,
     EmailLinkGeneratorComponent,
+    UnitConverterComponent,
+    CurrencyConverterComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,
@@ -40,6 +48,10 @@ import { EmailLinkGeneratorComponent } from './components/utilities/email-link-g
 })
 export class App {
   protected readonly title = signal('utilities');
+  protected readonly lengthUnits = LENGTH_UNITS;
+  protected readonly weightUnits = WEIGHT_UNITS;
+  protected readonly volumeUnits = VOLUME_UNITS;
+  protected readonly temperatureUnits = TEMPERATURE_UNITS;
 
   constructor(
     public settingsService: SettingsService,
