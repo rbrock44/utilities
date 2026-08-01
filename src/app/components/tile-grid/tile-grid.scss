@@ -3,3 +3,20 @@
     margin: 0 auto;
     padding: 2rem 1rem;
 }
+
+.search-input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}

@@ -1,4 +1,6 @@
 <div class="container">
-    <app-category *ngFor="let category of this.settingsService.categories" [category]="category">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by category, name, or description..."
+        class="search-input" aria-label="Search widgets">
+    <app-category *ngFor="let category of filteredCategories" [category]="category">
     </app-category>
 </div>
