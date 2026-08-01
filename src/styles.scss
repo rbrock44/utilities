@@ -22,21 +22,107 @@ html {
   ));
 }
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
+@mixin dark-theme-tokens {
+  --surface: #1b2230;
+  --surface-alt: #232c3d;
+  --surface-sunken: #161c28;
+  --border: #34405a;
+  --border-strong: #46567a;
+  --text: #e8edf5;
+  --text-soft: #aab4cc;
+  --text-faint: #7c88a3;
 
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
+  --brand: #5b9bf0;
+  --brand-deep: #82b6f5;
+  --brand-soft: #1e3a5c;
+  --brand-soft-hover: #274a72;
+  --brand-soft-text: #bcdcff;
+  --brand-border: #3f6ea8;
+
+  --success: #4caf50;
+  --success-deep: #66bb6a;
+  --success-soft: #1e3a24;
+
+  --error: #ef5350;
+  --error-deep: #c62828;
+  --error-soft: #3b1f22;
+  --error-soft-strong: #4a2529;
+  --error-text: #ff8a80;
+  --error-border: #7a3232;
+
+  --warning: #ffa726;
+  --warning-soft: #3a2c14;
+  --warning-text: #ffcc80;
+
+  --muted: #9aa5b8;
+  --muted-soft: #2a3242;
+  --muted-text: #c3cbdb;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
+}
+
+:root {
+  --surface: #ffffff;
+  --surface-alt: #f5f7fa;
+  --surface-sunken: #eef2f7;
+  --border: #d9e1ea;
+  --border-strong: #b9c5d6;
+  --text: #1f2733;
+  --text-soft: #5b6b81;
+  --text-faint: #93a1b5;
+
+  --brand: #1976d2;
+  --brand-deep: #1565c0;
+  --brand-soft: #e3f0fd;
+  --brand-soft-hover: #dbeafe;
+  --brand-soft-text: #0d47a1;
+  --brand-border: #93c5fd;
+
+  --success: #2e7d32;
+  --success-deep: #1b5e20;
+  --success-soft: #e6f4ea;
+
+  --error: #d32f2f;
+  --error-deep: #b71c1c;
+  --error-soft: #fdecea;
+  --error-soft-strong: #fee2e2;
+  --error-text: #b71c1c;
+  --error-border: #f3b4b0;
+
+  --warning: #ef6c00;
+  --warning-soft: #fff3e0;
+  --warning-text: #e65100;
+
+  --muted: #757575;
+  --muted-soft: #f0f0f0;
+  --muted-text: #424242;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 8px 20px rgba(15, 23, 42, 0.12);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  @include dark-theme-tokens;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark-theme-tokens;
+  }
+}
+
+body {
+  background-color: var(--surface-alt);
+  color: var(--text);
   font: var(--mat-sys-body-medium);
 
   // Reset the user agent margin.
   margin: 0;
   height: 100%;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
-/* You can add global styles to this file, and also import other style files */

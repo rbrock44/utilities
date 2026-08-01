@@ -2,26 +2,26 @@
   max-width: 900px;
   margin: 1rem auto;
   padding: 1rem;
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 h2 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .description {
   margin-top: 0.4rem;
-  color: #4b5563;
+  color: var(--text-soft);
 }
 
 .illustration {
   margin: 1rem 0;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--brand-border);
   border-radius: 10px;
-  background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+  background: var(--brand-soft);
   padding: 0.75rem;
   display: flex;
   justify-content: center;
@@ -34,24 +34,24 @@ h2 {
 }
 
 .triangle-line {
-  stroke: #1e3a8a;
+  stroke: var(--brand-soft-text);
   stroke-width: 4;
   fill: none;
 }
 
 .triangle-line.hypotenuse {
-  stroke: #0369a1;
+  stroke: var(--brand-deep);
 }
 
 .right-angle-mark {
-  stroke: #0f172a;
+  stroke: var(--text);
   stroke-width: 2;
   fill: none;
 }
 
 .label {
   font-size: 18px;
-  fill: #111827;
+  fill: var(--text);
   font-weight: 700;
 }
 
@@ -65,33 +65,35 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #111827;
+  color: var(--text);
   font-weight: 600;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.6rem;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .inputs-grid label.solved {
-  border-color: #0284c7;
-  background: #ecfeff;
+  border-color: var(--brand);
+  background: var(--brand-soft);
 }
 
 input[type='number'] {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
   font-size: 0.95rem;
+  background: var(--surface);
+  color: var(--text);
 }
 
 input[type='number'].solved {
-  border-color: #0284c7;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 25%, transparent);
 }
 
 input[type='number']:disabled {
-  background: #eef2ff;
+  background: var(--brand-soft);
 }
 
 .calculate-btn {
@@ -112,7 +114,7 @@ input[type='number']:disabled {
 
 .error {
   margin-top: 0.75rem;
-  color: #b91c1c;
+  color: var(--error-text);
   font-weight: 600;
 }
 
@@ -120,8 +122,8 @@ input[type='number']:disabled {
   margin-top: 0.75rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #ecfeff;
-  border: 1px solid #99f6e4;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
 }
 
 .angle-arc {
@@ -131,19 +133,19 @@ input[type='number']:disabled {
 }
 
 .angle-label {
-  fill: #6d28d9;
+  fill: #8b5cf6;
   font-size: 15px;
 }
 
 .right-angle-label {
   font-size: 11px;
-  fill: #374151;
+  fill: var(--text-soft);
 }
 
 .inputs-section-label {
   margin: 0.75rem 0 0.35rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-soft);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -153,11 +155,11 @@ input[type='number']:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #d1d5db;
+  border: 1px dashed var(--border);
   border-radius: 8px;
   padding: 0.6rem;
-  background: #f9fafb;
-  color: #6b7280;
+  background: var(--surface-alt);
+  color: var(--text-soft);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -170,7 +172,7 @@ input[type='number']:disabled {
 }
 
 .solved-value {
-  color: #0369a1;
+  color: var(--brand-deep);
   font-weight: 700;
 }
 

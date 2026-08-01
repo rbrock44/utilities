@@ -15,7 +15,7 @@
     border-radius: 999px;
     border: none;
     background: transparent;
-    color: #1976d2;
+    color: var(--brand);
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 500;
@@ -24,11 +24,11 @@
 }
 
 .back-btn:hover {
-    background: rgba(25, 118, 210, 0.1);
+    background: var(--brand-soft);
 }
 
 .back-btn:active {
-    background: rgba(25, 118, 210, 0.16);
+    background: var(--brand-soft);
     transform: scale(0.97);
 }
 

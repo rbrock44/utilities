@@ -3,18 +3,19 @@
   margin: 2rem auto;
   padding: 1.5rem;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #d7dde6;
-  box-shadow: 0 8px 24px rgba(0, 24, 64, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
 
   h2 {
     margin: 0;
     font-size: 1.6rem;
+    color: var(--text);
   }
 
   .description {
     margin: 0.5rem 0 1.25rem;
-    color: #48556a;
+    color: var(--text-soft);
   }
 }
 
@@ -26,9 +27,9 @@
   margin-bottom: 1rem;
 
   button {
-    border: 1px solid #b9c5d6;
-    background: #f8fbff;
-    color: #1d3048;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-alt);
+    color: var(--text);
     border-radius: 999px;
     padding: 0.45rem 0.9rem;
     cursor: pointer;
@@ -36,9 +37,9 @@
   }
 
   button.active {
-    background: #1d3048;
+    background: var(--brand-deep);
     color: #ffffff;
-    border-color: #1d3048;
+    border-color: var(--brand-deep);
   }
 
   button.secondary {
@@ -53,18 +54,19 @@
   label {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #32435b;
+    color: var(--text-soft);
   }
 
   select {
-    border: 1px solid #cad5e4;
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.35rem 0.45rem;
     min-width: 0;
     width: auto;
     max-width: 10.5rem;
     font: inherit;
-    background: #ffffff;
+    background: var(--surface);
+    color: var(--text);
   }
 }
 
@@ -75,37 +77,37 @@
   margin-bottom: 1rem;
 
   div {
-    border: 1px solid #d7dde6;
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 0.75rem;
-    background: #f8fbff;
+    background: var(--surface-alt);
     display: grid;
     gap: 0.25rem;
 
     span {
       font-size: 0.85rem;
-      color: #3e4a5d;
+      color: var(--text-soft);
     }
 
     strong {
       font-size: 1.2rem;
-      color: #12243a;
+      color: var(--text);
     }
   }
 }
 
 .status {
-  color: #394b63;
+  color: var(--text-soft);
 }
 
 .error {
-  color: #9d1f1f;
+  color: var(--error-text);
   font-weight: 600;
 }
 
 .person-card {
   margin-top: 1.3rem;
-  border: 1px solid #d7dde6;
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
 
@@ -116,12 +118,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.9rem 1rem;
-    background: #eef4fb;
-    border-bottom: 1px solid #d7dde6;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
 
     h3 {
       margin: 0;
       font-size: 1.2rem;
+      color: var(--text);
     }
   }
 }
@@ -130,7 +133,7 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  color: #34465f;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -144,26 +147,28 @@
 
   th,
   td {
-    border-bottom: 1px solid #e7edf6;
+    border-bottom: 1px solid var(--border);
     padding: 0.55rem 0.65rem;
     text-align: left;
     font-size: 0.92rem;
+    color: var(--text);
   }
 
   th {
-    background: #f8fbff;
-    color: #233a57;
+    background: var(--surface-alt);
+    color: var(--text);
   }
 
   input,
   select {
     width: 100%;
     min-width: 110px;
-    border: 1px solid #cad5e4;
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 0.35rem 0.45rem;
     font: inherit;
-    background: #ffffff;
+    background: var(--surface);
+    color: var(--text);
   }
 
   input[type='checkbox'] {
@@ -185,26 +190,26 @@
 
   span {
     font-weight: 600;
-    color: #1f3551;
+    color: var(--text);
   }
 }
 
 .table-wrap.meetings {
-  border-top: 1px solid #e1e8f2;
+  border-top: 1px solid var(--border);
 }
 
 .meetings-toggle-row {
   display: flex;
   justify-content: flex-end;
   padding: 0.6rem 0.9rem;
-  border-top: 1px solid #e1e8f2;
-  background: #fbfdff;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
 }
 
 .expand-meetings-btn {
-  border: 1px solid #b9c5d6;
-  background: #f8fbff;
-  color: #1d3048;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-alt);
+  color: var(--text);
   border-radius: 999px;
   padding: 0.35rem 0.8rem;
   cursor: pointer;
@@ -260,10 +265,10 @@
     }
 
     tr {
-      border: 1px solid #e0e8f3;
+      border: 1px solid var(--border);
       border-radius: 10px;
       margin-bottom: 0.7rem;
-      background: #ffffff;
+      background: var(--surface);
       overflow: hidden;
     }
 
@@ -274,13 +279,13 @@
       align-items: center;
       padding: 0.55rem 0.65rem;
       text-align: right;
-      border-bottom: 1px solid #edf2f9;
+      border-bottom: 1px solid var(--border);
     }
 
     td::before {
       content: attr(data-label);
       font-weight: 700;
-      color: #233a57;
+      color: var(--text);
       text-align: left;
       flex: 1;
     }

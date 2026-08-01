@@ -2,19 +2,19 @@
   max-width: 920px;
   margin: 1rem auto;
   padding: 1rem;
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 h2 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .description {
   margin-top: 0.4rem;
-  color: #4b5563;
+  color: var(--text-soft);
 }
 
 .inputs-grid {
@@ -30,15 +30,17 @@ h2 {
   flex-direction: column;
   gap: 0.35rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
 }
 
 input[type='number'] {
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
   font-size: 0.95rem;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .toggle-row {
@@ -47,7 +49,7 @@ input[type='number'] {
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .toggle-row input[type='checkbox'] {
@@ -57,15 +59,15 @@ input[type='number'] {
 
 .error {
   margin-top: 0.75rem;
-  color: #b91c1c;
+  color: var(--error-text);
   font-weight: 600;
 }
 
 .results {
   margin-top: 0.8rem;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--brand-border);
   border-radius: 10px;
-  background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+  background: var(--brand-soft);
   padding: 0.8rem;
 }
 
@@ -74,16 +76,16 @@ input[type='number'] {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.4rem;
-  color: #111827;
+  color: var(--text);
 }
 
 .result-row strong {
-  color: #075985;
+  color: var(--brand-deep);
 }
 
 .note {
   margin: 0.4rem 0 0.6rem;
-  color: #334155;
+  color: var(--text-soft);
   font-size: 0.93rem;
 }
 
@@ -91,9 +93,9 @@ input[type='number'] {
   margin-top: 0.65rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--surface);
 }
 
 table {
@@ -105,13 +107,14 @@ th,
 td {
   text-align: left;
   padding: 0.55rem 0.65rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   font-size: 0.93rem;
+  color: var(--text);
 }
 
 th {
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: var(--brand-soft);
+  color: var(--brand-soft-text);
   font-weight: 700;
 }
 
@@ -121,18 +124,18 @@ tr:last-child td {
 
 .illustration {
   margin-bottom: 0.75rem;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--surface-alt);
   padding: 0.6rem;
 }
 
 .table-toggle {
   margin-top: 0.25rem;
-  border: 1px solid #2563eb;
+  border: 1px solid var(--brand);
   border-radius: 8px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--brand-soft);
+  color: var(--brand-deep);
   font-size: 0.9rem;
   font-weight: 700;
   min-height: 2.5rem;
@@ -141,7 +144,7 @@ tr:last-child td {
 }
 
 .table-toggle:hover {
-  background: #dbeafe;
+  background: var(--brand-soft-hover);
 }
 
 svg {
@@ -150,8 +153,8 @@ svg {
 }
 
 .frame {
-  fill: #ffffff;
-  stroke: #1e3a8a;
+  fill: var(--surface);
+  stroke: var(--brand-soft-text);
   stroke-width: 2;
 }
 
@@ -160,7 +163,7 @@ svg {
 }
 
 .dimension-line {
-  stroke: #334155;
+  stroke: var(--text-soft);
   stroke-width: 1.5;
 }
 
@@ -169,33 +172,33 @@ svg {
 }
 
 .dimension-line.gap {
-  stroke: #1d4ed8;
+  stroke: var(--brand);
 }
 
 .dimension-label {
-  fill: #0f172a;
+  fill: var(--text);
   font-size: 10px;
   font-weight: 700;
 }
 
 .start-tick {
-  stroke: #334155;
+  stroke: var(--text-soft);
   stroke-width: 1.8;
 }
 
 .start-tick-label {
-  fill: #0f172a;
+  fill: var(--text);
   font-size: 8px;
   font-weight: 700;
 }
 
 .axis {
-  stroke: #334155;
+  stroke: var(--text-soft);
   stroke-width: 1.5;
 }
 
 .axis-label {
-  fill: #0f172a;
+  fill: var(--text);
   font-size: 12px;
 }
 

@@ -2,6 +2,31 @@
       <div class="container">
         <h1 class="logo" (click)="goHome()">Dashboard</h1>
         <nav>
+          <button
+            type="button"
+            class="theme-toggle"
+            (click)="themeService.toggle()"
+            [attr.aria-pressed]="themeService.theme() === 'dark'"
+            [attr.aria-label]="themeService.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            @if (themeService.theme() === 'dark') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <line x1="12" y1="2" x2="12" y2="4" />
+                <line x1="12" y1="20" x2="12" y2="22" />
+                <line x1="4" y1="12" x2="2" y2="12" />
+                <line x1="22" y1="12" x2="20" y2="12" />
+                <line x1="4.93" y1="4.93" x2="3.51" y2="3.51" />
+                <line x1="20.49" y1="20.49" x2="19.07" y2="19.07" />
+                <line x1="4.93" y1="19.07" x2="3.51" y2="20.49" />
+                <line x1="20.49" y1="3.51" x2="19.07" y2="4.93" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+              </svg>
+            }
+          </button>
           <a href="https://directory.ryan-brock.com" target="_blank" class="nav-link">
             Directory
           </a>
