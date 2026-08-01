@@ -8,8 +8,33 @@
       <input
         id="emailInput"
         type="email"
-        placeholder="someone@example.com"
+        multiple
+        placeholder="someone@example.com, someone.else@example.com"
         [(ngModel)]="email"
+        (ngModelChange)="generateLink()"
+      />
+    </label>
+
+    <label for="ccInput">
+      Cc
+      <input
+        id="ccInput"
+        type="email"
+        multiple
+        placeholder="someone@example.com, someone.else@example.com"
+        [(ngModel)]="cc"
+        (ngModelChange)="generateLink()"
+      />
+    </label>
+
+    <label for="bccInput">
+      Bcc
+      <input
+        id="bccInput"
+        type="email"
+        multiple
+        placeholder="someone@example.com, someone.else@example.com"
+        [(ngModel)]="bcc"
         (ngModelChange)="generateLink()"
       />
     </label>

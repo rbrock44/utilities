@@ -12,6 +12,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class EmailLinkGeneratorComponent {
   email = '';
+  cc = '';
+  bcc = '';
   subject = '';
   body = '';
   generatedLink = '';
@@ -28,6 +30,14 @@ export class EmailLinkGeneratorComponent {
 
     let link = `mailto:${this.email.trim()}`;
     const params: string[] = [];
+
+    if (this.cc.trim() !== '') {
+      params.push(`cc=${encodeURIComponent(this.cc.trim())}`);
+    }
+
+    if (this.bcc.trim() !== '') {
+      params.push(`bcc=${encodeURIComponent(this.bcc.trim())}`);
+    }
 
     if (this.subject.trim() !== '') {
       params.push(`subject=${encodeURIComponent(this.subject.trim())}`);
