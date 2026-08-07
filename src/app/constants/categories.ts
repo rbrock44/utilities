@@ -133,6 +133,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Generate random hex values with a chosen length and count',
                 icon: '🔢',
                 param: 'hex-generator'
+            },
+            {
+                title: 'GUID Generator',
+                description: 'Generate random GUIDs (UUID v4)',
+                icon: '🆔',
+                param: 'guid-generator'
             }
         ]
     },

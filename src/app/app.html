@@ -75,6 +75,13 @@
   }
 
   @if (
+    this.settingsService.getSelectedTile() === 'gg' ||
+    this.settingsService.getSelectedTile() === 'guid-generator'
+  ) {
+    <app-guid-generator></app-guid-generator>
+  }
+
+  @if (
     this.settingsService.getSelectedTile() === 'lc' ||
     this.settingsService.getSelectedTile() === 'length-converter'
   ) {

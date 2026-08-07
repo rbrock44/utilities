@@ -15,6 +15,7 @@ import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-t
 import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-combiner';
 import { EmailLinkGeneratorComponent } from './components/utilities/email-link-generator/email-link-generator';
 import { HexGeneratorComponent } from './components/utilities/hex-generator/hex-generator';
+import { GuidGeneratorComponent } from './components/utilities/guid-generator/guid-generator';
 import { UnitConverterComponent } from './components/calculators/unit-converter/unit-converter';
 import { CurrencyConverterComponent } from './components/calculators/currency-converter/currency-converter';
 import { LENGTH_UNITS } from './constants/units/length-units';
@@ -37,6 +38,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     PdfCombinerComponent,
     EmailLinkGeneratorComponent,
     HexGeneratorComponent,
+    GuidGeneratorComponent,
     UnitConverterComponent,
     CurrencyConverterComponent,
     SilverInCoinComponent,
