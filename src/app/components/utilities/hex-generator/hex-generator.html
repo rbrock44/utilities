@@ -1,0 +1,64 @@
+<section class="widget-container">
+  <h2>Hex Generator</h2>
+  <p class="description">Generate random hexadecimal values with customization</p>
+
+  <div class="inputs">
+    <label for="digitsInput">
+      Characters
+      <input
+        id="digitsInput"
+        type="number"
+        min="1"
+        step="1"
+        [(ngModel)]="digits"
+        (ngModelChange)="generate()"
+      />
+    </label>
+
+    <label for="countInput">
+      How many
+      <input
+        id="countInput"
+        type="number"
+        min="1"
+        step="1"
+        [(ngModel)]="count"
+        (ngModelChange)="generate()"
+      />
+    </label>
+  </div>
+
+  <button type="button" class="btn-generate" (click)="generate()">Generate</button>
+
+  @if (results.length > 0) {
+    <div class="generated-results">
+      <div class="results-header">
+        <h3>Generated Values</h3>
+        <button
+          type="button"
+          class="btn-copy-all"
+          (click)="copyAllToClipboard()"
+          aria-label="Copy all values to clipboard"
+          title="Copy all to clipboard"
+        >
+          {{ justCopiedAll ? 'Copied!' : 'Copy All' }}
+        </button>
+      </div>
+
+      @for (result of results; track $index) {
+        <div class="result-row">
+          <input type="text" [value]="result" readonly />
+          <button
+            type="button"
+            class="btn-copy"
+            (click)="copyToClipboard(result, $index)"
+            aria-label="Copy value to clipboard"
+            title="Copy to clipboard"
+          >
+            {{ justCopiedIndex === $index ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      }
+    </div>
+  }
+</section>

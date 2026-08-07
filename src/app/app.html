@@ -68,6 +68,13 @@
   }
 
   @if (
+    this.settingsService.getSelectedTile() === 'hg' ||
+    this.settingsService.getSelectedTile() === 'hex-generator'
+  ) {
+    <app-hex-generator></app-hex-generator>
+  }
+
+  @if (
     this.settingsService.getSelectedTile() === 'lc' ||
     this.settingsService.getSelectedTile() === 'length-converter'
   ) {

@@ -125,4 +125,15 @@ export const CATEGORIES: Category[] = [
             }
         ]
     },
+    {
+        name: 'Generators',
+        tiles: [
+            {
+                title: 'Hex Generator',
+                description: 'Generate random hex values with a chosen length and count',
+                icon: '🔢',
+                param: 'hex-generator'
+            }
+        ]
+    },
 ];
