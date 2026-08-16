@@ -106,6 +106,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Equal spacing for divider material along a total width',
                 icon: '📏',
                 param: 'divider-spacing-calculator'
+            },
+            {
+                title: 'Loan Calculator',
+                description: 'Monthly payment, total interest, and amortization schedule',
+                icon: '🏦',
+                param: 'loan-calculator'
             }
         ]
     },

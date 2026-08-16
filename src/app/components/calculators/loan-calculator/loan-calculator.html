@@ -1,0 +1,126 @@
+<section class="widget-container">
+  <h2>Loan Calculator</h2>
+  <p class="description">
+    Work out the monthly payment on a loan, how much of it is interest, and when it is paid off.
+  </p>
+
+  <div class="inputs-grid">
+    <label for="amountInput">
+      Loan amount
+      <input
+        id="amountInput"
+        type="number"
+        min="0"
+        step="1000"
+        [(ngModel)]="amount"
+        (ngModelChange)="calculate()"
+      />
+    </label>
+
+    <label for="rateInput">
+      Interest rate (APR %)
+      <input
+        id="rateInput"
+        type="number"
+        min="0"
+        step="0.05"
+        [(ngModel)]="rate"
+        (ngModelChange)="calculate()"
+      />
+    </label>
+
+    <label for="termInput">
+      Term
+      <span class="term-row">
+        <input
+          id="termInput"
+          type="number"
+          min="1"
+          step="1"
+          [(ngModel)]="term"
+          (ngModelChange)="calculate()"
+        />
+        <select
+          [(ngModel)]="termUnit"
+          (ngModelChange)="calculate()"
+          aria-label="Term unit"
+        >
+          <option value="years">years</option>
+          <option value="months">months</option>
+        </select>
+      </span>
+    </label>
+
+    <label for="startInput">
+      First payment
+      <input id="startInput" type="month" [(ngModel)]="startDate" (ngModelChange)="calculate()" />
+    </label>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (summary) {
+    <div class="summary" aria-live="polite">
+      <div class="headline">
+        <span class="headline-label">Monthly payment</span>
+        <span class="headline-value">{{ money(summary.monthlyPayment) }}</span>
+      </div>
+
+      <div class="summary-rows">
+        <div class="summary-row">
+          <span>Total interest</span>
+          <strong>{{ money(summary.totalInterest) }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total paid</span>
+          <strong>{{ money(summary.totalPaid) }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Interest share</span>
+          <strong>{{ interestShare.toFixed(1) }}%</strong>
+        </div>
+        <div class="summary-row">
+          <span>Paid off</span>
+          <strong>{{ summary.payoffLabel }} · {{ summary.months }} payments</strong>
+        </div>
+      </div>
+    </div>
+
+    <h3>Amortization schedule</h3>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date</th>
+            <th scope="col">Payment</th>
+            <th scope="col">Principal</th>
+            <th scope="col">Interest</th>
+            <th scope="col">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of visibleSchedule; track row.index) {
+            <tr>
+              <td>{{ row.index }}</td>
+              <td>{{ row.dateLabel }}</td>
+              <td>{{ money(row.payment) }}</td>
+              <td>{{ money(row.principal) }}</td>
+              <td class="interest">{{ money(row.interest) }}</td>
+              <td>{{ money(row.balance) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (hiddenCount > 0) {
+      <button type="button" class="btn-secondary" (click)="toggleAll()">
+        {{ showAll ? 'Show first 12 payments' : 'Show all ' + schedule.length + ' payments' }}
+      </button>
+    }
+  }
+</section>
