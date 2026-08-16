@@ -133,6 +133,13 @@
   ) {
     <app-number-base-converter></app-number-base-converter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'b64' ||
+    this.settingsService.getSelectedTile() === 'base64-converter'
+  ) {
+    <app-base64-converter></app-base64-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

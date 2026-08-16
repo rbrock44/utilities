@@ -1,0 +1,164 @@
+<section class="widget-container">
+  <h2>Base64 Encoder/Decoder</h2>
+  <p class="description">
+    Encode or decode Base64 text, or turn a file into a Base64 string
+  </p>
+
+  <div class="segmented" role="tablist" aria-label="Input type">
+    <button
+      type="button"
+      class="segment"
+      role="tab"
+      [class.active]="mode === 'text'"
+      [attr.aria-selected]="mode === 'text'"
+      (click)="setMode('text')"
+    >
+      Text
+    </button>
+    <button
+      type="button"
+      class="segment"
+      role="tab"
+      [class.active]="mode === 'file'"
+      [attr.aria-selected]="mode === 'file'"
+      (click)="setMode('file')"
+    >
+      File
+    </button>
+  </div>
+
+  @if (mode === 'text') {
+    <div class="segmented direction" role="group" aria-label="Direction">
+      <button
+        type="button"
+        class="segment"
+        [class.active]="direction === 'encode'"
+        (click)="setDirection('encode')"
+      >
+        Text → Base64
+      </button>
+      <button
+        type="button"
+        class="segment"
+        [class.active]="direction === 'decode'"
+        (click)="setDirection('decode')"
+      >
+        Base64 → Text
+      </button>
+    </div>
+
+    <label for="inputArea" class="field">
+      {{ direction === 'encode' ? 'Plain text' : 'Base64' }}
+      <textarea
+        id="inputArea"
+        rows="5"
+        spellcheck="false"
+        [placeholder]="direction === 'encode' ? 'Type or paste text…' : 'Paste Base64…'"
+        [(ngModel)]="input"
+        (ngModelChange)="convert()"
+      ></textarea>
+    </label>
+
+    @if (direction === 'encode') {
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="urlSafe" (ngModelChange)="convert()" />
+        URL-safe alphabet (<code>-_</code> instead of <code>+/</code>, no padding)
+      </label>
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <label for="outputArea" class="field">
+      {{ direction === 'encode' ? 'Base64' : 'Plain text' }}
+      <textarea id="outputArea" rows="5" readonly [value]="output"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" [disabled]="output === ''" (click)="copyResult()">
+        {{ justCopied ? 'Copied!' : 'Copy result' }}
+      </button>
+      <button
+        type="button"
+        class="btn-secondary"
+        [disabled]="output === '' || errorMessage !== null"
+        (click)="swap()"
+      >
+        ⇅ Use as input
+      </button>
+      <button type="button" class="btn-secondary" [disabled]="input === ''" (click)="clearText()">
+        Clear
+      </button>
+    </div>
+  } @else {
+    @if (file === null) {
+      <div
+        class="drop-zone"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+        role="button"
+        tabindex="0"
+        aria-label="Upload a file to encode"
+        (keydown.enter)="fileInput.click()"
+        (keydown.space)="fileInput.click()"
+      >
+        <span class="drop-icon">🔤</span>
+        <span class="drop-text">Drag &amp; drop a file here, or click to browse</span>
+        <span class="drop-hint">Any file type, up to 10 MB</span>
+        <input #fileInput type="file" hidden (change)="onFileInputChange($event)" />
+      </div>
+    } @else {
+      <div class="file-bar">
+        <span class="file-icon">📎</span>
+        <span class="file-info">
+          <span class="file-name" [title]="file.name">{{ file.name }}</span>
+          <span class="file-meta">
+            @if (isReading) {
+              reading…
+            } @else {
+              {{ fileSizeLabel }} → {{ encodedSizeLabel }} encoded
+            }
+          </span>
+        </span>
+        <button type="button" class="btn-secondary" (click)="clearFile()">Choose another</button>
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="includeDataUri" />
+        Include <code>data:</code> URI prefix (paste straight into CSS or an
+        <code>&lt;img&gt;</code> tag)
+      </label>
+
+      @if (!includeDataUri) {
+        <label class="checkbox">
+          <input type="checkbox" [(ngModel)]="urlSafe" />
+          URL-safe alphabet
+        </label>
+      }
+
+      <label for="fileOutputArea" class="field">
+        Base64
+        <textarea id="fileOutputArea" rows="7" readonly [value]="fileOutput"></textarea>
+      </label>
+
+      <div class="actions">
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="fileOutput === ''"
+          (click)="copyResult()"
+        >
+          {{ justCopied ? 'Copied!' : 'Copy result' }}
+        </button>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+  }
+</section>

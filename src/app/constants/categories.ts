@@ -138,6 +138,17 @@ export const CATEGORIES: Category[] = [
         ]
     },
     {
+        name: 'Developer Tools',
+        tiles: [
+            {
+                title: 'Base64 Encoder/Decoder',
+                description: 'Encode or decode Base64 text, or convert a file to Base64',
+                icon: '🔤',
+                param: 'base64-converter'
+            }
+        ]
+    },
+    {
         name: 'Generators',
         tiles: [
             {
