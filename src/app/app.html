@@ -61,6 +61,13 @@
   }
 
   @if (
+    this.settingsService.getSelectedTile() === 'ppu' ||
+    this.settingsService.getSelectedTile() === 'pdf-page-utility'
+  ) {
+    <app-pdf-page-utility></app-pdf-page-utility>
+  }
+
+  @if (
     this.settingsService.getSelectedTile() === 'elg' ||
     this.settingsService.getSelectedTile() === 'email-link-generator'
   ) {

@@ -71,6 +71,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Merge multiple PDFs into one',
                 icon: '📑',
                 param: 'pdf-combiner'
+            },
+            {
+                title: 'PDF Page Utility',
+                description: 'Extract, delete, reorder, or rotate pages',
+                icon: '✂️',
+                param: 'pdf-page-utility'
             }
         ]
     },

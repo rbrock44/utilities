@@ -13,6 +13,7 @@ import { CleaningPayoutCalculatorComponent } from './components/calculators/clea
 import { DividerSpacingCalculatorComponent } from './components/calculators/divider-spacing-calculator/divider-spacing-calculator';
 import { ImageToPdfComponent } from './components/utilities/image-to-pdf/image-to-pdf';
 import { PdfCombinerComponent } from './components/utilities/pdf-combiner/pdf-combiner';
+import { PdfPageUtilityComponent } from './components/utilities/pdf-page-utility/pdf-page-utility';
 import { EmailLinkGeneratorComponent } from './components/utilities/email-link-generator/email-link-generator';
 import { HexGeneratorComponent } from './components/utilities/hex-generator/hex-generator';
 import { GuidGeneratorComponent } from './components/utilities/guid-generator/guid-generator';
@@ -36,6 +37,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     DividerSpacingCalculatorComponent,
     ImageToPdfComponent,
     PdfCombinerComponent,
+    PdfPageUtilityComponent,
     EmailLinkGeneratorComponent,
     HexGeneratorComponent,
     GuidGeneratorComponent,
