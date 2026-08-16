@@ -19,6 +19,7 @@ import { HexGeneratorComponent } from './components/utilities/hex-generator/hex-
 import { GuidGeneratorComponent } from './components/utilities/guid-generator/guid-generator';
 import { UnitConverterComponent } from './components/calculators/unit-converter/unit-converter';
 import { CurrencyConverterComponent } from './components/calculators/currency-converter/currency-converter';
+import { NumberBaseConverterComponent } from './components/calculators/number-base-converter/number-base-converter';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -43,6 +44,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     GuidGeneratorComponent,
     UnitConverterComponent,
     CurrencyConverterComponent,
+    NumberBaseConverterComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

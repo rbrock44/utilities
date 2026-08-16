@@ -1,0 +1,60 @@
+<section class="widget-container">
+  <h2>Number Base Converter</h2>
+  <p class="description">
+    Convert between binary, octal, decimal, and hexadecimal. Type in any field and the rest update.
+  </p>
+
+  <div class="base-rows">
+    @for (field of bases; track field.base) {
+      <div class="base-row">
+        <label [for]="field.id" class="base-label">
+          {{ field.label }}
+          <span class="base-tag">base {{ field.base }}</span>
+        </label>
+        <div class="base-input-wrap">
+          <input
+            [id]="field.id"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            [placeholder]="field.placeholder"
+            [(ngModel)]="values[field.base]"
+            (ngModelChange)="onValueChange(field.base)"
+          />
+          <button
+            type="button"
+            class="btn-copy"
+            [disabled]="values[field.base] === ''"
+            (click)="copy(field.base)"
+            [attr.aria-label]="'Copy ' + field.label + ' value to clipboard'"
+            title="Copy to clipboard"
+          >
+            {{ justCopiedBase === field.base ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (value !== null) {
+    <div class="info" aria-live="polite">
+      <span class="info-item">{{ bitLength }} bit{{ bitLength !== 1 ? 's' : '' }}</span>
+      <span class="info-item">{{ byteLength }} byte{{ byteLength !== 1 ? 's' : '' }}</span>
+      @if (isNegative) {
+        <span class="info-item">negative</span>
+      }
+    </div>
+  }
+
+  <p class="field-hint">
+    Spaces, commas, and underscores are ignored, so grouped values like
+    <code>1111_0000</code> paste cleanly. <code>0x</code>, <code>0b</code>, and
+    <code>0o</code> prefixes are accepted.
+  </p>
+
+  <button type="button" class="btn-clear" [disabled]="!hasInput" (click)="clearAll()">Clear</button>
+</section>

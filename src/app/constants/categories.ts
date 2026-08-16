@@ -54,6 +54,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert between world currencies using live rates',
                 icon: '💱',
                 param: 'currency-converter'
+            },
+            {
+                title: 'Number Base Converter',
+                description: 'Convert between binary, octal, decimal, and hexadecimal',
+                icon: '🧮',
+                param: 'number-base-converter'
             }
         ]
     },

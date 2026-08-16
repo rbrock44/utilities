@@ -126,6 +126,13 @@
   ) {
     <app-currency-converter></app-currency-converter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'nbc' ||
+    this.settingsService.getSelectedTile() === 'number-base-converter'
+  ) {
+    <app-number-base-converter></app-number-base-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {
