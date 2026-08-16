@@ -1,0 +1,283 @@
+.widget-container {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
+}
+
+.drop-zone {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2rem 1rem;
+  border: 2px dashed var(--brand-border);
+  border-radius: 10px;
+  background: var(--brand-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  background: var(--brand-soft-hover);
+  border-color: var(--brand);
+}
+
+.drop-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.drop-text {
+  font-weight: 600;
+  color: var(--brand-soft-text);
+}
+
+.drop-hint {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+.file-bar {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.segmented {
+  margin-top: 0.85rem;
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segment {
+  flex: 1;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-soft);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.segment + .segment {
+  border-left: 1px solid var(--border);
+}
+
+.segment.active {
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.controls {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.controls label,
+.slider-field {
+  flex: 1;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.93rem;
+}
+
+.slider-field {
+  margin-top: 0.75rem;
+}
+
+input[type='number'],
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--brand);
+}
+
+.checkbox {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.result {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  padding: 0.8rem;
+}
+
+.preview {
+  max-width: 220px;
+  max-height: 180px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+}
+
+.result-meta {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.result-row strong {
+  color: var(--text);
+}
+
+.smaller {
+  color: var(--success);
+}
+
+.larger {
+  color: var(--warning-text);
+}
+
+.actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  border: none;
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-deep);
+}
+
+.btn-secondary {
+  flex-shrink: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-sunken);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--warning-text);
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .preview {
+    max-width: 100%;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+}

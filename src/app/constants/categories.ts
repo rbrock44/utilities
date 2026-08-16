@@ -144,6 +144,17 @@ export const CATEGORIES: Category[] = [
         ]
     },
     {
+        name: 'Image Utilities',
+        tiles: [
+            {
+                title: 'Image Resizer',
+                description: 'Resize images and convert between PNG, JPEG, and WebP',
+                icon: '🖼️',
+                param: 'image-resizer'
+            }
+        ]
+    },
+    {
         name: 'Developer Tools',
         tiles: [
             {

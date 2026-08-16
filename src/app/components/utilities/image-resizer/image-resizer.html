@@ -1,0 +1,167 @@
+<section class="widget-container">
+  <h2>Image Resizer</h2>
+  <p class="description">
+    Resize an image and convert between PNG, JPEG, and WebP, in browser only.
+  </p>
+
+  @if (file === null) {
+    <div
+      class="drop-zone"
+      [class.dragging]="isDragging"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+      role="button"
+      tabindex="0"
+      aria-label="Upload an image"
+      (keydown.enter)="fileInput.click()"
+      (keydown.space)="fileInput.click()"
+    >
+      <span class="drop-icon">🖼️</span>
+      <span class="drop-text">Drag &amp; drop an image here, or click to browse</span>
+      <span class="drop-hint">PNG, JPEG, WebP, GIF, or SVG · up to 25 MB</span>
+      <input #fileInput type="file" accept="image/*" hidden (change)="onFileInputChange($event)" />
+    </div>
+  } @else {
+    <div class="file-bar">
+      <span class="file-info">
+        <span class="file-name" [title]="file.name">{{ file.name }}</span>
+        <span class="file-meta">
+          {{ originalWidth }} × {{ originalHeight }} · {{ formatBytes(originalSize) }}
+        </span>
+      </span>
+      <button type="button" class="btn-secondary" (click)="clear()">Choose another</button>
+    </div>
+
+    <div class="segmented">
+      <button
+        type="button"
+        class="segment"
+        [class.active]="mode === 'dimensions'"
+        (click)="onModeChange('dimensions')"
+      >
+        Dimensions
+      </button>
+      <button
+        type="button"
+        class="segment"
+        [class.active]="mode === 'percent'"
+        (click)="onModeChange('percent')"
+      >
+        Percentage
+      </button>
+    </div>
+
+    @if (mode === 'dimensions') {
+      <div class="controls">
+        <label for="widthInput">
+          Width (px)
+          <input
+            id="widthInput"
+            type="number"
+            min="1"
+            [(ngModel)]="targetWidth"
+            (ngModelChange)="onWidthChange()"
+          />
+        </label>
+        <label for="heightInput">
+          Height (px)
+          <input
+            id="heightInput"
+            type="number"
+            min="1"
+            [(ngModel)]="targetHeight"
+            (ngModelChange)="onHeightChange()"
+          />
+        </label>
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="lockAspect" />
+        Lock aspect ratio
+      </label>
+    } @else {
+      <label for="percentInput" class="slider-field">
+        Scale — {{ percent }}% ({{ targetWidth }} × {{ targetHeight }})
+        <input
+          id="percentInput"
+          type="range"
+          min="1"
+          max="200"
+          step="1"
+          [(ngModel)]="percent"
+          (ngModelChange)="onPercentChange()"
+        />
+      </label>
+    }
+
+    <div class="controls">
+      <label for="formatSelect">
+        Format
+        <select id="formatSelect" [(ngModel)]="format" (ngModelChange)="scheduleRender()">
+          <option value="original">Keep original</option>
+          <option value="image/png">PNG</option>
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+        </select>
+      </label>
+
+      @if (usesQuality) {
+        <label for="qualityInput" class="slider-field">
+          Quality — {{ quality }}%
+          <input
+            id="qualityInput"
+            type="range"
+            min="1"
+            max="100"
+            step="1"
+            [(ngModel)]="quality"
+            (ngModelChange)="scheduleRender()"
+          />
+        </label>
+      }
+    </div>
+
+    @if (flattensAlpha) {
+      <p class="note">JPEG has no transparency — any transparent areas become white.</p>
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (outputUrl) {
+      <div class="result" aria-live="polite">
+        <img class="preview" [src]="outputUrl" alt="Resized preview" />
+        <div class="result-meta">
+          <div class="result-row">
+            <span>New size</span>
+            <strong>{{ targetWidth }} × {{ targetHeight }}</strong>
+          </div>
+          <div class="result-row">
+            <span>File size</span>
+            <strong>{{ formatBytes(outputSize) }}</strong>
+          </div>
+          <div class="result-row">
+            <span>Change</span>
+            <strong [class.smaller]="sizeDelta < 0" [class.larger]="sizeDelta > 0">
+              {{ sizeDelta > 0 ? '+' : '' }}{{ sizeDelta.toFixed(1) }}%
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" [disabled]="isProcessing" (click)="download()">
+          @if (isProcessing) {
+            Working…
+          } @else {
+            ⬇ Download image
+          }
+        </button>
+        <button type="button" class="btn-secondary" (click)="resetSize()">Reset size</button>
+      </div>
+    }
+  }
+</section>

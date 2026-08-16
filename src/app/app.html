@@ -161,6 +161,13 @@
   ) {
     <app-loan-calculator></app-loan-calculator>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'imr' ||
+    this.settingsService.getSelectedTile() === 'image-resizer'
+  ) {
+    <app-image-resizer></app-image-resizer>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

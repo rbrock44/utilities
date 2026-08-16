@@ -24,6 +24,7 @@ import { Base64ConverterComponent } from './components/utilities/base64-converte
 import { TimestampConverterComponent } from './components/utilities/timestamp-converter/timestamp-converter';
 import { ColorConverterComponent } from './components/utilities/color-converter/color-converter';
 import { LoanCalculatorComponent } from './components/calculators/loan-calculator/loan-calculator';
+import { ImageResizerComponent } from './components/utilities/image-resizer/image-resizer';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -53,6 +54,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     TimestampConverterComponent,
     ColorConverterComponent,
     LoanCalculatorComponent,
+    ImageResizerComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,
