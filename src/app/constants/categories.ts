@@ -145,6 +145,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Encode or decode Base64 text, or convert a file to Base64',
                 icon: '🔤',
                 param: 'base64-converter'
+            },
+            {
+                title: 'Unix Timestamp Converter',
+                description: 'Convert epoch timestamps to a date and back',
+                icon: '⏰',
+                param: 'timestamp-converter'
             }
         ]
     },

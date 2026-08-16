@@ -140,6 +140,13 @@
   ) {
     <app-base64-converter></app-base64-converter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'tsc' ||
+    this.settingsService.getSelectedTile() === 'timestamp-converter'
+  ) {
+    <app-timestamp-converter></app-timestamp-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

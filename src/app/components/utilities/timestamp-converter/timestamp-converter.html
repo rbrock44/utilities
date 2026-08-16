@@ -1,0 +1,122 @@
+<section class="widget-container">
+  <h2>Unix Timestamp Converter</h2>
+  <p class="description">
+    Convert Unix epoch timestamps to a readable date and back. Seconds, milliseconds, microseconds,
+    and nanoseconds are all detected automatically.
+  </p>
+
+  <div class="now-bar">
+    <span class="now-label">Right now</span>
+    <span class="now-value">{{ nowSeconds }}</span>
+    <button
+      type="button"
+      class="btn-copy"
+      (click)="copy('now', nowSeconds.toString())"
+      aria-label="Copy the current epoch seconds"
+    >
+      {{ copiedKey === 'now' ? 'Copied!' : 'Copy' }}
+    </button>
+    <button type="button" class="btn-copy" (click)="useNow()">Use it</button>
+  </div>
+
+  <h3>Timestamp → date</h3>
+
+  <div class="inputs">
+    <label for="timestampInput" class="grow">
+      Timestamp
+      <input
+        id="timestampInput"
+        type="text"
+        inputmode="numeric"
+        spellcheck="false"
+        placeholder="1755360000"
+        [(ngModel)]="timestampInput"
+        (ngModelChange)="parseTimestamp()"
+      />
+    </label>
+
+    <label for="unitSelect">
+      Unit
+      <select id="unitSelect" [(ngModel)]="unit" (ngModelChange)="parseTimestamp()">
+        <option value="auto">Auto-detect</option>
+        <option value="seconds">Seconds</option>
+        <option value="milliseconds">Milliseconds</option>
+        <option value="microseconds">Microseconds</option>
+        <option value="nanoseconds">Nanoseconds</option>
+      </select>
+    </label>
+  </div>
+
+  @if (timestampError) {
+    <p class="error" role="alert">{{ timestampError }}</p>
+  }
+
+  @if (timestampRows.length > 0) {
+    @if (unit === 'auto') {
+      <p class="detected">Read as {{ detectedUnitLabel }}.</p>
+    }
+
+    <div class="results" aria-live="polite">
+      @for (row of timestampRows; track row.key) {
+        <div class="result-row">
+          <span class="result-label">{{ row.label }}</span>
+          <span class="result-value">{{ row.value }}</span>
+          <button
+            type="button"
+            class="btn-copy"
+            (click)="copy(row.key, row.value)"
+            [attr.aria-label]="'Copy ' + row.label"
+          >
+            {{ copiedKey === row.key ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <h3>Date → timestamp</h3>
+
+  <div class="inputs">
+    <label for="dateInput" class="grow">
+      Date and time
+      <input
+        id="dateInput"
+        type="datetime-local"
+        step="1"
+        [(ngModel)]="dateInput"
+        (ngModelChange)="parseDate()"
+      />
+    </label>
+
+    <label for="basisSelect">
+      Interpret as
+      <select id="basisSelect" [(ngModel)]="basis" (ngModelChange)="parseDate()">
+        <option value="local">Local time</option>
+        <option value="utc">UTC</option>
+      </select>
+    </label>
+  </div>
+
+  @if (dateError) {
+    <p class="error" role="alert">{{ dateError }}</p>
+  }
+
+  @if (dateRows.length > 0) {
+    <div class="results" aria-live="polite">
+      @for (row of dateRows; track row.key) {
+        <div class="result-row">
+          <span class="result-label">{{ row.label }}</span>
+          <span class="result-value">{{ row.value }}</span>
+          <button
+            type="button"
+            class="btn-copy"
+            (click)="copy(row.key, row.value)"
+            [attr.aria-label]="'Copy ' + row.label"
+          >
+            {{ copiedKey === row.key ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      }
+    </div>
+  }
+</section>
