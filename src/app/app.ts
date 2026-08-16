@@ -22,6 +22,7 @@ import { CurrencyConverterComponent } from './components/calculators/currency-co
 import { NumberBaseConverterComponent } from './components/calculators/number-base-converter/number-base-converter';
 import { Base64ConverterComponent } from './components/utilities/base64-converter/base64-converter';
 import { TimestampConverterComponent } from './components/utilities/timestamp-converter/timestamp-converter';
+import { ColorConverterComponent } from './components/utilities/color-converter/color-converter';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -49,6 +50,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     NumberBaseConverterComponent,
     Base64ConverterComponent,
     TimestampConverterComponent,
+    ColorConverterComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

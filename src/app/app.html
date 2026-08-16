@@ -147,6 +147,13 @@
   ) {
     <app-timestamp-converter></app-timestamp-converter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'clr' ||
+    this.settingsService.getSelectedTile() === 'color-converter'
+  ) {
+    <app-color-converter></app-color-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

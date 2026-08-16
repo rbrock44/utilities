@@ -151,6 +151,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert epoch timestamps to a date and back',
                 icon: '⏰',
                 param: 'timestamp-converter'
+            },
+            {
+                title: 'Color Converter',
+                description: 'Convert HEX, RGB, and HSL, and check WCAG contrast',
+                icon: '🎨',
+                param: 'color-converter'
             }
         ]
     },

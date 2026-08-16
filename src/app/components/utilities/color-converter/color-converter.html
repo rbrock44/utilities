@@ -1,0 +1,106 @@
+<section class="widget-container">
+  <h2>Color Converter</h2>
+  <p class="description">
+    Convert a color between HEX, RGB, and HSL, then check it for WCAG contrast against a background.
+  </p>
+
+  <div class="picker-row">
+    <input
+      type="color"
+      class="picker"
+      [value]="pickerValue"
+      (input)="onPickerChange($event)"
+      aria-label="Pick a color"
+    />
+    <div class="swatch-info">
+      <span class="swatch-hex">{{ values.hex }}</span>
+      <span class="swatch-hint">Pick a color, or type any format below</span>
+    </div>
+  </div>
+
+  <div class="fields">
+    @for (format of formats; track format.key) {
+      <div class="field">
+        <label [for]="'field-' + format.key">{{ format.label }}</label>
+        <div class="field-input">
+          <input
+            [id]="'field-' + format.key"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            [placeholder]="format.placeholder"
+            [(ngModel)]="values[format.key]"
+            (ngModelChange)="onFieldChange(format.key)"
+          />
+          <button
+            type="button"
+            class="btn-copy"
+            (click)="copy(format.key, values[format.key])"
+            [attr.aria-label]="'Copy ' + format.label + ' value'"
+          >
+            {{ copiedKey === format.key ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  <h3>Contrast</h3>
+
+  <div class="contrast-controls">
+    <label for="backgroundHexInput" class="bg-field">
+      Background
+      <span class="field-input">
+        <input
+          type="color"
+          class="picker small"
+          [value]="backgroundCss"
+          (input)="onBackgroundPickerChange($event)"
+          aria-label="Pick a background color"
+        />
+        <input
+          id="backgroundHexInput"
+          type="text"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="#FFFFFF"
+          [(ngModel)]="backgroundHex"
+          (ngModelChange)="onBackgroundChange()"
+        />
+      </span>
+    </label>
+
+    <button type="button" class="btn-secondary" (click)="swap()">⇅ Swap</button>
+  </div>
+
+  @if (backgroundError) {
+    <p class="error" role="alert">{{ backgroundError }}</p>
+  }
+
+  <div class="contrast-panel" aria-live="polite">
+    <div class="preview" [style.background]="backgroundCss" [style.color]="colorCss">
+      <span class="preview-large">Large text</span>
+      <span class="preview-small">Normal body text at a smaller size</span>
+    </div>
+
+    <div class="contrast-detail">
+      <span class="ratio">{{ contrastLabel }}</span>
+      <div class="badges">
+        @for (check of checks; track check.label) {
+          <span class="badge" [class.pass]="check.passes">
+            {{ check.label }} {{ check.passes ? '✓' : '✕' }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <p class="field-hint">
+    Large text means 18pt/24px, or 14pt/18.66px bold. Alpha channels are not supported — contrast is
+    measured on opaque colors.
+  </p>
+</section>
