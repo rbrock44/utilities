@@ -1,0 +1,40 @@
+<!-- Template for src/app/components/<group>/<folder>/<folder>.html -->
+<section class="widget-container">
+  <h2>Widget Title</h2>
+  <p class="description">One line describing what this utility does.</p>
+
+  <div class="inputs">
+    <label for="valueInput">
+      Value
+      <input id="valueInput" type="text" [(ngModel)]="input" (ngModelChange)="compute()" />
+    </label>
+  </div>
+
+  <button type="button" class="btn-primary" (click)="compute()">Calculate</button>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (result) {
+    <div class="results" aria-live="polite">
+      <div class="results-header">
+        <h3>Result</h3>
+        <button
+          type="button"
+          class="btn-copy"
+          (click)="copyToClipboard(result)"
+          aria-label="Copy result to clipboard"
+          title="Copy to clipboard"
+        >
+          {{ justCopied ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+
+      <div class="result-row">
+        <span>Output</span>
+        <strong>{{ result }}</strong>
+      </div>
+    </div>
+  }
+</section>
