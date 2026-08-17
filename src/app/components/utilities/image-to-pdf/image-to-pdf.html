@@ -31,14 +31,63 @@
   @if (images.length > 0) {
     <div class="preview-header">
       <span class="preview-count">{{ images.length }} image{{ images.length !== 1 ? 's' : '' }}</span>
-      <button type="button" class="btn-clear" (click)="images = []">Clear all</button>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-sort"
+          [class.active]="sortDirection !== null"
+          (click)="toggleSort()"
+          [attr.aria-pressed]="sortDirection !== null"
+          title="Sort by filename — click again to reverse"
+        >
+          {{ sortDirection === 'desc' ? '↑' : '↓' }} {{ sortLabel }}
+        </button>
+        <button type="button" class="btn-clear" (click)="clearAll()">Clear all</button>
+      </div>
     </div>
 
-    <ul class="preview-list" aria-label="Image list">
+    <p class="reorder-hint">Drag the ⠿ handle to reorder pages.</p>
+
+    @if (brokenCount > 0) {
+      <p class="warning-banner" role="alert">
+        {{ brokenCount }} file{{ brokenCount !== 1 ? 's' : '' }} could not be read and will be
+        skipped. Re-export {{ brokenCount !== 1 ? 'them' : 'it' }} as JPG or PNG and add
+        {{ brokenCount !== 1 ? 'them' : 'it' }} again.
+      </p>
+    }
+
+    <ul
+      class="preview-list"
+      aria-label="Image list"
+      cdkDropList
+      (cdkDropListDropped)="onListDrop($event)"
+    >
       @for (img of images; track img.id; let i = $index) {
-        <li class="preview-item">
-          <img [src]="img.dataUrl" [alt]="img.name" class="thumbnail" />
-          <span class="img-name" [title]="img.name">{{ img.name }}</span>
+        <li class="preview-item" [class.broken]="img.usable === false" cdkDrag>
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          <button
+            type="button"
+            class="drag-handle"
+            cdkDragHandle
+            aria-label="Drag to reorder"
+            title="Drag to reorder"
+          >⠿</button>
+          <span class="page-number">{{ i + 1 }}</span>
+          @if (img.dataUrl) {
+            <img [src]="img.dataUrl" [alt]="img.name" class="thumbnail" />
+          } @else {
+            <span class="thumbnail thumbnail-empty" aria-hidden="true"></span>
+          }
+          <span class="img-meta">
+            <span class="img-name" [title]="img.name">{{ img.name }}</span>
+            @if (img.usable === false) {
+              <span class="img-status error">Unreadable — will be skipped</span>
+            } @else if (img.usable === null) {
+              <span class="img-status">Loading…</span>
+            } @else {
+              <span class="img-status">{{ img.width }} × {{ img.height }}</span>
+            }
+          </span>
           <div class="item-actions">
             <button
               type="button"
@@ -119,9 +168,11 @@
       (click)="generatePdf()"
     >
       @if (isGenerating) {
-        Generating…
+        Generating… {{ generatedCount }}/{{ usableCount }}
+      } @else if (isLoading) {
+        Reading images…
       } @else {
-        ⬇ Download PDF
+        ⬇ Download PDF ({{ usableCount }} page{{ usableCount !== 1 ? 's' : '' }})
       }
     </button>
   }
