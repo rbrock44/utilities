@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 
 type Mode = 'text' | 'inspect';
 type Direction = 'encode' | 'decode';
@@ -19,7 +26,7 @@ interface QueryParam {
 @Component({
   selector: 'app-url-encoder',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CdkDropList, CdkDrag, CdkDragHandle],
   templateUrl: './url-encoder.html',
   styleUrl: './url-encoder.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -177,6 +184,15 @@ export class UrlEncoderComponent implements OnDestroy {
   removeParam(index: number): void {
     this.params = this.params.filter((_, position) => position !== index);
     this.cdr.markForCheck();
+  }
+
+  /** Query string is rebuilt in list order, so dragging a row rewrites the URL. */
+  onParamDrop(event: CdkDragDrop<QueryParam[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    const reordered = [...this.params];
+    moveItemInArray(reordered, event.previousIndex, event.currentIndex);
+    this.params = reordered;
+    this.onParamChange();
   }
 
   onParamChange(): void {

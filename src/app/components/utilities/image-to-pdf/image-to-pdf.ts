@@ -20,6 +20,8 @@ interface ImageEntry {
   usable: boolean | null;
   width: number;
   height: number;
+  /** Format jsPDF can embed as-is, or null when the bytes must be redrawn first. */
+  passthroughFormat: 'JPEG' | 'PNG' | null;
 }
 
 type PageSize = 'a4' | 'letter' | 'legal';
@@ -119,6 +121,7 @@ export class ImageToPdfComponent {
       usable: null,
       width: 0,
       height: 0,
+      passthroughFormat: null,
     }));
     this.images = [...this.images, ...entries];
     this.sortDirection = null;
@@ -136,6 +139,7 @@ export class ImageToPdfComponent {
       entry.usable = img !== null;
       entry.width = img?.naturalWidth ?? 0;
       entry.height = img?.naturalHeight ?? 0;
+      entry.passthroughFormat = await this.detectPassthroughFormat(entry.file);
       this.cdr.markForCheck();
     };
     reader.onerror = () => {
@@ -143,6 +147,49 @@ export class ImageToPdfComponent {
       this.cdr.markForCheck();
     };
     reader.readAsDataURL(entry.file);
+  }
+
+  private async detectPassthroughFormat(file: File): Promise<'JPEG' | 'PNG' | null> {
+    try {
+      // The frame header sits before the scan data; 256 KB clears even fat EXIF/ICC blocks.
+      const head = new Uint8Array(await file.slice(0, 262144).arrayBuffer());
+
+      if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47) {
+        return 'PNG';
+      }
+      if (head[0] !== 0xff || head[1] !== 0xd8) return null;
+
+      let offset = 2;
+      while (offset + 9 < head.length) {
+        if (head[offset] !== 0xff) {
+          offset++;
+          continue;
+        }
+        const marker = head[offset + 1];
+        // Padding, restart markers and SOI carry no payload.
+        if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+          offset += 2;
+          continue;
+        }
+        // Scan data or end of image: no frame header found.
+        if (marker === 0xda || marker === 0xd9) return null;
+
+        // SOF markers are C0-CF except C4 (Huffman tables), C8 (reserved) and CC (arithmetic tables).
+        const isFrameHeader =
+          marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
+        if (isFrameHeader) {
+          const progressive = marker === 0xc2 || marker === 0xc6 || marker === 0xca || marker === 0xce;
+          const arithmetic = marker >= 0xc9;
+          const components = head[offset + 9];
+          const plainColour = components === 1 || components === 3;
+          return !progressive && !arithmetic && plainColour ? 'JPEG' : null;
+        }
+        offset += 2 + ((head[offset + 2] << 8) | head[offset + 3]);
+      }
+    } catch {
+      // Fall through — redrawing is always the safe option.
+    }
+    return null;
   }
 
   private decode(dataUrl: string): Promise<HTMLImageElement | null> {
@@ -239,7 +286,20 @@ export class ImageToPdfComponent {
 
         if (written > 0) pdf.addPage();
         const rect = this.computeRect(img, pageWidth, pageHeight);
-        pdf.addImage(this.renderToJpeg(img, rect.w, rect.h), 'JPEG', rect.x, rect.y, rect.w, rect.h);
+
+        // Normal photos keep their original bytes; only formats a PDF viewer cannot
+        // decode are redrawn through a canvas.
+        let data = entry.dataUrl!;
+        let format: 'JPEG' | 'PNG' = entry.passthroughFormat ?? 'JPEG';
+        if (entry.passthroughFormat === null) {
+          const redrawn = this.renderToJpeg(img, rect.w, rect.h);
+          if (redrawn) {
+            data = redrawn;
+            format = 'JPEG';
+          }
+        }
+
+        pdf.addImage(data, format, rect.x, rect.y, rect.w, rect.h);
         written++;
 
         this.generatedCount = written;
@@ -258,48 +318,46 @@ export class ImageToPdfComponent {
     }
   }
 
-  /** Where the image sits on the page. `fill` covers the page because we crop on the canvas. */
+  /** Where the image sits on the page. `fill` overflows the page, which the viewer clips. */
   private computeRect(
     img: HTMLImageElement,
     pageWidth: number,
     pageHeight: number
   ): { x: number; y: number; w: number; h: number } {
-    if (this.fitMode === 'stretch' || this.fitMode === 'fill') {
+    if (this.fitMode === 'stretch') {
       return { x: 0, y: 0, w: pageWidth, h: pageHeight };
     }
 
     const pageRatio = pageWidth / pageHeight;
     const imgRatio = img.naturalWidth / img.naturalHeight;
-
-    let w: number;
-    let h: number;
-    if (imgRatio > pageRatio) {
-      w = pageWidth;
-      h = pageWidth / imgRatio;
-    } else {
-      h = pageHeight;
-      w = pageHeight * imgRatio;
+    // A file that decoded to nothing would poison the page box with NaN.
+    if (!Number.isFinite(imgRatio) || imgRatio <= 0) {
+      return { x: 0, y: 0, w: pageWidth, h: pageHeight };
     }
+
+    // `fit` matches the limiting edge so the whole image shows; `fill` matches the other
+    // edge so the image covers the page, overflowing the side the viewer clips.
+    const wider = imgRatio > pageRatio;
+    const matchWidth = this.fitMode === 'fill' ? !wider : wider;
+
+    const w = matchWidth ? pageWidth : pageHeight * imgRatio;
+    const h = matchWidth ? pageWidth / imgRatio : pageHeight;
     return { x: (pageWidth - w) / 2, y: (pageHeight - h) / 2, w, h };
   }
 
-  /** Redraws the image as a baseline sRGB JPEG, capped at `maxDpi` for its printed size. */
-  private renderToJpeg(img: HTMLImageElement, destWidthPt: number, destHeightPt: number): string {
-    let sx = 0;
-    let sy = 0;
-    let sw = img.naturalWidth;
-    let sh = img.naturalHeight;
-
-    if (this.fitMode === 'fill') {
-      const destRatio = destWidthPt / destHeightPt;
-      if (sw / sh > destRatio) {
-        sw = sh * destRatio;
-        sx = (img.naturalWidth - sw) / 2;
-      } else {
-        sh = sw / destRatio;
-        sy = (img.naturalHeight - sh) / 2;
-      }
-    }
+  /**
+   * Redraws an image jsPDF cannot embed directly as a baseline sRGB JPEG, capped at
+   * `maxDpi` for its printed size. Returns null if the canvas came back blank, so the
+   * caller can fall back to the original bytes rather than write a black page.
+   */
+  private renderToJpeg(
+    img: HTMLImageElement,
+    destWidthPt: number,
+    destHeightPt: number
+  ): string | null {
+    const sw = img.naturalWidth;
+    const sh = img.naturalHeight;
+    if (!sw || !sh) return null;
 
     const maxWidth = Math.max(1, Math.round((destWidthPt / 72) * this.maxDpi));
     const maxHeight = Math.max(1, Math.round((destHeightPt / 72) * this.maxDpi));
@@ -309,12 +367,40 @@ export class ImageToPdfComponent {
     canvas.width = Math.max(1, Math.round(sw * scale));
     canvas.height = Math.max(1, Math.round(sh * scale));
 
-    const ctx = canvas.getContext('2d')!;
-    // JPEG has no alpha, so transparent PNGs would otherwise flatten onto black.
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    // JPEG has no alpha, so anything transparent would otherwise flatten onto black.
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    return canvas.toDataURL('image/jpeg', this.jpegQuality);
+    if (!this.hasContent(ctx, canvas.width, canvas.height)) return null;
+
+    const data = canvas.toDataURL('image/jpeg', this.jpegQuality);
+    // Drop the backing store rather than wait for GC during a long batch.
+    canvas.width = 1;
+    canvas.height = 1;
+    return data;
+  }
+
+  /**
+   * A canvas the browser failed to back (memory pressure, size limits) reads back fully
+   * transparent and would encode to solid black, so check a small sample before trusting it.
+   */
+  private hasContent(ctx: CanvasRenderingContext2D, width: number, height: number): boolean {
+    try {
+      const size = Math.min(8, width, height);
+      const x = Math.max(0, Math.floor((width - size) / 2));
+      const y = Math.max(0, Math.floor((height - size) / 2));
+      const { data } = ctx.getImageData(x, y, size, size);
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] !== 0) return true;
+      }
+      return false;
+    } catch {
+      // getImageData can throw on a tainted canvas; assume the draw worked.
+      return true;
+    }
   }
 }

@@ -1,6 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDragPlaceholder,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { PDFDocument } from 'pdf-lib';
 
 interface PdfEntry {
@@ -10,10 +18,19 @@ interface PdfEntry {
   pageCount: number | null;
 }
 
+type SortDirection = 'asc' | 'desc';
+
 @Component({
   selector: 'app-pdf-combiner',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CdkDropList,
+    CdkDrag,
+    CdkDragHandle,
+    CdkDragPlaceholder,
+  ],
   templateUrl: './pdf-combiner.html',
   styleUrl: './pdf-combiner.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +41,14 @@ export class PdfCombinerComponent {
   isMerging = false;
   fileName = 'combined';
   errorMessage: string | null = null;
+  sortDirection: SortDirection | null = null;
   private nextId = 1;
+
+  /** Numeric collation so Scan 2 sorts before Scan 10. */
+  private readonly collator = new Intl.Collator(undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  });
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -56,6 +80,7 @@ export class PdfCombinerComponent {
 
   private addFiles(files: File[]): void {
     this.errorMessage = null;
+    this.sortDirection = null;
     const pdfFiles = files.filter((f) => f.type === 'application/pdf');
     pdfFiles.forEach((file) => {
       const entry: PdfEntry = { id: this.nextId++, file, name: file.name, pageCount: null };
@@ -85,18 +110,49 @@ export class PdfCombinerComponent {
     this.errorMessage = null;
   }
 
+  onListDrop(event: CdkDragDrop<PdfEntry[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    const reordered = [...this.pdfs];
+    moveItemInArray(reordered, event.previousIndex, event.currentIndex);
+    this.pdfs = reordered;
+    this.sortDirection = null;
+  }
+
   moveUp(index: number): void {
     if (index > 0) {
-      [this.pdfs[index - 1], this.pdfs[index]] = [this.pdfs[index], this.pdfs[index - 1]];
-      this.pdfs = [...this.pdfs];
+      const reordered = [...this.pdfs];
+      moveItemInArray(reordered, index, index - 1);
+      this.pdfs = reordered;
+      this.sortDirection = null;
     }
   }
 
   moveDown(index: number): void {
     if (index < this.pdfs.length - 1) {
-      [this.pdfs[index], this.pdfs[index + 1]] = [this.pdfs[index + 1], this.pdfs[index]];
-      this.pdfs = [...this.pdfs];
+      const reordered = [...this.pdfs];
+      moveItemInArray(reordered, index, index + 1);
+      this.pdfs = reordered;
+      this.sortDirection = null;
     }
+  }
+
+  /** First click sorts A→Z, clicking again flips to Z→A. */
+  toggleSort(): void {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    const direction = this.sortDirection === 'asc' ? 1 : -1;
+    this.pdfs = [...this.pdfs].sort((a, b) => direction * this.collator.compare(a.name, b.name));
+  }
+
+  get sortLabel(): string {
+    if (this.sortDirection === 'asc') return 'Sorted A→Z';
+    if (this.sortDirection === 'desc') return 'Sorted Z→A';
+    return 'Sort A→Z';
+  }
+
+  clearAll(): void {
+    this.pdfs = [];
+    this.sortDirection = null;
+    this.errorMessage = null;
   }
 
   get canMerge(): boolean {

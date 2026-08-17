@@ -36,12 +36,35 @@
           &nbsp;·&nbsp;{{ totalPages }} page{{ totalPages !== 1 ? 's' : '' }} total
         }
       </span>
-      <button type="button" class="btn-clear" (click)="pdfs = []">Clear all</button>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-sort"
+          [class.active]="sortDirection !== null"
+          (click)="toggleSort()"
+          [attr.aria-pressed]="sortDirection !== null"
+          title="Sort by filename — click again to reverse"
+        >
+          {{ sortDirection === 'desc' ? '↑' : '↓' }} {{ sortLabel }}
+        </button>
+        <button type="button" class="btn-clear" (click)="clearAll()">Clear all</button>
+      </div>
     </div>
 
-    <ul class="pdf-list" aria-label="PDF list">
+    <p class="reorder-hint">Drag the ⠿ handle to reorder. Files merge top to bottom.</p>
+
+    <ul class="pdf-list" aria-label="PDF list" cdkDropList (cdkDropListDropped)="onListDrop($event)">
       @for (pdf of pdfs; track pdf.id; let i = $index) {
-        <li class="pdf-item">
+        <li class="pdf-item" cdkDrag>
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          <button
+            type="button"
+            class="drag-handle"
+            cdkDragHandle
+            aria-label="Drag to reorder"
+            title="Drag to reorder"
+          >⠿</button>
+          <span class="order-number">{{ i + 1 }}</span>
           <span class="pdf-icon">📄</span>
           <span class="pdf-info">
             <span class="pdf-name" [title]="pdf.name">{{ pdf.name }}</span>

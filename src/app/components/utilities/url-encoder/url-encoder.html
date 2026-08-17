@@ -138,10 +138,20 @@
 
       @if (params.length === 0) {
         <p class="note">This URL has no query parameters.</p>
+      } @else if (params.length > 1) {
+        <p class="note">Drag the ⠿ handle to reorder parameters.</p>
       }
 
-      @for (param of params; track $index) {
-        <div class="param-row">
+      <div class="param-list" cdkDropList (cdkDropListDropped)="onParamDrop($event)">
+      @for (param of params; track param) {
+        <div class="param-row" cdkDrag>
+          <button
+            type="button"
+            class="drag-handle"
+            cdkDragHandle
+            aria-label="Drag to reorder parameter"
+            title="Drag to reorder"
+          >⠿</button>
           <input
             type="text"
             spellcheck="false"
@@ -169,6 +179,7 @@
           </button>
         </div>
       }
+      </div>
 
       <button type="button" class="btn-secondary" (click)="addParam()">+ Add parameter</button>
 
