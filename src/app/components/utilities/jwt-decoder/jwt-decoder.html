@@ -1,0 +1,108 @@
+<section class="widget-container">
+  <h2>JWT Decoder</h2>
+  <p class="description">
+    Decode a JSON Web Token. Nothing is uploaded and the signature is not verified.
+  </p>
+
+  <label for="tokenArea" class="field">
+    Token
+    <textarea
+      id="tokenArea"
+      rows="4"
+      spellcheck="false"
+      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NSJ9.signature"
+      [(ngModel)]="token"
+      (ngModelChange)="onTokenChange()"
+    ></textarea>
+  </label>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (decoded) {
+    <div class="badges" aria-live="polite">
+      <span class="badge">{{ algorithm }}</span>
+      @if (tokenType) {
+        <span class="badge">{{ tokenType }}</span>
+      }
+      <span
+        class="badge"
+        [class.ok]="expiryState === 'valid'"
+        [class.bad]="expiryState === 'expired' || expiryState === 'not-yet-valid'"
+      >
+        {{ expiryLabel }}
+      </span>
+    </div>
+
+    @if (algorithmIsNone) {
+      <p class="warn">
+        This token declares <code>alg: none</code>, meaning it carries no signature at all. Never
+        accept one of these as proof of anything.
+      </p>
+    }
+
+    @if (timeClaims.length > 0) {
+      <div class="claims">
+        @for (claim of timeClaims; track claim.key) {
+          <div class="claim-row">
+            <span class="claim-label">{{ claim.label }}</span>
+            <span class="claim-value">{{ claim.absolute }}</span>
+            <span class="claim-relative">{{ claim.relative }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (otherClaims.length > 0) {
+      <div class="claims">
+        @for (claim of otherClaims; track claim.key) {
+          <div class="claim-row">
+            <span class="claim-label">{{ claim.label }}</span>
+            <span class="claim-value wide">{{ claim.value }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Header</h3>
+        <button type="button" class="btn-copy" (click)="copy('header', headerJson)">
+          {{ copiedKey === 'header' ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+      <pre>{{ headerJson }}</pre>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Payload</h3>
+        <button type="button" class="btn-copy" (click)="copy('payload', payloadJson)">
+          {{ copiedKey === 'payload' ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+      <pre>{{ payloadJson }}</pre>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Signature</h3>
+        <button type="button" class="btn-copy" (click)="copy('signature', signature)">
+          {{ copiedKey === 'signature' ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+      <pre class="signature">{{ signature }}</pre>
+      <p class="panel-note">
+        Shown as-is. Verifying it needs the issuer's secret or public key, which this tool does not
+        ask for.
+      </p>
+    </div>
+  }
+
+  <div class="actions">
+    <button type="button" class="btn-secondary" [disabled]="!hasToken" (click)="clear()">
+      Clear
+    </button>
+  </div>
+</section>

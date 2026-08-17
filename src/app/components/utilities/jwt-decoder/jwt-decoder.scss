@@ -1,0 +1,249 @@
+.widget-container {
+  max-width: min(1100px, 96vw);
+  margin: 1rem auto;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
+}
+
+.field {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.93rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 18vh;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.88rem;
+  font-family: 'Courier New', monospace;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+  word-break: break-all;
+}
+
+.badges {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--muted-soft);
+  color: var(--muted-text);
+  border: 1px solid var(--border);
+}
+
+.badge.ok {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.badge.bad {
+  background: var(--error-soft);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+
+.warn {
+  margin: 0.7rem 0 0;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  background: var(--warning-soft);
+  color: var(--warning-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}
+
+.claims {
+  margin-top: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  padding: 0.2rem 0.7rem;
+}
+
+.claim-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+}
+
+.claim-row + .claim-row {
+  border-top: 1px solid var(--border);
+}
+
+.claim-label {
+  flex: 0 0 7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.claim-value {
+  flex: 0 0 auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.claim-value.wide {
+  flex: 1;
+  min-width: 0;
+}
+
+.claim-relative {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+.panel {
+  margin-top: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-head h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+pre {
+  margin: 0;
+  padding: 0.6rem 0.7rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--surface);
+  overflow-x: auto;
+  max-height: 30vh;
+}
+
+.signature {
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: var(--text-soft);
+}
+
+.panel-note {
+  margin: 0;
+  padding: 0.4rem 0.7rem 0.55rem;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  background: var(--surface);
+}
+
+.error {
+  margin-top: 0.7rem;
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+.actions {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-copy {
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn-copy {
+  border: none;
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.btn-copy:hover {
+  background: var(--brand-deep);
+}
+
+.btn-secondary {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-sunken);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .claim-label {
+    flex: 1 0 100%;
+  }
+}

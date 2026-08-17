@@ -31,6 +31,7 @@ import { TextCaseConverterComponent } from './components/utilities/text-case-con
 import { TextDiffComponent } from './components/utilities/text-diff/text-diff';
 import { BoardFootCalculatorComponent } from './components/calculators/board-foot-calculator/board-foot-calculator';
 import { QrCodeGeneratorComponent } from './components/utilities/qr-code-generator/qr-code-generator';
+import { JwtDecoderComponent } from './components/utilities/jwt-decoder/jwt-decoder';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -67,6 +68,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     TextDiffComponent,
     BoardFootCalculatorComponent,
     QrCodeGeneratorComponent,
+    JwtDecoderComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

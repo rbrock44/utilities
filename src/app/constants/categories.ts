@@ -204,6 +204,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Compare two blocks of text with visuals',
                 icon: '🔍',
                 param: 'text-diff'
+            },
+            {
+                title: 'JWT Decoder',
+                description: 'Decode a JSON Web Token',
+                icon: '🎫',
+                param: 'jwt-decoder'
             }
         ]
     },

@@ -210,6 +210,13 @@
   ) {
     <app-qr-code-generator></app-qr-code-generator>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'jwt' ||
+    this.settingsService.getSelectedTile() === 'jwt-decoder'
+  ) {
+    <app-jwt-decoder></app-jwt-decoder>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {
