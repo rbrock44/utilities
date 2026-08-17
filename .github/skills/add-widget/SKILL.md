@@ -3,267 +3,317 @@ name: add-widget
 description: >
   Step-by-step guide for adding a new utility widget to the rbrock44/utilities
   Angular app. Use this skill whenever the user asks to create, add, or scaffold
-  a new widget, utility, calculator, or tool in this project.
+  a new widget, utility, tool, calculator, converter, or generator in this
+  project.
 ---
 
-# Adding a New Widget to the Utilities App
+# Adding a Widget to the Utilities App
 
-This Angular 21 app uses **standalone components**, `ChangeDetectionStrategy.OnPush`, and no routing — widgets are shown/hidden via a `SettingsService.getSelectedTile()` string key. Follow every step below in order.
+Angular 22, standalone components, `ChangeDetectionStrategy.OnPush`. Widgets are **not**
+Angular Router routes — `app.routes.ts` is intentionally empty. Instead `app.html` is one
+big `@if` switch keyed off `SettingsService.getSelectedTile()`, which is fed by the
+`?tile=` query parameter.
 
----
+Adding a widget means **creating 3 files and editing 3 existing ones**:
 
-## Step 1 — Decide the widget's details
-
-Gather (or ask the user for) these four things before writing any code:
-
-| Field | Example |
+| Action | Path |
 |---|---|
-| **Display title** | `Image to PDF` |
-| **Short description** (tile subtitle) | `Convert one or more images into a downloadable PDF` |
-| **Emoji icon** | `📄` |
-| **URL param / tile key** (2-4 lowercase letters) | `itp` |
-| **Category** | `Utilities` (or `Calculators`, `Information`, …) |
-| **Component folder name** | `image-to-pdf` |
-| **Angular selector** | `app-image-to-pdf` |
-| **TypeScript class name** | `ImageToPdfComponent` |
+| Create | `src/app/components/<group>/<folder>/<folder>.ts` |
+| Create | `src/app/components/<group>/<folder>/<folder>.html` |
+| Create | `src/app/components/<group>/<folder>/<folder>.scss` |
+| Edit | `src/app/app.ts` — import + `imports` array |
+| Edit | `src/app/app.html` — `@if` branch |
+| Edit | `src/app/constants/categories.ts` — tile entry |
 
-Component folders live under `src/app/components/<category-kebab>/`. Existing categories: `calculators/`, `information/`, `utilities/`.
+Nothing else changes. Not `app.routes.ts`, not `index.html`, not `public/sitemap.xml`
+(single-URL site), not the deploy workflow.
 
 ---
 
-## Step 2 — Create the component folder and three files
+## Step 1 — Pin down the details
 
-Create the directory:
-```
-src/app/components/<category>/<component-folder>/
-```
+Ask only for what you can't reasonably infer; pick sensible defaults for the rest and
+state them.
 
-Create exactly **three files** inside it:
+| Field | Example | Rule |
+|---|---|---|
+| Display title | `Color Converter` | Title Case |
+| Tile description | `Convert HEX, RGB, and HSL, and check WCAG contrast` | One line, no trailing period |
+| Emoji icon | `🎨` | Should not duplicate an existing tile's |
+| Tile param | `color-converter` | kebab-case, **identical to the folder name** |
+| Short alias | `clr` | 2–4 characters, unique across `app.html` |
+| Category | `Developer Tools` | Existing name, or a new one |
+| Folder group | `utilities` | `calculators/`, `information/`, or `utilities/` |
+| Folder / file base | `color-converter` | kebab-case |
+| Selector | `app-color-converter` | `app-` + folder name |
+| Class | `ColorConverterComponent` | PascalCase + `Component` |
 
-### `<name>.ts` — Component class
+**Folder group and category are independent.** `hex-generator` lives in
+`components/utilities/` but is listed under `Generators`; `unit-converter` lives in
+`components/calculators/` but powers `Converters`. Pick the group by what kind of code it
+is (`calculators/` = math, `information/` = reference data, `utilities/` = everything
+else), and the category by where a user would look for it.
+
+**Currently in use — do not collide:**
+
+- Categories: `Converters`, `PDF Utilities`, `Calculators`, `Information`, `Email`,
+  `Image Utilities`, `Developer Tools`, `Generators`
+- Aliases: `pm` `sic` `gic` `rac` `cpc` `dsc` `itp` `pmc` `ppu` `elg` `hg` `gg` `lc` `wc`
+  `vc` `tc` `cc` `nbc` `b64` `tsc` `clr` `lnc` `imr`
+- Icons: 📏 ⚖️ 🥄 🌡️ 💱 🧮 📄 📑 ✂️ ⚖ 📐 🏦 🥇 🥈 ✉️ 🖼️ 🔤 ⏰ 🎨 🔢 🆔
+
+---
+
+## Step 2 — Create the component
+
+### `<folder>.ts`
 
 ```typescript
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-<name>',
+  selector: 'app-<folder>',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './<name>.html',
-  styleUrl: './<name>.scss',
+  templateUrl: './<folder>.html',
+  styleUrl: './<folder>.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class <ClassName>Component {
-  // component logic here
+export class <Class>Component {
+  input = '';
+  result: string | null = null;
+  errorMessage: string | null = null;
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  compute(): void {
+    this.errorMessage = null;
+    // ...
+    this.cdr.markForCheck();
+  }
 }
 ```
 
-Key conventions:
-- Always `standalone: true`
-- Always `changeDetection: ChangeDetectionStrategy.OnPush`
-- If the component needs to trigger re-renders after async work, inject `ChangeDetectorRef` and call `this.cdr.markForCheck()`
-- Import `FormsModule` whenever you use `[(ngModel)]`
-- Use Angular 17+ control flow syntax (`@if`, `@for`, `@switch`) — **never** `*ngIf` / `*ngFor`
+Rules:
 
-### `<name>.html` — Template
+- `standalone: true` and `changeDetection: ChangeDetectionStrategy.OnPush`, always
+- Inject `ChangeDetectorRef` and call `this.cdr.markForCheck()` after async work or any
+  state change not driven directly by a template binding
+- Import `FormsModule` whenever the template uses `[(ngModel)]`
+- Clean up in `ngOnDestroy`: `clearInterval`/`clearTimeout`, and `URL.revokeObjectURL`
+  for any object URL you created
+- Debounce expensive recomputation (canvas re-encodes, large loops) with a ~150 ms timer
+- No new dependencies. Prefer platform APIs — `crypto.randomUUID()`,
+  `navigator.clipboard`, `FileReader`, `<canvas>`, `Intl.NumberFormat`, `BigInt`. Only
+  `jspdf` and `pdf-lib` are available for document work.
+- Money and large numbers go through `Intl.NumberFormat`; run financial math in integer
+  cents so rounding doesn't drift
 
-Wrap content in a `<section>` with class `widget-container` (or `calculator-container` for calculators):
+### `<folder>.html`
 
 ```html
 <section class="widget-container">
   <h2>Widget Title</h2>
-  <p class="description">One-line description of what the widget does.</p>
+  <p class="description">One line describing what this does.</p>
 
-  <!-- inputs -->
+  <div class="inputs">
+    <label for="valueInput">
+      Value
+      <input id="valueInput" type="text" [(ngModel)]="input" (ngModelChange)="compute()" />
+    </label>
+  </div>
 
-  <!-- @if (errorMessage) { -->
-  <!--   <p class="error" role="alert">{{ errorMessage }}</p> -->
-  <!-- } -->
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
 
-  <!-- @if (result) { -->
-  <!--   <div class="results" aria-live="polite"> -->
-  <!--     ... -->
-  <!--   </div> -->
-  <!-- } -->
+  @if (result) {
+    <div class="results" aria-live="polite">…</div>
+  }
 </section>
 ```
 
-### `<name>.scss` — Styles
+Rules:
 
-Base scaffold to copy and extend:
+- Root element is `<section class="widget-container">`
+- Use `@if` / `@for` / `@switch` — **never** `*ngIf` / `*ngFor` in new components (some
+  older components still use the legacy syntax; don't copy it)
+- Every `@for` needs a `track`
+- Template expressions are limited: **no `Math.*`, no BigInt literals like `0n`, no
+  optional chaining on the left of an assignment.** Expose a getter on the component
+  instead.
+- `<select>` bound to non-string values needs `[ngValue]` on each `<option>`, not `value`
+- Accessibility: `<label for>` paired with a matching `id`, `aria-label` on icon-only
+  buttons, `role="alert"` on errors, `aria-live="polite"` on results that update in place
 
-```scss
-.widget-container {
-  max-width: 800px;
-  margin: 1rem auto;
-  padding: 1rem;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
+### `<folder>.scss`
 
-h2 {
-  margin: 0;
-  color: #1f2937;
-}
+See Step 3 — the styling rules matter more than the scaffold.
 
-.description {
-  margin-top: 0.4rem;
-  color: #4b5563;
-}
+---
 
-.inputs-grid {
-  margin-top: 0.75rem;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 220px));
-  justify-content: start;
-  gap: 0.75rem;
-}
+## Step 3 — Style with theme tokens, and watch the size budget
 
-.inputs-grid label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-weight: 600;
-  color: #111827;
-}
+The app has light and dark themes driven by CSS custom properties defined in
+`src/styles.scss`. **Hardcoded colors break dark mode.** The only literal color that
+belongs in a widget stylesheet is `#ffffff` for text on a solid `var(--brand)` button.
 
-input[type='number'],
-input[type='text'],
-select {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 0.55rem 0.65rem;
-  font-size: 0.95rem;
-}
+| Purpose | Tokens |
+|---|---|
+| Surfaces | `--surface`, `--surface-alt`, `--surface-sunken` |
+| Borders | `--border`, `--border-strong` |
+| Text | `--text`, `--text-soft`, `--text-faint` |
+| Brand | `--brand`, `--brand-deep`, `--brand-soft`, `--brand-soft-hover`, `--brand-soft-text`, `--brand-border` |
+| Success | `--success`, `--success-deep`, `--success-soft` |
+| Error | `--error`, `--error-deep`, `--error-soft`, `--error-soft-strong`, `--error-text`, `--error-border` |
+| Warning | `--warning`, `--warning-soft`, `--warning-text` |
+| Muted | `--muted`, `--muted-soft`, `--muted-text` |
+| Shadows | `--shadow-sm`, `--shadow-md` |
 
-.error {
-  margin-top: 0.75rem;
-  color: #b91c1c;
-  font-weight: 600;
-}
+### Size budget — the thing that bites
 
-.results {
-  margin-top: 0.8rem;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
-  padding: 0.8rem;
-}
+`angular.json` sets `anyComponentStyle` to **warn at 4 kB and error at 8 kB**, measured on
+the *compiled* CSS. A typical widget with a drop zone, a segmented control, and a results
+panel lands right around 4 kB, so plan for it rather than trimming afterwards:
 
-.result-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.4rem;
-  color: #111827;
-}
+- Merge selectors that share declarations (`.options-grid label, .filename-row label { … }`)
+- Skip decorative `transition` declarations
+- Don't restate inherited `font-size` / `color`
+- One `@media` block, not three
 
-.result-row strong {
-  color: #075985;
-}
+Verify with `npm run build` and grep the output for `budget`.
 
-@media (max-width: 768px) {
-  .inputs-grid {
-    grid-template-columns: repeat(2, minmax(0, 220px));
-  }
-}
+### Layout conventions
 
-@media (max-width: 480px) {
-  .widget-container {
-    margin: 0.5rem;
-    padding: 0.75rem;
-  }
+- `max-width` 700–800px, `margin: 1rem auto`, `background: var(--surface)`,
+  `border-radius: 10px`, `box-shadow: var(--shadow-sm)`
+- `border-radius`: `8px` inputs/buttons, `10px` cards/containers
+- Spacing in `0.5rem` multiples; `font-weight: 600` labels, `700` headings
+- Primary button: `var(--brand)` bg, `#ffffff` text, hover `var(--brand-deep)`
+- Always include a `@media (max-width: 480px)` block that tightens padding and makes
+  buttons full width
 
-  .inputs-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+---
+
+## Step 4 — Register in `src/app/app.ts`
+
+```typescript
+import { <Class>Component } from './components/<group>/<folder>/<folder>';
 ```
 
----
-
-## Step 3 — Register the component in `src/app/app.ts`
-
-1. Add an import at the top with the other component imports:
-   ```typescript
-   import { <ClassName>Component } from './components/<category>/<folder>/<name>';
-   ```
-
-2. Add the class to the `imports` array of the `@Component` decorator (keep the list alphabetical by class name or grouped by category — match the existing order):
-   ```typescript
-   imports: [
-     // ... existing imports ...
-     <ClassName>Component,
-     // ...
-   ]
-   ```
+…and add `<Class>Component` to the `@Component` `imports` array, near related widgets.
+If the widget needs shared constant data (as `unit-converter` does), also expose it as a
+`protected readonly` field on `App` and pass it through the template binding.
 
 ---
 
-## Step 4 — Add the route condition to `src/app/app.html`
+## Step 5 — Add the branch in `src/app/app.html`
 
-Inside the outer `@if (this.settingsService.getSelectedTile() !== null)` block, add a new `@if` for the new widget's tile key, **before** the closing `}`:
+Inside the outer `@if (this.settingsService.getSelectedTile() !== null) { … }` block,
+after the last existing branch:
 
 ```html
-@if (this.settingsService.getSelectedTile() === "<tile-key>") {
-  <app-<name>></app-<name>>
+@if (
+  this.settingsService.getSelectedTile() === '<alias>' ||
+  this.settingsService.getSelectedTile() === '<param>'
+) {
+  <app-<folder>></app-<folder>>
 }
 ```
 
+Both keys are deliberate: the short alias is the legacy URL form, the kebab param is the
+current one, so old `?tile=gg` links keep working. New widgets get both.
+
 ---
 
-## Step 5 — Add the tile to `src/app/constants/categories.ts`
+## Step 6 — Add the tile in `src/app/constants/categories.ts`
 
-Add an entry to the appropriate category's `tiles` array. If the category doesn't exist yet, add a new category object:
+Append to the matching category's `tiles` array — 4-space indent, single quotes, no
+trailing comma on the last property:
 
 ```typescript
 {
-  name: '<Category Name>',
-  tiles: [
-    {
-      title: '<Display Title>',
-      description: '<Short description shown on the tile>',
-      icon: '<emoji>',
-      param: '<tile-key>'
-    }
-  ]
+    title: '<Display Title>',
+    description: '<Short description>',
+    icon: '<emoji>',
+    param: '<param>'
 }
 ```
 
-The `param` value must exactly match the string used in `app.html`'s `@if` condition.
+`param` must be the **kebab** form from the `app.html` branch, never the short alias —
+that's what `TileComponent.handleClick()` writes into the URL.
+
+If the category doesn't exist, append a new `{ name, tiles: [...] }` object to
+`CATEGORIES`. File order is home-page order; new categories go at the end. The home-page
+search box matches on `title` and `description`, so put the words a user would actually
+type into the description.
 
 ---
 
-## Step 6 — Build to verify
+## Step 7 — Add a spec when there's real logic
 
-Run:
+Skip it for a thin wrapper around a form. **Write one whenever the widget has pure logic
+worth pinning** — parsers, numeric conversion, validation, financial math. Test through
+the component's public API with `TestBed`; the canvas/clipboard APIs are unavailable in
+jsdom, so set state fields directly and assert on getters instead of driving the DOM.
+
+```typescript
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { <Class>Component } from './<folder>';
+
+describe('<Class>Component', () => {
+  let component: <Class>Component;
+  let fixture: ComponentFixture<<Class>Component>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [<Class>Component] }).compileComponents();
+    fixture = TestBed.createComponent(<Class>Component);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+```
+
+Tests run on vitest via `@angular/build:unit-test`.
+
+---
+
+## Step 8 — Verify
+
+From `C:\workspace\utilities`:
+
 ```
 npm run build
+npx ng test --watch=false
 ```
-from `C:\workspace\utilities`. The build must complete with **exit code 0** (warnings are acceptable, errors are not). Fix any TypeScript or template compilation errors before considering the task done.
+
+Both must exit 0 — `.github/workflows/deploy.yml` runs the tests before building on every
+push to `master`. Warnings are acceptable, errors are not, but check that **you** didn't
+add a new warning. Two are pre-existing and expected:
+
+- `bundle initial exceeded maximum budget` (1 MB budget, app is over)
+- `cleaning-payout-calculator.scss exceeded maximum budget` (4.20 kB)
+
+Then check it by hand: `npm start`, visit `http://localhost:4200/?tile=<param>`, and
+toggle the theme in the header to confirm both light and dark look right.
 
 ---
 
-## Design conventions to follow
+## Completion checklist
 
-- **Color palette**: blues (`#2563eb`, `#1e3a8a`, `#dbeafe`), neutrals (`#1f2937`, `#4b5563`, `#e2e8f0`), error red (`#b91c1c`)
-- **Border radius**: `8px` for inputs/buttons, `10px` for cards/containers
-- **Buttons**: solid blue (`#2563eb`) for primary actions; outline red for destructive actions
-- **Typography**: system font stack (inherited from global styles); `font-weight: 600` for labels; `font-weight: 700` for headings and strong values
-- **Spacing unit**: `0.5rem` multiples
-- **No external UI libraries** — all styles are hand-written SCSS
-- **No routing** — widgets are toggled via `SettingsService`, not Angular Router routes
-
-## File-naming conventions
-
-| Thing | Convention |
-|---|---|
-| Folder name | `kebab-case` |
-| File names | `kebab-case` (e.g. `image-to-pdf.ts`) |
-| Selector | `app-<kebab-case>` |
-| Class name | `PascalCaseComponent` |
-| Tile key (`param`) | `2-4 lowercase letters` (e.g. `itp`, `dsc`, `rac`) |
+- [ ] Three files under `src/app/components/<group>/<folder>/`
+- [ ] `standalone: true` + `OnPush`, `@if`/`@for` control flow, `markForCheck()` after async
+- [ ] Timers and object URLs cleaned up in `ngOnDestroy`
+- [ ] SCSS uses theme tokens only, has a mobile breakpoint, compiles under 4 kB
+- [ ] Imported and listed in `app.ts`
+- [ ] `@if` branch in `app.html` with both the alias and the kebab key
+- [ ] Tile in `categories.ts` with `param` matching the folder name
+- [ ] Emoji and alias don't collide with an existing utility
+- [ ] Spec added if the widget has non-trivial logic
+- [ ] `npm run build` and `npx ng test --watch=false` both pass with no new warnings

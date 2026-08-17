@@ -50,6 +50,14 @@ Rough mapping for the group: `calculators/` = math/conversion/derived numbers,
 `information/` = mostly-static reference data, `utilities/` = everything else
 (file manipulation, generators, link builders).
 
+**Currently in use — don't collide:**
+
+- Categories: `Converters`, `PDF Utilities`, `Calculators`, `Information`,
+  `Email`, `Image Utilities`, `Developer Tools`, `Generators`
+- Aliases: `pm` `sic` `gic` `rac` `cpc` `dsc` `itp` `pmc` `ppu` `elg` `hg` `gg`
+  `lc` `wc` `vc` `tc` `cc` `nbc` `b64` `tsc` `clr` `lnc` `imr`
+- Icons: 📏 ⚖️ 🥄 🌡️ 💱 🧮 📄 📑 ✂️ ⚖ 📐 🏦 🥇 🥈 ✉️ 🖼️ 🔤 ⏰ 🎨 🔢 🆔
+
 ---
 
 ## Step 2 — Create the three component files
@@ -73,11 +81,21 @@ Non-negotiable component conventions:
 - Use `@if` / `@for` / `@switch` — never `*ngIf` / `*ngFor` in new components
   (some older components still use the legacy syntax; do not copy that)
 - `@for` always needs a `track` (`track $index` is fine for generated string lists)
+- Template expressions are limited: **no `Math.*`, no BigInt literals like `0n`**.
+  Expose a getter on the component instead (`get isNegative()`, `get bitLength()`).
+- A `<select>` bound to non-string values needs `[ngValue]` on each `<option>`,
+  not `value` — otherwise numbers arrive as strings
+- Clean up in `ngOnDestroy`: `clearInterval` / `clearTimeout`, and
+  `URL.revokeObjectURL` for every object URL you created
+- Debounce expensive recomputation (canvas re-encodes, long loops) with a ~150ms
+  timer so dragging a slider doesn't thrash
+- Run money math in integer cents and format with `Intl.NumberFormat`; per-step
+  float rounding drifts noticeably over hundreds of iterations
 - No external UI libraries. Angular Material is installed for theming tokens only;
   widgets are hand-written HTML + SCSS.
 - Everything runs client-side. Prefer platform APIs (`crypto.randomUUID()`,
-  `navigator.clipboard`, `FileReader`) over new dependencies. Only `jspdf` and
-  `pdf-lib` are available for document work.
+  `navigator.clipboard`, `FileReader`, `<canvas>`, `TextEncoder`, `BigInt`) over
+  new dependencies. Only `jspdf` and `pdf-lib` are available for document work.
 
 ---
 
@@ -113,9 +131,14 @@ Layout conventions:
 - Primary button: `var(--brand)` background, `#ffffff` text, hover `var(--brand-deep)`
 - Include a `@media (max-width: 480px)` block that tightens padding and makes
   buttons full width
-- **Hard limit: the compiled `.scss` must stay under 8kB** — `angular.json` sets
-  `anyComponentStyle` `maximumError: 8kB`, so an oversized stylesheet fails the
-  production build. Existing widgets land around 2–3kB.
+- **Size budget — plan for it, don't trim afterwards.** `angular.json` sets
+  `anyComponentStyle` to **warn at 4kB and error at 8kB**, measured on the
+  *compiled* CSS. A widget with a drop zone, a segmented control, and a results
+  panel lands right at ~4kB. Keep under it by merging selectors that share
+  declarations (`.options-grid label, .filename-row label { … }`), skipping
+  decorative `transition` declarations, not restating inherited `font-size` /
+  `color`, and using one `@media` block instead of three. Check with
+  `npm run build 2>&1 | grep -i budget`.
 
 Accessibility: label every input (`<label for>` + matching `id`), give icon-only
 buttons an `aria-label`, put `role="alert"` on error text and `aria-live="polite"`
@@ -192,12 +215,24 @@ npx ng test --watch=false
 ```
 
 Both must exit 0 — the deploy workflow (`.github/workflows/deploy.yml`) runs tests
-before building on every push to `master`. Warnings are acceptable, errors are not.
+before building on every push to `master`. Errors are never acceptable; check that
+**you** didn't add a new warning. Exactly two are pre-existing and expected:
 
-A `.spec.ts` is optional and most widgets don't have one. Add one only if the widget
-has non-trivial pure logic worth pinning down; follow the existing style
-(`src/app/services/settings.spec.ts` for logic, `src/app/components/tile/tile.spec.ts`
-for a component smoke test). Tests run on vitest through `@angular/build:unit-test`.
+- `bundle initial exceeded maximum budget` (1MB budget, app is over)
+- `cleaning-payout-calculator.scss exceeded maximum budget` (4.20kB)
+
+**Write a spec whenever the widget has pure logic worth pinning** — parsers,
+numeric conversion, validation, financial math. Skip it only for a thin wrapper
+around a form. Test through the component's public API with `TestBed`; canvas and
+clipboard APIs don't exist in jsdom, so set state fields directly and assert on
+getters rather than driving the DOM. Tests run on vitest via
+`@angular/build:unit-test`; follow the style in
+`src/app/components/calculators/number-base-converter/number-base-converter.spec.ts`.
+
+Treat a failing new test as a real question, not a nuisance: twice while building
+these, the test was wrong about the requirement rather than the code being broken,
+and the fix was to state the actual behavior (an auto-detected unit, a lossy
+round-trip tolerance) instead of loosening the assertion.
 
 Then confirm manually with `npm start` and visit
 `http://localhost:4200/?tile=<param>`, checking both themes via the header toggle.
@@ -207,10 +242,12 @@ Then confirm manually with `npm start` and visit
 ## Completion checklist
 
 - [ ] Three files created under `src/app/components/<group>/<folder>/`
-- [ ] `OnPush` + `standalone: true`, `@if`/`@for` control flow
-- [ ] SCSS uses theme tokens only, has a mobile breakpoint, is under 8kB
+- [ ] `OnPush` + `standalone: true`, `@if`/`@for` control flow, `markForCheck()` after async
+- [ ] Timers and object URLs cleaned up in `ngOnDestroy`
+- [ ] SCSS uses theme tokens only, has a mobile breakpoint, compiles under 4kB
 - [ ] Imported and listed in `app.ts`
 - [ ] `@if` branch in `app.html` with both the alias and the kebab key
 - [ ] Tile in `categories.ts` with `param` matching the folder name
 - [ ] Emoji and short alias don't collide with an existing utility
-- [ ] `npm run build` and `npx ng test --watch=false` both pass
+- [ ] Spec added if the widget has non-trivial logic
+- [ ] `npm run build` and `npx ng test --watch=false` both pass with no new warnings
