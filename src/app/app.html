@@ -203,6 +203,13 @@
   ) {
     <app-board-foot-calculator></app-board-foot-calculator>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'qr' ||
+    this.settingsService.getSelectedTile() === 'qr-code-generator'
+  ) {
+    <app-qr-code-generator></app-qr-code-generator>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

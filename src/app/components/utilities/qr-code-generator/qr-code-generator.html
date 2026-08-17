@@ -1,0 +1,126 @@
+<section class="widget-container">
+  <h2>QR Code Generator</h2>
+  <p class="description">
+    Turn a link or any text into a QR code, then download it as a PNG or a scalable SVG.
+  </p>
+
+  <label for="contentArea" class="field">
+    Content
+    <textarea
+      id="contentArea"
+      rows="3"
+      spellcheck="false"
+      placeholder="https://example.com or any text, a mailto: link, a phone number…"
+      [(ngModel)]="content"
+      (ngModelChange)="scheduleRender()"
+    ></textarea>
+    <span class="field-hint">{{ byteLength }} bytes</span>
+  </label>
+
+  <div class="controls">
+    <label for="sizeInput">
+      Size (px)
+      <input
+        id="sizeInput"
+        type="number"
+        min="64"
+        max="2048"
+        step="32"
+        [(ngModel)]="size"
+        (ngModelChange)="scheduleRender()"
+      />
+    </label>
+
+    <label for="marginInput">
+      Quiet zone
+      <input
+        id="marginInput"
+        type="number"
+        min="0"
+        max="20"
+        step="1"
+        [(ngModel)]="margin"
+        (ngModelChange)="scheduleRender()"
+      />
+    </label>
+
+    <label for="levelSelect">
+      Error correction
+      <select id="levelSelect" [(ngModel)]="errorLevel" (ngModelChange)="scheduleRender()">
+        @for (level of errorLevels; track level.value) {
+          <option [value]="level.value">{{ level.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="controls">
+    <label for="foregroundInput">
+      Foreground
+      <span class="color-field">
+        <input
+          type="color"
+          class="picker"
+          [value]="foreground"
+          (input)="onForegroundPicked($event)"
+          aria-label="Pick a foreground color"
+        />
+        <input
+          id="foregroundInput"
+          type="text"
+          spellcheck="false"
+          [(ngModel)]="foreground"
+          (ngModelChange)="scheduleRender()"
+        />
+      </span>
+    </label>
+
+    <label for="backgroundInput">
+      Background
+      <span class="color-field">
+        <input
+          type="color"
+          class="picker"
+          [value]="background"
+          (input)="onBackgroundPicked($event)"
+          aria-label="Pick a background color"
+        />
+        <input
+          id="backgroundInput"
+          type="text"
+          spellcheck="false"
+          [(ngModel)]="background"
+          (ngModelChange)="scheduleRender()"
+        />
+      </span>
+    </label>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (dataUrl) {
+    <div class="preview" aria-live="polite">
+      <img [src]="dataUrl" alt="QR code for the entered content" />
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" [disabled]="isRendering" (click)="downloadPng()">
+        ⬇ PNG
+      </button>
+      <button type="button" class="btn-secondary" [disabled]="isRendering" (click)="downloadSvg()">
+        ⬇ SVG
+      </button>
+      <button type="button" class="btn-secondary" [disabled]="isRendering" (click)="copySvg()">
+        {{ justCopied ? 'Copied!' : 'Copy SVG' }}
+      </button>
+    </div>
+  }
+
+  <p class="note">
+    Higher error correction survives more damage but packs less data into the same size. Keep a
+    quiet zone of at least 4 modules or some scanners will miss the code, and keep the foreground
+    darker than the background.
+  </p>
+</section>

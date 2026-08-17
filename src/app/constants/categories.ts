@@ -221,6 +221,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Generate random GUIDs (UUID v4)',
                 icon: '🆔',
                 param: 'guid-generator'
+            },
+            {
+                title: 'QR Code Generator',
+                description: 'Turn a link or text into a QR code and download it',
+                icon: '🔳',
+                param: 'qr-code-generator'
             }
         ]
     },
