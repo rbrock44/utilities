@@ -112,6 +112,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Monthly payment, total interest, and amortization schedule',
                 icon: '🏦',
                 param: 'loan-calculator'
+            },
+            {
+                title: 'Board Foot Calculator',
+                description: 'Board feet, linear feet, and cost for a lumber list',
+                icon: '🪵',
+                param: 'board-foot-calculator'
             }
         ]
     },

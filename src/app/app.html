@@ -196,6 +196,13 @@
   ) {
     <app-text-diff></app-text-diff>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'bfc' ||
+    this.settingsService.getSelectedTile() === 'board-foot-calculator'
+  ) {
+    <app-board-foot-calculator></app-board-foot-calculator>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

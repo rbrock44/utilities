@@ -1,0 +1,167 @@
+<section class="widget-container">
+  <h2>Board Foot Calculator</h2>
+  <p class="description">
+    Work out board feet, linear feet, and cost for a lumber list, thickness × width × length ÷ 144.
+  </p>
+
+  <div class="quick-add">
+    <span class="quick-label">Add a common size</span>
+    <div class="quick-buttons">
+      @for (size of nominalSizes; track size.label) {
+        <button type="button" class="btn-chip" (click)="addRow(size)">{{ size.label }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Qty</th>
+          <th scope="col">Thickness (in)</th>
+          <th scope="col">Width (in)</th>
+          <th scope="col">Length</th>
+          <th scope="col">Unit</th>
+          <th scope="col">$ / bd ft</th>
+          <th scope="col">Board feet</th>
+          <th scope="col"><span class="visually-hidden">Remove</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.id; let i = $index) {
+          <tr>
+            <td>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                [(ngModel)]="row.quantity"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' quantity'"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                step="0.25"
+                [(ngModel)]="row.thickness"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' thickness in inches'"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                step="0.25"
+                [(ngModel)]="row.width"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' width in inches'"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                [(ngModel)]="row.length"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' length'"
+              />
+            </td>
+            <td>
+              <select
+                [(ngModel)]="row.lengthUnit"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' length unit'"
+              >
+                <option value="ft">ft</option>
+                <option value="in">in</option>
+              </select>
+            </td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                step="0.25"
+                [(ngModel)]="row.pricePerBoardFoot"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' price per board foot'"
+              />
+            </td>
+            <td class="computed">
+              {{ feet(boardFeet(row)) }}
+              @if (rowCost(row) > 0) {
+                <span class="row-cost">{{ money(rowCost(row)) }}</span>
+              }
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn-remove"
+                (click)="removeRow(row.id)"
+                [attr.aria-label]="'Remove row ' + (i + 1)"
+                title="Remove"
+              >
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="below-table">
+    <button type="button" class="btn-secondary" (click)="addRow()">+ Add row</button>
+
+    <label for="wasteInput" class="waste-field">
+      Waste factor (%)
+      <input
+        id="wasteInput"
+        type="number"
+        min="0"
+        step="1"
+        [(ngModel)]="wastePercent"
+        (ngModelChange)="onChange()"
+      />
+    </label>
+  </div>
+
+  <div class="summary" aria-live="polite">
+    <div class="headline">
+      <span class="headline-label">Total board feet</span>
+      <span class="headline-value">{{ feet(boardFeetWithWaste) }}</span>
+    </div>
+
+    <div class="summary-rows">
+      @if (hasWaste) {
+        <div class="summary-row">
+          <span>Before waste</span>
+          <strong>{{ feet(totalBoardFeet) }} bd ft</strong>
+        </div>
+      }
+      <div class="summary-row">
+        <span>Linear feet</span>
+        <strong>{{ feet(totalLinearFeet) }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Pieces</span>
+        <strong>{{ pieceCount }}</strong>
+      </div>
+      @if (hasCost) {
+        <div class="summary-row">
+          <span>{{ hasWaste ? 'Cost with waste' : 'Total cost' }}</span>
+          <strong>{{ money(costWithWaste) }}</strong>
+        </div>
+      }
+    </div>
+  </div>
+
+  <p class="note">
+    Lumber is sold by nominal size, so a 2×4 is billed as 2″ × 4″ even though it measures 1½″ × 3½″.
+    Enter nominal dimensions to match a supplier's quote, or actual ones to find out what you really
+    have.
+  </p>
+</section>
