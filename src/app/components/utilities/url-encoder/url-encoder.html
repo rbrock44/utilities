@@ -1,0 +1,196 @@
+<section class="widget-container">
+  <h2>URL Encoder/Decoder</h2>
+  <p class="description">
+    Percent-encode or decode text, or pull a URL apart and edit its query parameters.
+  </p>
+
+  <div class="segmented" role="tablist" aria-label="Mode">
+    <button
+      type="button"
+      class="segment"
+      role="tab"
+      [class.active]="mode === 'text'"
+      [attr.aria-selected]="mode === 'text'"
+      (click)="setMode('text')"
+    >
+      Encode / Decode
+    </button>
+    <button
+      type="button"
+      class="segment"
+      role="tab"
+      [class.active]="mode === 'inspect'"
+      [attr.aria-selected]="mode === 'inspect'"
+      (click)="setMode('inspect')"
+    >
+      Inspect URL
+    </button>
+  </div>
+
+  @if (mode === 'text') {
+    <div class="segmented direction" role="group" aria-label="Direction">
+      <button
+        type="button"
+        class="segment"
+        [class.active]="direction === 'encode'"
+        (click)="setDirection('encode')"
+      >
+        Encode
+      </button>
+      <button
+        type="button"
+        class="segment"
+        [class.active]="direction === 'decode'"
+        (click)="setDirection('decode')"
+      >
+        Decode
+      </button>
+    </div>
+
+    <label for="scopeSelect" class="field">
+      Scope
+      <select id="scopeSelect" [(ngModel)]="scope" (ngModelChange)="convert()">
+        <option value="component">Component — escapes / ? : &#64; &amp; = + $ #</option>
+        <option value="full">Full URI</option>
+      </select>
+      <span class="field-hint">
+        Use <strong>component</strong> for a single query value or path segment, and
+        <strong>full URI</strong> when encoding a whole address.
+      </span>
+    </label>
+
+    @if (direction === 'decode') {
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="plusAsSpace" (ngModelChange)="convert()" />
+        Treat <code>+</code> as a space (how form-encoded query strings work)
+      </label>
+    }
+
+    <label for="textArea" class="field">
+      Input
+      <textarea
+        id="textArea"
+        rows="4"
+        spellcheck="false"
+        [placeholder]="direction === 'encode' ? 'Text to encode…' : 'Percent-encoded text…'"
+        [(ngModel)]="text"
+        (ngModelChange)="convert()"
+      ></textarea>
+    </label>
+
+    @if (textError) {
+      <p class="error" role="alert">{{ textError }}</p>
+    }
+
+    <label for="outputArea" class="field">
+      Output
+      <textarea id="outputArea" rows="4" readonly [value]="textOutput"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" [disabled]="textOutput === ''" (click)="copyResult()">
+        {{ justCopied ? 'Copied!' : 'Copy result' }}
+      </button>
+      <button
+        type="button"
+        class="btn-secondary"
+        [disabled]="textOutput === '' || textError !== null"
+        (click)="swap()"
+      >
+        ⇅ Use as input
+      </button>
+      <button type="button" class="btn-secondary" [disabled]="text === ''" (click)="clearText()">
+        Clear
+      </button>
+    </div>
+  } @else {
+    <label for="urlArea" class="field">
+      URL
+      <textarea
+        id="urlArea"
+        rows="3"
+        spellcheck="false"
+        placeholder="https://example.com/search?q=hello+world&amp;page=2"
+        [(ngModel)]="urlInput"
+        (ngModelChange)="parseUrl()"
+      ></textarea>
+    </label>
+
+    @if (urlError) {
+      <p class="error" role="alert">{{ urlError }}</p>
+    }
+
+    @if (assumedProtocol) {
+      <p class="note">No protocol given, so <code>https://</code> was assumed.</p>
+    }
+
+    @if (parts.length > 0) {
+      <div class="parts">
+        @for (part of parts; track part.label) {
+          <div class="part-row">
+            <span class="part-label">{{ part.label }}</span>
+            <span class="part-value">{{ part.value }}</span>
+          </div>
+        }
+      </div>
+
+      <h3>Query parameters</h3>
+
+      @if (params.length === 0) {
+        <p class="note">This URL has no query parameters.</p>
+      }
+
+      @for (param of params; track $index) {
+        <div class="param-row">
+          <input
+            type="text"
+            spellcheck="false"
+            placeholder="name"
+            [(ngModel)]="param.key"
+            (ngModelChange)="onParamChange()"
+            [attr.aria-label]="'Parameter ' + ($index + 1) + ' name'"
+          />
+          <input
+            type="text"
+            spellcheck="false"
+            placeholder="value"
+            [(ngModel)]="param.value"
+            (ngModelChange)="onParamChange()"
+            [attr.aria-label]="'Parameter ' + ($index + 1) + ' value'"
+          />
+          <button
+            type="button"
+            class="btn-remove"
+            (click)="removeParam($index)"
+            aria-label="Remove parameter"
+            title="Remove"
+          >
+            ✕
+          </button>
+        </div>
+      }
+
+      <button type="button" class="btn-secondary" (click)="addParam()">+ Add parameter</button>
+
+      <label for="rebuiltArea" class="field">
+        Rebuilt URL
+        <textarea id="rebuiltArea" rows="3" readonly [value]="rebuiltUrl"></textarea>
+      </label>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" (click)="copyResult()">
+          {{ justCopied ? 'Copied!' : 'Copy URL' }}
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="!changedFromInput"
+          (click)="applyRebuilt()"
+        >
+          ⇅ Use as input
+        </button>
+        <button type="button" class="btn-secondary" (click)="clearUrl()">Clear</button>
+      </div>
+    }
+  }
+</section>

@@ -26,6 +26,7 @@ import { ColorConverterComponent } from './components/utilities/color-converter/
 import { LoanCalculatorComponent } from './components/calculators/loan-calculator/loan-calculator';
 import { ImageResizerComponent } from './components/utilities/image-resizer/image-resizer';
 import { JsonFormatterComponent } from './components/utilities/json-formatter/json-formatter';
+import { UrlEncoderComponent } from './components/utilities/url-encoder/url-encoder';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -57,6 +58,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     LoanCalculatorComponent,
     ImageResizerComponent,
     JsonFormatterComponent,
+    UrlEncoderComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

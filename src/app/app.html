@@ -175,6 +175,13 @@
   ) {
     <app-json-formatter></app-json-formatter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'url' ||
+    this.settingsService.getSelectedTile() === 'url-encoder'
+  ) {
+    <app-url-encoder></app-url-encoder>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

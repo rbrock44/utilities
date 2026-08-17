@@ -180,6 +180,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Format, minify, and validate JSON',
                 icon: '📋',
                 param: 'json-formatter'
+            },
+            {
+                title: 'URL Encoder/Decoder',
+                description: 'Encode or decode URLs and edit query parameters',
+                icon: '🔗',
+                param: 'url-encoder'
             }
         ]
     },
