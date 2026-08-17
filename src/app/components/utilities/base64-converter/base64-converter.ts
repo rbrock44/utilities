@@ -37,8 +37,6 @@ export class Base64ConverterComponent {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  /* ── Shared ──────────────────────────────────────────── */
-
   setMode(mode: Mode): void {
     this.mode = mode;
     this.errorMessage = null;
@@ -63,13 +61,12 @@ export class Base64ConverterComponent {
     if (this.copiedTimeout) {
       clearTimeout(this.copiedTimeout);
     }
+
     this.copiedTimeout = setTimeout(() => {
       this.justCopied = false;
       this.cdr.markForCheck();
     }, 2000);
   }
-
-  /* ── Text mode ───────────────────────────────────────── */
 
   setDirection(direction: Direction): void {
     this.direction = direction;
@@ -116,6 +113,7 @@ export class Base64ConverterComponent {
     if (this.output === '' || this.errorMessage !== null) {
       return;
     }
+
     this.input = this.output;
     this.direction = this.direction === 'encode' ? 'decode' : 'encode';
     this.convert();
@@ -128,14 +126,13 @@ export class Base64ConverterComponent {
     this.cdr.markForCheck();
   }
 
-  /* ── File mode ───────────────────────────────────────── */
-
   onFileInputChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) {
       this.readFile(file);
     }
+
     input.value = '';
   }
 
@@ -170,6 +167,7 @@ export class Base64ConverterComponent {
     if (this.rawBase64 === '') {
       return '';
     }
+
     return this.includeDataUri ? this.dataUri : this.applyUrlSafe(this.rawBase64);
   }
 
@@ -218,14 +216,13 @@ export class Base64ConverterComponent {
     reader.readAsDataURL(file);
   }
 
-  /* ── Encoding helpers ────────────────────────────────── */
-
   private encodeText(text: string): string {
     const bytes = new TextEncoder().encode(text);
     let binary = '';
     for (const byte of bytes) {
       binary += String.fromCharCode(byte);
     }
+
     return btoa(binary);
   }
 
@@ -245,6 +242,7 @@ export class Base64ConverterComponent {
     if (remainder === 1) {
       throw new Error('invalid base64 length');
     }
+
     if (remainder > 0) {
       normalized += '='.repeat(4 - remainder);
     }
@@ -257,6 +255,7 @@ export class Base64ConverterComponent {
     if (!this.urlSafe) {
       return encoded;
     }
+
     return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
@@ -264,9 +263,11 @@ export class Base64ConverterComponent {
     if (bytes < 1024) {
       return `${bytes} B`;
     }
+
     if (bytes < 1024 * 1024) {
       return `${(bytes / 1024).toFixed(1)} KB`;
     }
+
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }

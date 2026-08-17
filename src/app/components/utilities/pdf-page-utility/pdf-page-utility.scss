@@ -17,7 +17,6 @@ h2 {
   color: var(--text-soft);
 }
 
-/* ── Drop Zone ─────────────────────────────────────────── */
 .drop-zone {
   margin-top: 1rem;
   display: flex;
@@ -60,7 +59,6 @@ h2 {
   color: var(--text-soft);
 }
 
-/* ── Loaded File Bar ───────────────────────────────────── */
 .file-bar {
   margin-top: 1rem;
   display: flex;
@@ -114,7 +112,6 @@ h2 {
   background: var(--surface-sunken);
 }
 
-/* ── Mode Toggle ───────────────────────────────────────── */
 .mode-group {
   margin: 1rem 0 0;
   padding: 0;
@@ -163,7 +160,6 @@ h2 {
   outline-offset: -2px;
 }
 
-/* ── Options ───────────────────────────────────────────── */
 .options-grid {
   margin-top: 0.85rem;
   display: flex;
@@ -213,7 +209,6 @@ select {
   font-weight: 400;
 }
 
-/* ── Preview ───────────────────────────────────────────── */
 .preview {
   margin-top: 0.85rem;
   display: flex;
@@ -237,14 +232,12 @@ select {
   word-break: break-word;
 }
 
-/* ── Error ─────────────────────────────────────────────── */
 .error {
   margin-top: 0.75rem;
   color: var(--error-text);
   font-weight: 600;
 }
 
-/* ── Filename Input ────────────────────────────────────── */
 .filename-row {
   margin-top: 1rem;
 }
@@ -279,7 +272,6 @@ select {
   border-left: 1px solid var(--border);
 }
 
-/* ── Download Button ───────────────────────────────────── */
 .btn-download {
   margin-top: 1rem;
   display: block;
@@ -303,7 +295,6 @@ select {
   cursor: not-allowed;
 }
 
-/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 480px) {
   .widget-container {
     margin: 0.5rem;

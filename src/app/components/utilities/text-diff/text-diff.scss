@@ -1,0 +1,230 @@
+.widget-container {
+  max-width: 900px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
+}
+
+.pair {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.field {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.93rem;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.88rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1.45;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+}
+
+.options {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.options > label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  padding-bottom: 0.55rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.summary {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chip {
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--muted-soft);
+  color: var(--muted-text);
+  border: 1px solid var(--border);
+}
+
+.chip.added {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.chip.removed {
+  background: var(--error-soft);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+
+.diff {
+  margin-top: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 30rem;
+  background: var(--surface-alt);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.1rem 0.6rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.row.added {
+  background: var(--success-soft);
+}
+
+.row.removed {
+  background: var(--error-soft);
+}
+
+.gutter {
+  flex: 0 0 2.2rem;
+  text-align: right;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  user-select: none;
+}
+
+.marker {
+  flex: 0 0 0.8rem;
+  font-weight: 700;
+  user-select: none;
+}
+
+.row.added .marker {
+  color: var(--success);
+}
+
+.row.removed .marker {
+  color: var(--error-text);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.note {
+  margin: 0.7rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+.actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-secondary {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-sunken);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+}

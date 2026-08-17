@@ -1,0 +1,99 @@
+<section class="widget-container">
+  <h2>Text Diff</h2>
+  <p class="description">
+    Compare two blocks of text and see exactly what was added and removed.
+  </p>
+
+  <div class="pair">
+    <label for="originalArea" class="field">
+      Original
+      <textarea
+        id="originalArea"
+        rows="8"
+        spellcheck="false"
+        placeholder="Paste the original text…"
+        [(ngModel)]="original"
+        (ngModelChange)="onInputChange()"
+      ></textarea>
+    </label>
+
+    <label for="changedArea" class="field">
+      Changed
+      <textarea
+        id="changedArea"
+        rows="8"
+        spellcheck="false"
+        placeholder="Paste the changed text…"
+        [(ngModel)]="changed"
+        (ngModelChange)="onInputChange()"
+      ></textarea>
+    </label>
+  </div>
+
+  <div class="options">
+    <label for="granularitySelect">
+      Compare by
+      <select id="granularitySelect" [(ngModel)]="granularity" (ngModelChange)="compare()">
+        <option value="line">Line</option>
+        <option value="word">Word</option>
+      </select>
+    </label>
+
+    <div class="toggles">
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="ignoreCase" (ngModelChange)="compare()" />
+        Ignore case
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="ignoreWhitespace" (ngModelChange)="compare()" />
+        Ignore whitespace
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="hideUnchanged" />
+        Only show changes
+      </label>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (hasCompared) {
+    <div class="summary" aria-live="polite">
+      <span class="chip added">+{{ summary.added }} added</span>
+      <span class="chip removed">−{{ summary.removed }} removed</span>
+      <span class="chip">{{ summary.unchanged }} unchanged</span>
+    </div>
+
+    @if (identical) {
+      <p class="note">The two sides are identical.</p>
+    } @else {
+      <div class="diff">
+        @for (row of visibleRows; track $index) {
+          <div class="row" [class.added]="row.kind === 'added'" [class.removed]="row.kind === 'removed'">
+            <span class="gutter">{{ row.leftNumber ?? '' }}</span>
+            <span class="gutter">{{ row.rightNumber ?? '' }}</span>
+            <span class="marker">
+              @if (row.kind === 'added') {
+                +
+              } @else if (row.kind === 'removed') {
+                −
+              }
+            </span>
+            <span class="text">{{ row.text }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <div class="actions">
+    <button type="button" class="btn-secondary" [disabled]="!hasInput" (click)="swap()">
+      ⇅ Swap sides
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="!hasInput" (click)="clear()">
+      Clear
+    </button>
+  </div>
+</section>

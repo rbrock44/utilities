@@ -192,6 +192,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert between camelCase, snake_case, kebab-case, and more',
                 icon: '🔡',
                 param: 'text-case-converter'
+            },
+            {
+                title: 'Text Diff',
+                description: 'Compare two blocks of text with visuals',
+                icon: '🔍',
+                param: 'text-diff'
             }
         ]
     },

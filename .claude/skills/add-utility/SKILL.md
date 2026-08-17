@@ -91,6 +91,11 @@ Non-negotiable component conventions:
   timer so dragging a slider doesn't thrash
 - Run money math in integer cents and format with `Intl.NumberFormat`; per-step
   float rounding drifts noticeably over hundreds of iterations
+- **No section banner comments** — not `/* ── Inputs ─────── */`, not `// Helpers`,
+  in any file type. A comment that only restates the name of the thing below it is
+  noise the maintainer deletes by hand. Comment to explain *why* something is the
+  way it is (a rounding strategy, a browser quirk, a non-obvious formula); never to
+  label a region.
 - No external UI libraries. Angular Material is installed for theming tokens only;
   widgets are hand-written HTML + SCSS.
 - Everything runs client-side. Prefer platform APIs (`crypto.randomUUID()`,

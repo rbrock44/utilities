@@ -17,7 +17,6 @@ h2 {
   color: var(--text-soft);
 }
 
-/* ── Segmented controls ────────────────────────────────── */
 .segmented {
   margin-top: 1rem;
   display: inline-flex;
@@ -54,7 +53,6 @@ h2 {
   color: #ffffff;
 }
 
-/* ── Fields ────────────────────────────────────────────── */
 .field {
   margin-top: 0.85rem;
   display: flex;
@@ -99,7 +97,6 @@ textarea[readonly] {
   padding: 0 0.25rem;
 }
 
-/* ── Drop zone ─────────────────────────────────────────── */
 .drop-zone {
   margin-top: 0.85rem;
   display: flex;
@@ -144,7 +141,6 @@ textarea[readonly] {
   color: var(--text-soft);
 }
 
-/* ── Loaded file ───────────────────────────────────────── */
 .file-bar {
   margin-top: 0.85rem;
   display: flex;
@@ -177,7 +173,6 @@ textarea[readonly] {
   color: var(--text-soft);
 }
 
-/* ── Actions ───────────────────────────────────────────── */
 .actions {
   margin-top: 0.85rem;
   display: flex;

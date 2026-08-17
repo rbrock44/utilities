@@ -105,6 +105,10 @@ Rules:
 - Clean up in `ngOnDestroy`: `clearInterval`/`clearTimeout`, and `URL.revokeObjectURL`
   for any object URL you created
 - Debounce expensive recomputation (canvas re-encodes, large loops) with a ~150 ms timer
+- **No section banner comments** — not `/* ── Inputs ─────── */`, not `// Helpers`,
+  in any file type. A comment that only restates the name of the thing below it is
+  noise the maintainer deletes by hand. Comment to explain *why* (a rounding
+  strategy, a browser quirk, a non-obvious formula); never to label a region.
 - No new dependencies. Prefer platform APIs — `crypto.randomUUID()`,
   `navigator.clipboard`, `FileReader`, `<canvas>`, `Intl.NumberFormat`, `BigInt`. Only
   `jspdf` and `pdf-lib` are available for document work.

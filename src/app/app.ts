@@ -28,6 +28,7 @@ import { ImageResizerComponent } from './components/utilities/image-resizer/imag
 import { JsonFormatterComponent } from './components/utilities/json-formatter/json-formatter';
 import { UrlEncoderComponent } from './components/utilities/url-encoder/url-encoder';
 import { TextCaseConverterComponent } from './components/utilities/text-case-converter/text-case-converter';
+import { TextDiffComponent } from './components/utilities/text-diff/text-diff';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -61,6 +62,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     JsonFormatterComponent,
     UrlEncoderComponent,
     TextCaseConverterComponent,
+    TextDiffComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

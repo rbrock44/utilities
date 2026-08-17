@@ -189,6 +189,13 @@
   ) {
     <app-text-case-converter></app-text-case-converter>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'dif' ||
+    this.settingsService.getSelectedTile() === 'text-diff'
+  ) {
+    <app-text-diff></app-text-diff>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {
