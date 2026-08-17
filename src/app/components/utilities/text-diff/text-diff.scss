@@ -1,5 +1,5 @@
 .widget-container {
-  max-width: 900px;
+  max-width: min(1600px, 96vw);
   margin: 1rem auto;
   padding: 1rem;
   background: var(--surface);
@@ -37,6 +37,7 @@ h2 {
 
 textarea {
   width: 100%;
+  min-height: 34vh;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
@@ -126,7 +127,7 @@ select {
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: auto;
-  max-height: 30rem;
+  max-height: 55vh;
   background: var(--surface-alt);
 }
 

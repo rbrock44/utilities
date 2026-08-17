@@ -127,9 +127,16 @@ Available tokens:
 
 Layout conventions:
 
-- Root element is `<section class="widget-container">` with `max-width` 700–800px,
-  `margin: 1rem auto`, `background: var(--surface)`, `border-radius: 10px`,
-  `box-shadow: var(--shadow-sm)`
+- Root element is `<section class="widget-container">` with `margin: 1rem auto`,
+  `background: var(--surface)`, `border-radius: 10px`, `box-shadow: var(--shadow-sm)`
+- **Width follows the content.** A form of short numeric fields reads best at
+  `max-width: 700px`. Anything built around a `<textarea>` or a wide table must go
+  much wider — `max-width: min(1200px, 96vw)`, up to `min(1600px, 96vw)` for
+  side-by-side panes — or most of a desktop screen is empty margin.
+- **Give textareas a `min-height` in `vh`**, not just a `rows` attribute: `50vh` for
+  a single main editor, `~34vh` for a side-by-side pair, `~18vh` for a secondary
+  input. `rows` alone leaves a text tool looking like a comment box. Scrollable
+  result panels should cap with `max-height` in `vh` too.
 - `border-radius`: `8px` inputs/buttons, `10px` cards/containers
 - Spacing in `0.5rem` multiples
 - `font-weight: 600` labels, `700` headings and emphasized values

@@ -191,8 +191,15 @@ Verify with `npm run build` and grep the output for `budget`.
 
 ### Layout conventions
 
-- `max-width` 700–800px, `margin: 1rem auto`, `background: var(--surface)`,
-  `border-radius: 10px`, `box-shadow: var(--shadow-sm)`
+- `margin: 1rem auto`, `background: var(--surface)`, `border-radius: 10px`,
+  `box-shadow: var(--shadow-sm)`
+- **Width follows the content.** A form of short numeric fields reads best at
+  `max-width: 700px`. Anything built around a `<textarea>` or a wide table must go
+  much wider — `max-width: min(1200px, 96vw)`, up to `min(1600px, 96vw)` for
+  side-by-side panes — or most of a desktop screen is empty margin.
+- **Give textareas a `min-height` in `vh`**, not just a `rows` attribute: `50vh` for
+  a single main editor, `~34vh` for a side-by-side pair, `~18vh` for a secondary
+  input. Cap scrollable result panels with `max-height` in `vh` as well.
 - `border-radius`: `8px` inputs/buttons, `10px` cards/containers
 - Spacing in `0.5rem` multiples; `font-weight: 600` labels, `700` headings
 - Primary button: `var(--brand)` bg, `#ffffff` text, hover `var(--brand-deep)`
