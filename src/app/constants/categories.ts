@@ -186,6 +186,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Encode or decode URLs and edit query parameters',
                 icon: '🔗',
                 param: 'url-encoder'
+            },
+            {
+                title: 'Text Case Converter',
+                description: 'Convert between camelCase, snake_case, kebab-case, and more',
+                icon: '🔡',
+                param: 'text-case-converter'
             }
         ]
     },

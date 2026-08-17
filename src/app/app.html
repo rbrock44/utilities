@@ -182,6 +182,13 @@
   ) {
     <app-url-encoder></app-url-encoder>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'tcc' ||
+    this.settingsService.getSelectedTile() === 'text-case-converter'
+  ) {
+    <app-text-case-converter></app-text-case-converter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {
