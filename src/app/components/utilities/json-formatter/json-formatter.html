@@ -1,0 +1,80 @@
+<section class="widget-container">
+  <h2>JSON Formatter</h2>
+  <p class="description">
+    Pretty-print, minify, and validate JSON. Errors are reported with a line and column.
+  </p>
+
+  <div class="toolbar">
+    <label for="indentSelect">
+      Indent
+      <select id="indentSelect" [(ngModel)]="indent">
+        <option value="2">2 spaces</option>
+        <option value="4">4 spaces</option>
+        <option value="tab">Tab</option>
+      </select>
+    </label>
+
+    <label class="checkbox">
+      <input type="checkbox" [(ngModel)]="sortKeys" />
+      Sort keys alphabetically
+    </label>
+  </div>
+
+  <label for="jsonArea" class="field">
+    JSON
+    <textarea
+      id="jsonArea"
+      rows="14"
+      spellcheck="false"
+      placeholder='{ "paste": "your JSON here" }'
+      [(ngModel)]="input"
+      (ngModelChange)="onInputChange()"
+    ></textarea>
+  </label>
+
+  @if (hasInput) {
+    @if (isValid && stats) {
+      <div class="status valid" aria-live="polite">
+        <span class="badge-ok">✓ Valid JSON</span>
+        <span class="stat">{{ stats.type }}</span>
+        <span class="stat">{{ formatBytes(stats.bytes) }}</span>
+        <span class="stat">{{ stats.keys }} key{{ stats.keys !== 1 ? 's' : '' }}</span>
+        <span class="stat">depth {{ stats.depth }}</span>
+      </div>
+    }
+
+    @if (failure) {
+      <div class="status invalid" role="alert">
+        <span class="badge-bad">✕ Invalid</span>
+        <span class="stat">
+          @if (failure.line > 0) {
+            line {{ failure.line }}, column {{ failure.column }}
+          } @else {
+            parse error
+          }
+        </span>
+      </div>
+
+      <p class="failure-message">{{ failure.message }}</p>
+
+      @if (failure.snippet) {
+        <pre class="snippet">{{ failure.snippet }}</pre>
+      }
+    }
+  }
+
+  <div class="actions">
+    <button type="button" class="btn-primary" [disabled]="!hasInput" (click)="format()">
+      Format
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="!hasInput" (click)="minify()">
+      Minify
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="!hasInput" (click)="copy()">
+      {{ justCopied ? 'Copied!' : 'Copy' }}
+    </button>
+    <button type="button" class="btn-secondary" [disabled]="!hasInput" (click)="clear()">
+      Clear
+    </button>
+  </div>
+</section>

@@ -174,6 +174,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert HEX, RGB, and HSL, and check WCAG contrast',
                 icon: '🎨',
                 param: 'color-converter'
+            },
+            {
+                title: 'JSON Formatter',
+                description: 'Format, minify, and validate JSON',
+                icon: '📋',
+                param: 'json-formatter'
             }
         ]
     },

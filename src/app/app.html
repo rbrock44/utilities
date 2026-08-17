@@ -168,6 +168,13 @@
   ) {
     <app-image-resizer></app-image-resizer>
   }
+
+  @if (
+    this.settingsService.getSelectedTile() === 'jsn' ||
+    this.settingsService.getSelectedTile() === 'json-formatter'
+  ) {
+    <app-json-formatter></app-json-formatter>
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {
