@@ -20,8 +20,21 @@ interface ImageEntry {
   usable: boolean | null;
   width: number;
   height: number;
-  /** Format jsPDF can embed as-is, or null when the bytes must be redrawn first. */
-  passthroughFormat: 'JPEG' | 'PNG' | null;
+}
+
+/** One marker segment of a JPEG: `start` points at its 0xFF byte, `end` past its payload. */
+interface JpegSegment {
+  marker: number;
+  start: number;
+  end: number;
+}
+
+interface JpegLayout {
+  segments: JpegSegment[];
+  /** Index of the frame header in `segments`, or -1 when the file has none. */
+  sofIndex: number;
+  /** First byte of the entropy-coded data, just past the scan header. */
+  scanStart: number;
 }
 
 type PageSize = 'a4' | 'letter' | 'legal';
@@ -121,7 +134,6 @@ export class ImageToPdfComponent {
       usable: null,
       width: 0,
       height: 0,
-      passthroughFormat: null,
     }));
     this.images = [...this.images, ...entries];
     this.sortDirection = null;
@@ -139,7 +151,6 @@ export class ImageToPdfComponent {
       entry.usable = img !== null;
       entry.width = img?.naturalWidth ?? 0;
       entry.height = img?.naturalHeight ?? 0;
-      entry.passthroughFormat = await this.detectPassthroughFormat(entry.file);
       this.cdr.markForCheck();
     };
     reader.onerror = () => {
@@ -147,49 +158,6 @@ export class ImageToPdfComponent {
       this.cdr.markForCheck();
     };
     reader.readAsDataURL(entry.file);
-  }
-
-  private async detectPassthroughFormat(file: File): Promise<'JPEG' | 'PNG' | null> {
-    try {
-      // The frame header sits before the scan data; 256 KB clears even fat EXIF/ICC blocks.
-      const head = new Uint8Array(await file.slice(0, 262144).arrayBuffer());
-
-      if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47) {
-        return 'PNG';
-      }
-      if (head[0] !== 0xff || head[1] !== 0xd8) return null;
-
-      let offset = 2;
-      while (offset + 9 < head.length) {
-        if (head[offset] !== 0xff) {
-          offset++;
-          continue;
-        }
-        const marker = head[offset + 1];
-        // Padding, restart markers and SOI carry no payload.
-        if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
-          offset += 2;
-          continue;
-        }
-        // Scan data or end of image: no frame header found.
-        if (marker === 0xda || marker === 0xd9) return null;
-
-        // SOF markers are C0-CF except C4 (Huffman tables), C8 (reserved) and CC (arithmetic tables).
-        const isFrameHeader =
-          marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
-        if (isFrameHeader) {
-          const progressive = marker === 0xc2 || marker === 0xc6 || marker === 0xca || marker === 0xce;
-          const arithmetic = marker >= 0xc9;
-          const components = head[offset + 9];
-          const plainColour = components === 1 || components === 3;
-          return !progressive && !arithmetic && plainColour ? 'JPEG' : null;
-        }
-        offset += 2 + ((head[offset + 2] << 8) | head[offset + 3]);
-      }
-    } catch {
-      // Fall through — redrawing is always the safe option.
-    }
-    return null;
   }
 
   private decode(dataUrl: string): Promise<HTMLImageElement | null> {
@@ -287,19 +255,8 @@ export class ImageToPdfComponent {
         if (written > 0) pdf.addPage();
         const rect = this.computeRect(img, pageWidth, pageHeight);
 
-        // Normal photos keep their original bytes; only formats a PDF viewer cannot
-        // decode are redrawn through a canvas.
-        let data = entry.dataUrl!;
-        let format: 'JPEG' | 'PNG' = entry.passthroughFormat ?? 'JPEG';
-        if (entry.passthroughFormat === null) {
-          const redrawn = this.renderToJpeg(img, rect.w, rect.h);
-          if (redrawn) {
-            data = redrawn;
-            format = 'JPEG';
-          }
-        }
-
-        pdf.addImage(data, format, rect.x, rect.y, rect.w, rect.h);
+        const embed = await this.prepareEmbed(entry, img, rect);
+        pdf.addImage(embed.data, embed.format, rect.x, rect.y, rect.w, rect.h);
         written++;
 
         this.generatedCount = written;
@@ -316,6 +273,167 @@ export class ImageToPdfComponent {
       this.isGenerating = false;
       this.cdr.markForCheck();
     }
+  }
+
+  /**
+   * The bytes that go on the page: the original file when it can be embedded untouched,
+   * a canvas re-render otherwise.
+   */
+  private async prepareEmbed(
+    entry: ImageEntry,
+    img: HTMLImageElement,
+    rect: { w: number; h: number }
+  ): Promise<{ data: string | Uint8Array; format: 'JPEG' | 'PNG' }> {
+    const passthrough = await this.buildPassthrough(entry.file, img);
+    if (passthrough) return passthrough;
+
+    const redrawn = this.renderToJpeg(img, rect.w, rect.h);
+    if (redrawn) return { data: redrawn, format: 'JPEG' };
+    return { data: entry.dataUrl!, format: 'JPEG' };
+  }
+
+  /**
+   * Original bytes jsPDF can embed as-is, or null when the image has to be redrawn.
+   *
+   * jsPDF sizes the embedded JPEG by reading the frame header itself, and its scan stops
+   * at the first marker in the C0-C7 range — a range that also covers DHT (C4). Recent
+   * phone photos put a Huffman table ahead of the frame header, so jsPDF reads the table
+   * as a 1281x1 greyscale frame and the page renders as unreadable streaks. Moving those
+   * tables behind the frame header is a lossless rewrite that leaves jsPDF reading the
+   * real dimensions; anything still misread falls back to the canvas.
+   */
+  private async buildPassthrough(
+    file: File,
+    img: HTMLImageElement
+  ): Promise<{ data: Uint8Array; format: 'JPEG' | 'PNG' } | null> {
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+
+      if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+        return { data: bytes, format: 'PNG' };
+      }
+      if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return null;
+
+      const layout = this.readJpegLayout(bytes);
+      if (!layout || layout.sofIndex < 0) return null;
+
+      const sof = layout.segments[layout.sofIndex];
+      // Only huffman-coded baseline and extended sequential frames: a PDF cannot carry
+      // progressive or arithmetic scans, and CMYK needs an Adobe transform jsPDF omits.
+      if (sof.marker !== 0xc0 && sof.marker !== 0xc1) return null;
+      if (bytes[sof.start + 4] !== 8) return null;
+      const components = bytes[sof.start + 9];
+      if (components !== 1 && components !== 3) return null;
+
+      const height = (bytes[sof.start + 5] << 8) | bytes[sof.start + 6];
+      const width = (bytes[sof.start + 7] << 8) | bytes[sof.start + 8];
+      // Dimensions that disagree with the decoded image mean the browser transformed it on
+      // the way in (EXIF orientation), so the raw bytes would land on the page rotated.
+      if (width !== img.naturalWidth || height !== img.naturalHeight) return null;
+
+      if (this.jsPdfReadsFrameAt(bytes, sof.start)) return { data: bytes, format: 'JPEG' };
+
+      const rebuilt = this.reorderJpegForJsPdf(bytes, layout);
+      if (this.jsPdfReadsFrameAt(rebuilt.bytes, rebuilt.sofStart)) {
+        return { data: rebuilt.bytes, format: 'JPEG' };
+      }
+    } catch {
+      // Fall through — redrawing is always the safe option.
+    }
+    return null;
+  }
+
+  /** Walks the marker segments up to and including the scan header. */
+  private readJpegLayout(bytes: Uint8Array): JpegLayout | null {
+    const segments: JpegSegment[] = [];
+    let sofIndex = -1;
+    let offset = 2;
+
+    while (offset + 3 < bytes.length) {
+      if (bytes[offset] !== 0xff) return null;
+      // Padding, restart markers and a stray SOI carry no payload.
+      const marker = bytes[offset + 1];
+      if (marker === 0xff) {
+        offset++;
+        continue;
+      }
+      if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+        offset += 2;
+        continue;
+      }
+      if (marker === 0xd9) return null;
+
+      const length = (bytes[offset + 2] << 8) | bytes[offset + 3];
+      const end = offset + 2 + length;
+      if (length < 2 || end > bytes.length) return null;
+      segments.push({ marker, start: offset, end });
+
+      // SOF markers are C0-CF except C4 (Huffman tables), C8 (reserved) and CC (arithmetic
+      // tables).
+      if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+        if (sofIndex < 0) sofIndex = segments.length - 1;
+      }
+      if (marker === 0xda) return { segments, sofIndex, scanStart: end };
+      offset = end;
+    }
+    return null;
+  }
+
+  /** Mirrors jsPDF's own frame-header scan, so we only hand it bytes it reads correctly. */
+  private jsPdfReadsFrameAt(bytes: Uint8Array, sofStart: number): boolean {
+    let blockLength = (bytes[4] << 8) | bytes[5];
+    for (let i = 4; i < bytes.length; i += 2) {
+      i += blockLength;
+      if (i + 3 >= bytes.length) return false;
+      if (bytes[i + 1] >= 0xc0 && bytes[i + 1] <= 0xc7) return i === sofStart;
+      blockLength = (bytes[i + 2] << 8) | bytes[i + 3];
+    }
+    return false;
+  }
+
+  /**
+   * Rewrites the file with every table jsPDF could mistake for a frame header moved behind
+   * the real one — the segment order libjpeg itself emits, so no decoder cares.
+   */
+  private reorderJpegForJsPdf(
+    bytes: Uint8Array,
+    layout: JpegLayout
+  ): { bytes: Uint8Array; sofStart: number } {
+    const { segments, sofIndex, scanStart } = layout;
+    const confusable = (s: JpegSegment) => s.marker >= 0xc0 && s.marker <= 0xc7;
+    const sof = segments[sofIndex];
+    const before = segments.slice(0, sofIndex);
+    const ordered = [
+      ...before.filter((s) => !confusable(s)),
+      sof,
+      ...before.filter(confusable),
+      ...segments.slice(sofIndex + 1),
+    ];
+
+    // Entropy data escapes its own 0xFF bytes, so the first EOI past the scan header ends
+    // the image; whatever follows (a Pixel gain map, say) is weight the PDF does not need.
+    let tailEnd = bytes.length;
+    for (let i = scanStart; i + 1 < bytes.length; i++) {
+      if (bytes[i] === 0xff && bytes[i + 1] === 0xd9) {
+        tailEnd = i + 2;
+        break;
+      }
+    }
+
+    const size = ordered.reduce((n, s) => n + (s.end - s.start), 2 + tailEnd - scanStart);
+    const out = new Uint8Array(size);
+    out[0] = 0xff;
+    out[1] = 0xd8;
+
+    let at = 2;
+    let sofStart = 2;
+    for (const segment of ordered) {
+      if (segment === sof) sofStart = at;
+      out.set(bytes.subarray(segment.start, segment.end), at);
+      at += segment.end - segment.start;
+    }
+    out.set(bytes.subarray(scanStart, tailEnd), at);
+    return { bytes: out, sofStart };
   }
 
   /** Where the image sits on the page. `fill` overflows the page, which the viewer clips. */
