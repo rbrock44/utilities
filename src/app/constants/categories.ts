@@ -157,6 +157,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Resize images and convert between PNG, JPEG, and WebP',
                 icon: '🖼️',
                 param: 'image-resizer'
+            },
+            {
+                title: 'Favicon Generator',
+                description: 'Turn one image into favicon PNGs, favicon.ico, and a web manifest',
+                icon: '🌐',
+                param: 'favicon-generator'
             }
         ]
     },

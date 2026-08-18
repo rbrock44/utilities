@@ -247,6 +247,14 @@
       <p class="tool-loading">Loading…</p>
     }
   }
+
+  @if (isTile('fav', 'favicon-generator')) {
+    @defer (on immediate) {
+      <app-favicon-generator></app-favicon-generator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

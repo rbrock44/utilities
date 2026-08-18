@@ -1,0 +1,175 @@
+<section class="widget-container">
+  <h2>Favicon Generator</h2>
+  <p class="description">
+    Turn one image into a full favicon set — PNGs, a multi-size favicon.ico, and the
+    manifest, in browser only.
+  </p>
+
+  @if (file === null) {
+    <div
+      class="drop-zone"
+      [class.dragging]="isDragging"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+      role="button"
+      tabindex="0"
+      aria-label="Upload a source image"
+      (keydown.enter)="fileInput.click()"
+      (keydown.space)="fileInput.click()"
+    >
+      <span class="drop-icon">🌐</span>
+      <span class="drop-text">Drag &amp; drop an image here, or click to browse</span>
+      <span class="drop-hint">Square PNG or SVG works best · 512 × 512 or larger</span>
+      <input #fileInput type="file" accept="image/*" hidden (change)="onFileInputChange($event)" />
+    </div>
+  } @else {
+    <div class="file-bar">
+      <span class="file-info">
+        <span class="file-name" [title]="file.name">{{ file.name }}</span>
+        <span class="file-meta">{{ sourceDimensions }}</span>
+      </span>
+      <button type="button" class="btn-secondary" (click)="clear()">Choose another</button>
+    </div>
+
+    @if (!sourceIsSquare) {
+      <p class="note">
+        That image is not square — it will be centred with transparent or filled space on
+        the short edge.
+      </p>
+    }
+    @if (sourceIsSmall) {
+      <p class="note">Under 256 px wide, so the large icons will look soft.</p>
+    }
+
+    <fieldset class="sizes">
+      <legend>Sizes</legend>
+      @for (entry of sizes; track entry.size) {
+        <label class="size-check">
+          <input
+            type="checkbox"
+            [checked]="entry.selected"
+            (change)="toggleSize(entry)"
+          />
+          <span class="size-name">{{ entry.size }} × {{ entry.size }}</span>
+          <span class="size-label">{{ entry.label }}</span>
+        </label>
+      }
+    </fieldset>
+
+    <div class="controls">
+      <label for="paddingInput" class="slider-field">
+        Padding — {{ padding }}%
+        <input
+          id="paddingInput"
+          type="range"
+          min="0"
+          max="30"
+          step="1"
+          [(ngModel)]="padding"
+          (ngModelChange)="scheduleRender()"
+        />
+      </label>
+
+      <label for="radiusInput" class="slider-field">
+        Corner radius — {{ cornerRadius }}%
+        <input
+          id="radiusInput"
+          type="range"
+          min="0"
+          max="50"
+          step="1"
+          [(ngModel)]="cornerRadius"
+          (ngModelChange)="scheduleRender()"
+        />
+      </label>
+    </div>
+
+    <div class="controls">
+      <label class="checkbox">
+        <input type="checkbox" [(ngModel)]="transparent" (ngModelChange)="scheduleRender()" />
+        Transparent background
+      </label>
+
+      @if (!transparent) {
+        <label for="bgInput" class="color-field">
+          Background
+          <input
+            id="bgInput"
+            type="color"
+            [(ngModel)]="backgroundColor"
+            (ngModelChange)="scheduleRender()"
+          />
+        </label>
+      }
+
+      <label for="appNameInput" class="name-field">
+        App name (manifest)
+        <input id="appNameInput" type="text" placeholder="My site" [(ngModel)]="appName" />
+      </label>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (icons.length > 0) {
+      <div class="previews" aria-live="polite">
+        @for (icon of icons; track icon.size) {
+          <figure class="preview-card">
+            <img
+              [src]="icon.url"
+              [alt]="icon.size + ' pixel icon preview'"
+              [style.width.px]="icon.size > 96 ? 96 : icon.size"
+              [style.height.px]="icon.size > 96 ? 96 : icon.size"
+            />
+            <figcaption>
+              <strong>{{ icon.size }}px</strong>
+              <span>{{ icon.fileName }}</span>
+              <button
+                type="button"
+                class="btn-link"
+                (click)="downloadIcon(icon)"
+                [attr.aria-label]="'Download ' + icon.fileName"
+              >
+                Download
+              </button>
+            </figcaption>
+          </figure>
+        }
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" [disabled]="isRendering" (click)="downloadZip()">
+          @if (isRendering) {
+            Rendering…
+          } @else {
+            ⬇ Download pack ({{ formatBytes(totalBytes) }})
+          }
+        </button>
+        <button type="button" class="btn-secondary" (click)="downloadIco()">favicon.ico only</button>
+      </div>
+
+      <div class="snippet">
+        <div class="snippet-head">
+          <h3>HTML &lt;head&gt;</h3>
+          <button type="button" class="btn-copy" (click)="copy('html', htmlSnippet)">
+            {{ copiedKey === 'html' ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+        <pre>{{ htmlSnippet }}</pre>
+      </div>
+
+      <div class="snippet">
+        <div class="snippet-head">
+          <h3>site.webmanifest</h3>
+          <button type="button" class="btn-copy" (click)="copy('manifest', manifestJson)">
+            {{ copiedKey === 'manifest' ? 'Copied!' : 'Copy' }}
+          </button>
+        </div>
+        <pre>{{ manifestJson }}</pre>
+      </div>
+    }
+  }
+</section>
