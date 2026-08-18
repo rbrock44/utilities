@@ -91,6 +91,12 @@ export class App {
     private route: ActivatedRoute,
   ) { }
 
+  /** True when the selected tile matches any of its aliases (short code or full name). */
+  isTile(...aliases: string[]): boolean {
+    const selected = this.settingsService.getSelectedTile();
+    return selected !== null && aliases.includes(selected);
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const tileParam = params[this.settingsService.tileUrlParam];

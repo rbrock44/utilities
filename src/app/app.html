@@ -4,218 +4,248 @@
 @if (this.settingsService.getSelectedTile() !== null) {
   <app-back-button></app-back-button>
 
-  @if (
-    this.settingsService.getSelectedTile() === 'pm' ||
-    this.settingsService.getSelectedTile() === 'precious-metals'
-  ) {
-    <app-precious-metals></app-precious-metals>
+  @if (isTile('pm', 'precious-metals')) {
+    @defer (on immediate) {
+      <app-precious-metals></app-precious-metals>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'sic' ||
-    this.settingsService.getSelectedTile() === 'silver-in-coins'
-  ) {
-    <app-silver-in-coin></app-silver-in-coin>
+  @if (isTile('sic', 'silver-in-coins')) {
+    @defer (on immediate) {
+      <app-silver-in-coin></app-silver-in-coin>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'gic' ||
-    this.settingsService.getSelectedTile() === 'gold-in-coins'
-  ) {
-    <app-gold-in-coin></app-gold-in-coin>
+  @if (isTile('gic', 'gold-in-coins')) {
+    @defer (on immediate) {
+      <app-gold-in-coin></app-gold-in-coin>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'rac' ||
-    this.settingsService.getSelectedTile() === 'right-angle-calculator'
-  ) {
-    <app-right-angle-calculator></app-right-angle-calculator>
+  @if (isTile('rac', 'right-angle-calculator')) {
+    @defer (on immediate) {
+      <app-right-angle-calculator></app-right-angle-calculator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'cpc' ||
-    this.settingsService.getSelectedTile() === 'cleaning-payout-calculator'
-  ) {
-    <app-cleaning-payout-calculator></app-cleaning-payout-calculator>
+  @if (isTile('cpc', 'cleaning-payout-calculator')) {
+    @defer (on immediate) {
+      <app-cleaning-payout-calculator></app-cleaning-payout-calculator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'dsc' ||
-    this.settingsService.getSelectedTile() === 'divider-spacing-calculator'
-  ) {
-    <app-divider-spacing-calculator></app-divider-spacing-calculator>
+  @if (isTile('dsc', 'divider-spacing-calculator')) {
+    @defer (on immediate) {
+      <app-divider-spacing-calculator></app-divider-spacing-calculator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'itp' ||
-    this.settingsService.getSelectedTile() === 'image-to-pdf'
-  ) {
-    <app-image-to-pdf></app-image-to-pdf>
+  @if (isTile('itp', 'image-to-pdf')) {
+    @defer (on immediate) {
+      <app-image-to-pdf></app-image-to-pdf>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'pmc' ||
-    this.settingsService.getSelectedTile() === 'pdf-combiner'
-  ) {
-    <app-pdf-combiner></app-pdf-combiner>
+  @if (isTile('pmc', 'pdf-combiner')) {
+    @defer (on immediate) {
+      <app-pdf-combiner></app-pdf-combiner>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'ppu' ||
-    this.settingsService.getSelectedTile() === 'pdf-page-utility'
-  ) {
-    <app-pdf-page-utility></app-pdf-page-utility>
+  @if (isTile('ppu', 'pdf-page-utility')) {
+    @defer (on immediate) {
+      <app-pdf-page-utility></app-pdf-page-utility>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'elg' ||
-    this.settingsService.getSelectedTile() === 'email-link-generator'
-  ) {
-    <app-email-link-generator></app-email-link-generator>
+  @if (isTile('elg', 'email-link-generator')) {
+    @defer (on immediate) {
+      <app-email-link-generator></app-email-link-generator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'hg' ||
-    this.settingsService.getSelectedTile() === 'hex-generator'
-  ) {
-    <app-hex-generator></app-hex-generator>
+  @if (isTile('hg', 'hex-generator')) {
+    @defer (on immediate) {
+      <app-hex-generator></app-hex-generator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'gg' ||
-    this.settingsService.getSelectedTile() === 'guid-generator'
-  ) {
-    <app-guid-generator></app-guid-generator>
+  @if (isTile('gg', 'guid-generator')) {
+    @defer (on immediate) {
+      <app-guid-generator></app-guid-generator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'lc' ||
-    this.settingsService.getSelectedTile() === 'length-converter'
-  ) {
-    <app-unit-converter title="Length Converter" [units]="lengthUnits"></app-unit-converter>
+  @if (isTile('lc', 'length-converter')) {
+    @defer (on immediate) {
+      <app-unit-converter title="Length Converter" [units]="lengthUnits"></app-unit-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'wc' ||
-    this.settingsService.getSelectedTile() === 'weight-converter'
-  ) {
-    <app-unit-converter title="Weight Converter" [units]="weightUnits"></app-unit-converter>
+  @if (isTile('wc', 'weight-converter')) {
+    @defer (on immediate) {
+      <app-unit-converter title="Weight Converter" [units]="weightUnits"></app-unit-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'vc' ||
-    this.settingsService.getSelectedTile() === 'volume-converter'
-  ) {
-    <app-unit-converter
-      title="Volume Converter"
-      description="Includes cooking measurements like teaspoons, tablespoons, and cups."
-      [units]="volumeUnits"
-    ></app-unit-converter>
+  @if (isTile('vc', 'volume-converter')) {
+    @defer (on immediate) {
+      <app-unit-converter
+        title="Volume Converter"
+        description="Includes cooking measurements like teaspoons, tablespoons, and cups."
+        [units]="volumeUnits"
+      ></app-unit-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'tc' ||
-    this.settingsService.getSelectedTile() === 'temperature-converter'
-  ) {
-    <app-unit-converter title="Temperature Converter" [units]="temperatureUnits"></app-unit-converter>
+  @if (isTile('tc', 'temperature-converter')) {
+    @defer (on immediate) {
+      <app-unit-converter title="Temperature Converter" [units]="temperatureUnits"></app-unit-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'cc' ||
-    this.settingsService.getSelectedTile() === 'currency-converter'
-  ) {
-    <app-currency-converter></app-currency-converter>
+  @if (isTile('cc', 'currency-converter')) {
+    @defer (on immediate) {
+      <app-currency-converter></app-currency-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'nbc' ||
-    this.settingsService.getSelectedTile() === 'number-base-converter'
-  ) {
-    <app-number-base-converter></app-number-base-converter>
+  @if (isTile('nbc', 'number-base-converter')) {
+    @defer (on immediate) {
+      <app-number-base-converter></app-number-base-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'b64' ||
-    this.settingsService.getSelectedTile() === 'base64-converter'
-  ) {
-    <app-base64-converter></app-base64-converter>
+  @if (isTile('b64', 'base64-converter')) {
+    @defer (on immediate) {
+      <app-base64-converter></app-base64-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'tsc' ||
-    this.settingsService.getSelectedTile() === 'timestamp-converter'
-  ) {
-    <app-timestamp-converter></app-timestamp-converter>
+  @if (isTile('tsc', 'timestamp-converter')) {
+    @defer (on immediate) {
+      <app-timestamp-converter></app-timestamp-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'clr' ||
-    this.settingsService.getSelectedTile() === 'color-converter'
-  ) {
-    <app-color-converter></app-color-converter>
+  @if (isTile('clr', 'color-converter')) {
+    @defer (on immediate) {
+      <app-color-converter></app-color-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'lnc' ||
-    this.settingsService.getSelectedTile() === 'loan-calculator'
-  ) {
-    <app-loan-calculator></app-loan-calculator>
+  @if (isTile('lnc', 'loan-calculator')) {
+    @defer (on immediate) {
+      <app-loan-calculator></app-loan-calculator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'imr' ||
-    this.settingsService.getSelectedTile() === 'image-resizer'
-  ) {
-    <app-image-resizer></app-image-resizer>
+  @if (isTile('imr', 'image-resizer')) {
+    @defer (on immediate) {
+      <app-image-resizer></app-image-resizer>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'jsn' ||
-    this.settingsService.getSelectedTile() === 'json-formatter'
-  ) {
-    <app-json-formatter></app-json-formatter>
+  @if (isTile('jsn', 'json-formatter')) {
+    @defer (on immediate) {
+      <app-json-formatter></app-json-formatter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'url' ||
-    this.settingsService.getSelectedTile() === 'url-encoder'
-  ) {
-    <app-url-encoder></app-url-encoder>
+  @if (isTile('url', 'url-encoder')) {
+    @defer (on immediate) {
+      <app-url-encoder></app-url-encoder>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'tcc' ||
-    this.settingsService.getSelectedTile() === 'text-case-converter'
-  ) {
-    <app-text-case-converter></app-text-case-converter>
+  @if (isTile('tcc', 'text-case-converter')) {
+    @defer (on immediate) {
+      <app-text-case-converter></app-text-case-converter>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'dif' ||
-    this.settingsService.getSelectedTile() === 'text-diff'
-  ) {
-    <app-text-diff></app-text-diff>
+  @if (isTile('dif', 'text-diff')) {
+    @defer (on immediate) {
+      <app-text-diff></app-text-diff>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'bfc' ||
-    this.settingsService.getSelectedTile() === 'board-foot-calculator'
-  ) {
-    <app-board-foot-calculator></app-board-foot-calculator>
+  @if (isTile('bfc', 'board-foot-calculator')) {
+    @defer (on immediate) {
+      <app-board-foot-calculator></app-board-foot-calculator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'qr' ||
-    this.settingsService.getSelectedTile() === 'qr-code-generator'
-  ) {
-    <app-qr-code-generator></app-qr-code-generator>
+  @if (isTile('qr', 'qr-code-generator')) {
+    @defer (on immediate) {
+      <app-qr-code-generator></app-qr-code-generator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 
-  @if (
-    this.settingsService.getSelectedTile() === 'jwt' ||
-    this.settingsService.getSelectedTile() === 'jwt-decoder'
-  ) {
-    <app-jwt-decoder></app-jwt-decoder>
+  @if (isTile('jwt', 'jwt-decoder')) {
+    @defer (on immediate) {
+      <app-jwt-decoder></app-jwt-decoder>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
   }
 }
 
