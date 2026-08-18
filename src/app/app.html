@@ -255,6 +255,14 @@
       <p class="tool-loading">Loading…</p>
     }
   }
+
+  @if (isTile('pti', 'pdf-to-images')) {
+    @defer (on immediate) {
+      <app-pdf-to-images></app-pdf-to-images>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

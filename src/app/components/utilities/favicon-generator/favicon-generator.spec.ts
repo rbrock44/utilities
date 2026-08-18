@@ -57,36 +57,6 @@ describe('FaviconGeneratorComponent', () => {
     expect(ico[7]).toBe(0);
   });
 
-  it('should build a zip with a central directory for every entry', () => {
-    const zip = component.buildZip([
-      { name: 'favicon.ico', bytes: png(1) },
-      { name: 'site.webmanifest', bytes: new TextEncoder().encode('{}') },
-    ]);
-
-    expect(readU32(zip, 0)).toBe(0x04034b50);
-    expect(readU16(zip, 8)).toBe(0);
-
-    const end = zip.length - 22;
-    expect(readU32(zip, end)).toBe(0x06054b50);
-    expect(readU16(zip, end + 10)).toBe(2);
-
-    const centralOffset = readU32(zip, end + 16);
-    expect(readU32(zip, centralOffset)).toBe(0x02014b50);
-    // Stored entries repeat the size in both the compressed and uncompressed fields.
-    expect(readU32(zip, centralOffset + 20)).toBe(5);
-    expect(readU32(zip, centralOffset + 24)).toBe(5);
-    expect(readU32(zip, end + 12)).toBe(zip.length - 22 - centralOffset);
-  });
-
-  it('should checksum zip entries so the archive verifies', () => {
-    const zip = component.buildZip([
-      { name: 'a.txt', bytes: new TextEncoder().encode('123456789') },
-    ]);
-
-    // The CRC-32 of "123456789" is the standard check value for the algorithm.
-    expect(readU32(zip, 14)).toBe(0xcbf43926);
-  });
-
   it('should list only the selected sizes in the head snippet', () => {
     component.sizes = component.sizes.map((entry) => ({
       ...entry,

@@ -83,6 +83,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Extract, delete, reorder, or rotate pages',
                 icon: '✂️',
                 param: 'pdf-page-utility'
+            },
+            {
+                title: 'PDF to Images',
+                description: 'Render PDF pages to PNG or JPEG images at a chosen resolution',
+                icon: '🏞️',
+                param: 'pdf-to-images'
             }
         ]
     },

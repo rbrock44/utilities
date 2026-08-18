@@ -33,6 +33,7 @@ import { BoardFootCalculatorComponent } from './components/calculators/board-foo
 import { QrCodeGeneratorComponent } from './components/utilities/qr-code-generator/qr-code-generator';
 import { JwtDecoderComponent } from './components/utilities/jwt-decoder/jwt-decoder';
 import { FaviconGeneratorComponent } from './components/utilities/favicon-generator/favicon-generator';
+import { PdfToImagesComponent } from './components/utilities/pdf-to-images/pdf-to-images';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -71,6 +72,7 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     QrCodeGeneratorComponent,
     JwtDecoderComponent,
     FaviconGeneratorComponent,
+    PdfToImagesComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

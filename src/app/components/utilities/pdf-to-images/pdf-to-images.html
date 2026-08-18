@@ -1,0 +1,122 @@
+<section class="widget-container">
+  <h2>PDF to Images</h2>
+  <p class="description">
+    Render PDF pages to PNG or JPEG at the resolution you pick, in browser only.
+  </p>
+
+  @if (file === null) {
+    <div
+      class="drop-zone"
+      [class.dragging]="isDragging"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+      role="button"
+      tabindex="0"
+      aria-label="Upload a PDF"
+      (keydown.enter)="fileInput.click()"
+      (keydown.space)="fileInput.click()"
+    >
+      <span class="drop-icon">🏞️</span>
+      <span class="drop-text">Drag &amp; drop a PDF here, or click to browse</span>
+      <span class="drop-hint">Up to 100 MB · nothing leaves your browser</span>
+      <input #fileInput type="file" accept="application/pdf" hidden (change)="onFileInputChange($event)" />
+    </div>
+  } @else {
+    <div class="file-bar">
+      <span class="file-info">
+        <span class="file-name" [title]="file.name">{{ file.name }}</span>
+        <span class="file-meta">
+          @if (isLoading) {
+            Opening…
+          } @else {
+            {{ pageCount }} page{{ pageCount === 1 ? '' : 's' }} · {{ formatBytes(file.size) }}
+          }
+        </span>
+      </span>
+      <button type="button" class="btn-secondary" (click)="clear()">Choose another</button>
+    </div>
+
+    @if (pageCount > 0) {
+      <div class="controls">
+        <label for="pagesInput">
+          Pages
+          <input
+            id="pagesInput"
+            type="text"
+            placeholder="all"
+            [(ngModel)]="pageSpec"
+            [attr.aria-invalid]="selectedPages === null"
+          />
+          <span class="hint" [class.invalid]="selectedPages === null">{{ selectionLabel }}</span>
+        </label>
+
+        <label for="dpiSelect">
+          Resolution
+          <select id="dpiSelect" [(ngModel)]="dpi">
+            @for (option of dpiOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label for="formatSelect">
+          Format
+          <select id="formatSelect" [(ngModel)]="format">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPEG</option>
+          </select>
+        </label>
+      </div>
+
+      @if (usesQuality) {
+        <label for="qualityInput" class="slider-field">
+          Quality — {{ quality }}%
+          <input id="qualityInput" type="range" min="1" max="100" step="1" [(ngModel)]="quality" />
+        </label>
+      }
+
+      <div class="actions">
+        <button type="button" class="btn-primary" [disabled]="!canRender" (click)="render()">
+          @if (isRendering) {
+            Rendering {{ renderedCount }}/{{ selectedPages?.length }}…
+          } @else {
+            Render pages
+          }
+        </button>
+        @if (pages.length > 0 && !isRendering) {
+          <button type="button" class="btn-secondary" (click)="downloadZip()">
+            ⬇ Download all ({{ formatBytes(totalBytes) }})
+          </button>
+        }
+      </div>
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (pages.length > 0) {
+      <ul class="page-grid" aria-live="polite">
+        @for (page of pages; track page.page) {
+          <li class="page-card">
+            <img [src]="page.url" [alt]="'Page ' + page.page" loading="lazy" />
+            <div class="page-meta">
+              <strong>Page {{ page.page }}</strong>
+              <span>{{ page.width }} × {{ page.height }} · {{ formatBytes(page.bytes.length) }}</span>
+              <button
+                type="button"
+                class="btn-link"
+                (click)="downloadPage(page)"
+                [attr.aria-label]="'Download ' + page.fileName"
+              >
+                Download
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>
