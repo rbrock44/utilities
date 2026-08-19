@@ -1,6 +1,8 @@
 <div class="tile" role="button" tabindex="0" [attr.aria-label]="tile.title + ': ' + tile.description"
     (click)="handleClick()" (keydown.enter)="handleClick()" (keydown.space)="$event.preventDefault(); handleClick()">
-    <div class="icon" aria-hidden="true">{{ tile.icon }}</div>
-    <h3 class="title">{{ tile.title }}</h3>
+    <div class="heading">
+        <span class="icon" aria-hidden="true">{{ tile.icon }}</span>
+        <h3 class="title">{{ tile.title }}</h3>
+    </div>
     <p class="description">{{ tile.description }}</p>
 </div>
