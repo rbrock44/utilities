@@ -1,0 +1,70 @@
+<section class="widget-container">
+  <h2>Cron Expression Translator</h2>
+  <p class="description">
+    Decipher a cron schedule.
+  </p>
+
+  <label for="cronInput" class="cron-field">
+    Cron expression
+    <input
+      id="cronInput"
+      type="text"
+      spellcheck="false"
+      autocapitalize="off"
+      placeholder="*/15 9-17 * * 1-5"
+      [(ngModel)]="expression"
+      (ngModelChange)="translate()"
+    />
+  </label>
+
+  <div class="presets">
+    @for (preset of presets; track preset.value) {
+      <button type="button" class="btn-chip" (click)="usePreset(preset.value)">
+        {{ preset.label }}
+      </button>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (description) {
+    <p class="headline" aria-live="polite">{{ description }}</p>
+
+    @if (hasSeconds) {
+      <p class="note">Read as a 6-field expression, so the first field is seconds.</p>
+    }
+
+    <div class="panes">
+      <div class="pane">
+        <h3>Fields</h3>
+        <table>
+          <tbody>
+            @for (field of fields; track field.name) {
+              <tr>
+                <th scope="row">{{ field.name }}</th>
+                <td class="mono">{{ field.text }}</td>
+                <td>{{ field.meaning }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pane">
+        <h3>Next 10 runs</h3>
+        @if (runs.length === 0) {
+          <p class="note">This schedule never comes around, check the day and month fields.</p>
+        } @else {
+          <ol class="runs">
+            @for (run of runs; track $index) {
+              <li>{{ formatRun(run) }}</li>
+            }
+          </ol>
+          <p class="timezone">Times shown in {{ timeZone }}</p>
+        }
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,222 @@
+<section class="widget-container">
+  <h2>Cut List Optimizer</h2>
+  <p class="description">
+    Lay a cut list out on stock boards, kerf included.
+  </p>
+
+  <div class="stock">
+    <label for="unitSelect">
+      Units
+      <select id="unitSelect" [(ngModel)]="unit" (ngModelChange)="onChange()">
+        <option value="in">Inches</option>
+        <option value="ft">Feet</option>
+      </select>
+    </label>
+
+    <label for="stockInput">
+      Stock length ({{ unitLabel }})
+      <input
+        id="stockInput"
+        type="number"
+        min="0"
+        step="0.5"
+        [(ngModel)]="stockLength"
+        (ngModelChange)="onChange()"
+      />
+    </label>
+
+    <label for="kerfInput">
+      Blade kerf (in)
+      <input
+        id="kerfInput"
+        type="number"
+        min="0"
+        step="0.0625"
+        [(ngModel)]="kerf"
+        (ngModelChange)="onChange()"
+      />
+    </label>
+
+    <label for="trimInput">
+      Trim each end (in)
+      <input
+        id="trimInput"
+        type="number"
+        min="0"
+        step="0.25"
+        [(ngModel)]="trimPerEnd"
+        (ngModelChange)="onChange()"
+      />
+    </label>
+
+    <label for="onHandInput">
+      Boards on hand
+      <input
+        id="onHandInput"
+        type="number"
+        min="0"
+        step="1"
+        placeholder="0 = plenty"
+        [(ngModel)]="boardsOnHand"
+        (ngModelChange)="onChange()"
+      />
+    </label>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Qty</th>
+          <th scope="col">Length ({{ unitLabel }})</th>
+          <th scope="col">Part name</th>
+          <th scope="col"><span class="visually-hidden">Remove</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.id; let i = $index) {
+          <tr>
+            <td class="narrow">
+              <input
+                type="number"
+                min="1"
+                step="1"
+                [(ngModel)]="row.quantity"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' quantity'"
+              />
+            </td>
+            <td class="narrow">
+              <input
+                type="number"
+                min="0"
+                step="0.25"
+                [(ngModel)]="row.length"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' length'"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                placeholder="Leg, rail, shelf…"
+                [(ngModel)]="row.label"
+                (ngModelChange)="onChange()"
+                [attr.aria-label]="'Row ' + (i + 1) + ' part name'"
+              />
+            </td>
+            <td class="narrow">
+              <button
+                type="button"
+                class="btn-remove"
+                (click)="removeRow(row.id)"
+                [attr.aria-label]="'Remove row ' + (i + 1)"
+              >
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <button type="button" class="btn-secondary" (click)="addRow()">+ Add part</button>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (plan.tooLong.length > 0) {
+    <p class="error" role="alert">
+      Longer than one board: {{ plan.tooLong.join(', ') }}
+    </p>
+  }
+
+  @if (plan.boardCount > 0) {
+    <div class="summary" aria-live="polite">
+      <div class="stat">
+        <span>Boards needed</span>
+        <strong>{{ plan.boardCount }}</strong>
+      </div>
+      <div class="stat">
+        <span>Pieces cut</span>
+        <strong>{{ plan.pieceCount }}</strong>
+      </div>
+      <div class="stat">
+        <span>Waste</span>
+        <strong>{{ plan.wastePercent.toFixed(1) }}%</strong>
+      </div>
+      <div class="stat">
+        <span>Longest offcut</span>
+        <strong>{{ formatLength(plan.longestOffcut) }}</strong>
+      </div>
+    </div>
+
+    @if (shortBy > 0) {
+      <p class="note">
+        {{ shortBy }} board{{ shortBy === 1 ? '' : 's' }} short of what you have on hand.
+      </p>
+    }
+
+    <div class="layouts">
+      @for (group of plan.groups; track $index; let i = $index) {
+        <div class="layout">
+          <div class="layout-head">
+            <strong>Board {{ i + 1 }}</strong>
+            @if (group.count > 1) {
+              <span class="repeat">× {{ group.count }}</span>
+            }
+            <span class="layout-meta">
+              {{ formatLength(group.used) }} used · {{ formatLength(group.offcut) }} left
+            </span>
+          </div>
+          <div class="bar">
+            @for (piece of group.pieces; track $index) {
+              <span
+                class="piece"
+                [style.width.%]="barWidth(piece.length)"
+                [title]="piece.label + ' — ' + formatLength(piece.length)"
+              >
+                {{ formatLength(piece.length) }}
+              </span>
+            }
+            @if (group.offcut > 0) {
+              <span class="offcut" [style.width.%]="barWidth(group.offcut)"></span>
+            }
+          </div>
+          <ul class="piece-list">
+            @for (piece of group.pieces; track $index) {
+              <li>{{ piece.label }} — {{ formatLength(piece.length) }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    <div class="totals">
+      <div class="result-row">
+        <span>Stock consumed</span>
+        <strong>{{ formatLength(plan.stockUsed) }}</strong>
+      </div>
+      <div class="result-row">
+        <span>In parts</span>
+        <strong>{{ formatLength(plan.partLength) }}</strong>
+      </div>
+      <div class="result-row">
+        <span>Lost to offcuts</span>
+        <strong>{{ formatLength(plan.offcutLoss) }}</strong>
+      </div>
+      <div class="result-row">
+        <span>Lost to kerf</span>
+        <strong>{{ formatLength(plan.kerfLoss) }}</strong>
+      </div>
+      @if (plan.trimLoss > 0) {
+        <div class="result-row">
+          <span>Lost to end trim</span>
+          <strong>{{ formatLength(plan.trimLoss) }}</strong>
+        </div>
+      }
+    </div>
+  }
+</section>

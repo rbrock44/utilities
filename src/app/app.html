@@ -263,6 +263,22 @@
       <p class="tool-loading">Loading…</p>
     }
   }
+
+  @if (isTile('clo', 'cut-list-optimizer')) {
+    @defer (on immediate) {
+      <app-cut-list-optimizer></app-cut-list-optimizer>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
+  }
+
+  @if (isTile('crn', 'cron-translator')) {
+    @defer (on immediate) {
+      <app-cron-translator></app-cron-translator>
+    } @placeholder {
+      <p class="tool-loading">Loading…</p>
+    }
+  }
 }
 
 @if (this.settingsService.getSelectedTile() === null) {

@@ -34,6 +34,8 @@ import { QrCodeGeneratorComponent } from './components/utilities/qr-code-generat
 import { JwtDecoderComponent } from './components/utilities/jwt-decoder/jwt-decoder';
 import { FaviconGeneratorComponent } from './components/utilities/favicon-generator/favicon-generator';
 import { PdfToImagesComponent } from './components/utilities/pdf-to-images/pdf-to-images';
+import { CutListOptimizerComponent } from './components/calculators/cut-list-optimizer/cut-list-optimizer';
+import { CronTranslatorComponent } from './components/utilities/cron-translator/cron-translator';
 import { LENGTH_UNITS } from './constants/units/length-units';
 import { WEIGHT_UNITS } from './constants/units/weight-units';
 import { VOLUME_UNITS } from './constants/units/volume-units';
@@ -73,6 +75,8 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     JwtDecoderComponent,
     FaviconGeneratorComponent,
     PdfToImagesComponent,
+    CutListOptimizerComponent,
+    CronTranslatorComponent,
     SilverInCoinComponent,
     TileGridComponent,
     RouterOutlet,

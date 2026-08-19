@@ -124,6 +124,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Board feet, linear feet, and cost for a lumber list',
                 icon: '🪵',
                 param: 'board-foot-calculator'
+            },
+            {
+                title: 'Cut List Optimizer',
+                description: 'Lay a cut list out on stock boards with kerf',
+                icon: '🪚',
+                param: 'cut-list-optimizer'
             }
         ]
     },
@@ -222,6 +228,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Decode a JSON Web Token',
                 icon: '🎫',
                 param: 'jwt-decoder'
+            },
+            {
+                title: 'Cron Expression Translator',
+                description: 'Explain a cron schedule',
+                icon: '🗓️',
+                param: 'cron-translator'
             }
         ]
     },
