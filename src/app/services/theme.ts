@@ -18,7 +18,7 @@ export class ThemeService {
     const next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
     this.applyTheme(next);
-    localStorage.setItem(STORAGE_KEY, next);
+    this.storeTheme(next);
   }
 
   private readInitialTheme(): Theme {
@@ -27,8 +27,8 @@ export class ThemeService {
       return current;
     }
 
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark') {
+    const stored = this.readStoredTheme();
+    if (stored) {
       return stored;
     }
 
@@ -37,5 +37,23 @@ export class ThemeService {
 
   private applyTheme(theme: Theme): void {
     document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  // localStorage is missing in the test runner and blocked outright in some privacy modes.
+  private readStoredTheme(): Theme | null {
+    try {
+      const stored = globalThis.localStorage?.getItem(STORAGE_KEY);
+      return stored === 'light' || stored === 'dark' ? stored : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private storeTheme(theme: Theme): void {
+    try {
+      globalThis.localStorage?.setItem(STORAGE_KEY, theme);
+    } catch {
+      // ignore: theme preference just will not persist
+    }
   }
 }
