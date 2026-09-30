@@ -88,15 +88,21 @@ export class PreciousMetalsComponent implements OnInit {
     });
   }
 
+  /** Removes the row, or resets it to defaults when it is the only one left. */
   removeGoldRow(id: number) {
     if (this.goldRows.length > 1) {
       this.goldRows = this.goldRows.filter(row => row.id !== id);
+    } else {
+      this.goldRows = [{ id: this.nextGoldId++, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
     }
   }
 
+  /** Removes the row, or resets it to defaults when it is the only one left. */
   removeSilverRow(id: number) {
     if (this.silverRows.length > 1) {
       this.silverRows = this.silverRows.filter(row => row.id !== id);
+    } else {
+      this.silverRows = [{ id: this.nextSilverId++, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
     }
   }
 
