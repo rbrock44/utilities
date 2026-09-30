@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
-import { CommonModule, DOCUMENT } from "@angular/common";
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { CommonModule } from "@angular/common";
 import { TileGridComponent } from './components/tile-grid/tile-grid';
 import { HeaderComponent } from './components/header/header';
 import { BackButtonComponent } from './components/back-button/back-button';
@@ -93,7 +93,6 @@ export class App {
 
   constructor(
     public settingsService: SettingsService,
-    @Inject(DOCUMENT) private document: Document,
   ) { }
 
   /** True when the selected tile matches any of its aliases (short code or full name). */
@@ -103,10 +102,6 @@ export class App {
   }
 
   ngOnInit(): void {
-    const params = new URLSearchParams(this.document.location.search);
-    const tileParam = params.get(this.settingsService.tileUrlParam);
-    if (tileParam !== null && tileParam !== "") {
-      this.settingsService.setSelectedTile(tileParam);
-    }
+    this.settingsService.restoreFromUrl();
   }
 }
