@@ -1,7 +1,5 @@
 import { DeferBlockBehavior, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter } from '@angular/router';
 import { Component } from '@angular/core';
-import { of } from 'rxjs';
 import { App } from './app';
 import { RightAngleCalculatorComponent } from './components/calculators/right-angle-calculator/right-angle-calculator';
 
@@ -26,15 +24,6 @@ describe('App', () => {
       // Every widget in app.html sits behind `@defer (on immediate)`, and TestBed leaves
       // defer blocks in their placeholder unless it is told to play them through.
       deferBlockBehavior: DeferBlockBehavior.Playthrough,
-      providers: [
-        provideRouter([]),
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            queryParams: of({})
-          }
-        }
-      ]
     })
       .overrideComponent(App, {
         remove: {

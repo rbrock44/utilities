@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, signal } from '@angular/core';
-import { CommonModule } from "@angular/common";
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { TileGridComponent } from './components/tile-grid/tile-grid';
 import { HeaderComponent } from './components/header/header';
 import { BackButtonComponent } from './components/back-button/back-button';
@@ -79,7 +78,6 @@ import { TEMPERATURE_UNITS } from './constants/units/temperature-units';
     CronTranslatorComponent,
     SilverInCoinComponent,
     TileGridComponent,
-    RouterOutlet,
     CommonModule,
 ],
   templateUrl: './app.html',
@@ -95,8 +93,7 @@ export class App {
 
   constructor(
     public settingsService: SettingsService,
-    private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute,
+    @Inject(DOCUMENT) private document: Document,
   ) { }
 
   /** True when the selected tile matches any of its aliases (short code or full name). */
@@ -106,12 +103,10 @@ export class App {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const tileParam = params[this.settingsService.tileUrlParam];
-      if (tileParam !== null && tileParam !== undefined && tileParam !== "") {
-        this.settingsService.setSelectedTile(tileParam);
-        this.cdr.markForCheck();
-      } 
-    });
+    const params = new URLSearchParams(this.document.location.search);
+    const tileParam = params.get(this.settingsService.tileUrlParam);
+    if (tileParam !== null && tileParam !== "") {
+      this.settingsService.setSelectedTile(tileParam);
+    }
   }
 }

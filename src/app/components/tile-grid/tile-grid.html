@@ -1,5 +1,5 @@
 <div class="container">
-    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by category, name, or description..."
+    <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" placeholder="Search by category, name, or description..."
         class="search-input" aria-label="Search widgets">
     <app-category *ngFor="let category of filteredCategories" [category]="category">
     </app-category>

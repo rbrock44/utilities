@@ -74,7 +74,7 @@ describe('accessibility', () => {
     });
 
     it('should still pass once a search narrows the visible tiles', async () => {
-      fixture.componentInstance.searchTerm = 'convert';
+      fixture.componentInstance.searchTerm.set('convert');
       fixture.detectChanges();
       await fixture.whenStable();
 

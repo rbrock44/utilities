@@ -1,6 +1,5 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { CategoryComponent } from '../category/category';
 import { SettingsService } from '../../services/settings';
 
@@ -9,7 +8,6 @@ import { SettingsService } from '../../services/settings';
   standalone: true,
   imports: [
     CommonModule, 
-    FormsModule, 
     CategoryComponent
   ],
   templateUrl: './tile-grid.html',
@@ -17,7 +15,7 @@ import { SettingsService } from '../../services/settings';
   styleUrl: './tile-grid.scss',
 })
 export class TileGridComponent {
-  searchTerm = '';
+  searchTerm = signal('');
 
   constructor(
     public settingsService: SettingsService
@@ -25,7 +23,7 @@ export class TileGridComponent {
   }
 
   get filteredCategories(): Category[] {
-    const term = this.searchTerm.trim().toLowerCase();
+    const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
       return this.settingsService.categories;
     }
