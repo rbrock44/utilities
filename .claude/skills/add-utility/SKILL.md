@@ -14,6 +14,9 @@ is one big `@if` switch keyed off `SettingsService.getSelectedTile()`, which is 
 by the `?tile=` query param. Adding a utility means creating 3 files and touching 3
 existing files.
 
+Repo-wide architecture and conventions live in `.github/copilot-instructions.md`; read
+it first if you haven't this session.
+
 **Files created:** `src/app/components/<group>/<folder>/<folder>.{ts,html,scss}`
 **Files edited:** `src/app/app.ts`, `src/app/app.html`, `src/app/constants/categories.ts`
 
@@ -180,13 +183,17 @@ Inside the outer `@if (this.settingsService.getSelectedTile() !== null) { ... }`
 block, after the last existing branch, following the established two-key pattern:
 
 ```html
-@if (
-  this.settingsService.getSelectedTile() === 'gg' ||
-  this.settingsService.getSelectedTile() === 'guid-generator'
-) {
-  <app-guid-generator></app-guid-generator>
+@if (isTile('gg', 'guid-generator')) {
+  @defer (on immediate) {
+    <app-guid-generator></app-guid-generator>
+  } @placeholder {
+    <p class="tool-loading">Loading…</p>
+  }
 }
 ```
+
+The `@defer` wrapper is what makes each widget its own lazy-loaded chunk — never add a
+branch without it.
 
 Both keys are intentional: the short alias is the legacy URL form and the kebab param
 is the current one, so old `?tile=gg` links keep working. New widgets get both.
