@@ -67,8 +67,8 @@ npm start
 ### Github Hooks
 
 - Build
-    - Trigger: On Push to Main
-    - Action(s): Builds application then kicks off gh page action to deploy build output
+    - Trigger: On Push to `master`
+    - Action(s): Runs tests, builds application, then kicks off gh page action to deploy build output
 
 ---
 
@@ -80,7 +80,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ### Deploy
 
-Run `npm run prod` to build and deploy the project. Make sure to be on `master` and that it is up to date before running the command. It's really meant to be a CI/CD action
+Deploys happen in CI on every push to `master`. Run `npm run deploy` to produce the same production build locally.
 
 ---
 
