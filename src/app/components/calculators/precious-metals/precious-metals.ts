@@ -38,6 +38,11 @@ export class PreciousMetalsComponent implements OnInit {
     value70: 0
   };
 
+  offerOpen = false;
+  offerAmount: number | null = null;
+  offerPercent: number | null = null;
+  private offerSource: 'amount' | 'percent' = 'amount';
+
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
 
@@ -60,6 +65,7 @@ export class PreciousMetalsComponent implements OnInit {
       next: (prices) => {
         this.spotPrices = prices;
         this.loading = false;
+        this.calculate();
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -77,6 +83,7 @@ export class PreciousMetalsComponent implements OnInit {
       weight: 0,
       unit: 'grams'
     });
+    this.calculate();
   }
 
   addSilverRow() {
@@ -86,6 +93,7 @@ export class PreciousMetalsComponent implements OnInit {
       weight: 0,
       unit: 'grams'
     });
+    this.calculate();
   }
 
   /** Removes the row, or resets it to defaults when it is the only one left. */
@@ -95,6 +103,7 @@ export class PreciousMetalsComponent implements OnInit {
     } else {
       this.goldRows = [{ id: this.nextGoldId++, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
     }
+    this.calculate();
   }
 
   /** Removes the row, or resets it to defaults when it is the only one left. */
@@ -104,6 +113,7 @@ export class PreciousMetalsComponent implements OnInit {
     } else {
       this.silverRows = [{ id: this.nextSilverId++, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
     }
+    this.calculate();
   }
 
   calculate() {
@@ -139,5 +149,38 @@ export class PreciousMetalsComponent implements OnInit {
       value80: this.goldTotals.value80 + this.silverTotals.value80,
       value70: this.goldTotals.value70 + this.silverTotals.value70
     };
+    this.syncOffer();
+  }
+
+  toggleOffer() {
+    this.offerOpen = !this.offerOpen;
+  }
+
+  onOfferAmountChange(amount: number | null) {
+    this.offerAmount = amount;
+    this.offerSource = 'amount';
+    this.syncOffer();
+  }
+
+  onOfferPercentChange(percent: number | null) {
+    this.offerPercent = percent;
+    this.offerSource = 'percent';
+    this.syncOffer();
+  }
+
+  /** Recomputes whichever offer field the user did not type in last, against the combined spot value. */
+  private syncOffer() {
+    const spot = this.grandTotals.spotValue;
+    if (spot <= 0) return;
+
+    if (this.offerSource === 'amount') {
+      this.offerPercent = this.offerAmount == null ? null : this.round2(this.offerAmount / spot * 100);
+    } else {
+      this.offerAmount = this.offerPercent == null ? null : this.round2(spot * this.offerPercent / 100);
+    }
+  }
+
+  private round2(value: number): number {
+    return Math.round(value * 100) / 100;
   }
 }

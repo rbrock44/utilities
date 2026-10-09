@@ -59,4 +59,38 @@ describe('PreciousMetalsComponent', () => {
     expect(buttons.length).toBe(2);
     buttons.forEach(button => expect(button.disabled).toBe(false));
   });
+
+  describe('offer check', () => {
+    beforeEach(() => {
+      component.spotPrices = { gold: 2000, silver: 25, timestamp: new Date() };
+      const row = component.goldRows[0];
+      row.type = goldTypes[0].name;
+      row.weight = 1;
+      row.unit = 'toz';
+      component.calculate();
+    });
+
+    it('converts an offer amount to percent of combined spot', () => {
+      component.onOfferAmountChange(1598.4);
+      expect(component.offerPercent).toBe(80);
+    });
+
+    it('converts a percent to an offer amount', () => {
+      component.onOfferPercentChange(90);
+      expect(component.offerAmount).toBe(1798.2);
+    });
+
+    it('keeps the last edited field fixed when totals change', () => {
+      component.onOfferPercentChange(50);
+      component.addSilverRow();
+      const silver = component.silverRows[1];
+      silver.type = silverTypes[0].name;
+      silver.weight = 1;
+      silver.unit = 'toz';
+      component.calculate();
+
+      expect(component.offerPercent).toBe(50);
+      expect(component.offerAmount).toBe(1011.49);
+    });
+  });
 });

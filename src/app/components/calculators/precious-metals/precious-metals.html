@@ -31,15 +31,15 @@
 
     <div class="rows-container">
       <div class="row" *ngFor="let row of goldRows">
-        <select [(ngModel)]="row.type" class="type-select">
+        <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select">
           <option *ngFor="let type of goldMetalTypes" [value]="type.name">
             {{ type.name }}
           </option>
         </select>
 
-        <input type="number" [(ngModel)]="row.weight" placeholder="Weight" class="weight-input" step="0.01" min="0">
+        <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
-        <select [(ngModel)]="row.unit" class="unit-select">
+        <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
           <option value="grams">g</option>
           <option value="toz">oz t</option>
         </select>
@@ -64,15 +64,15 @@
 
     <div class="rows-container">
       <div class="row" *ngFor="let row of silverRows">
-        <select [(ngModel)]="row.type" class="type-select">
+        <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select">
           <option *ngFor="let type of silverMetalTypes" [value]="type.name">
             {{ type.name }}
           </option>
         </select>
 
-        <input type="number" [(ngModel)]="row.weight" placeholder="Weight" class="weight-input" step="0.01" min="0">
+        <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
-        <select [(ngModel)]="row.unit" class="unit-select">
+        <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
           <option value="grams">g</option>
           <option value="toz">oz t</option>
         </select>
@@ -87,11 +87,6 @@
       totalsTitle="Silver Totals" totalsClass="silver-totals">
     </app-precious-metal-breakdown>
   </div>
-
-  <!-- CALCULATE BUTTON -->
-  <button class="calculate-btn" (click)="calculate()" [disabled]="!spotPrices">
-    Calculate Values
-  </button>
 
   <!-- GRAND TOTALS -->
   @if (grandTotals.spotValue > 0) {
@@ -113,6 +108,35 @@
       <span>Total 70% Value:</span>
       <span>${{ grandTotals.value70.toFixed(2) }}</span>
     </div>
+
+    <button class="offer-toggle" (click)="toggleOffer()" [attr.aria-expanded]="offerOpen">
+      {{ offerOpen ? 'Hide offer check' : 'Check an offer' }}
+    </button>
+
+    @if (offerOpen) {
+    <div class="offer-panel">
+      <div class="offer-fields">
+        <label class="offer-field">
+          <span class="offer-label">Offer</span>
+          <span class="offer-input-wrap">
+            <span class="offer-affix">$</span>
+            <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"
+              [ngModel]="offerAmount" (ngModelChange)="onOfferAmountChange($event)">
+          </span>
+        </label>
+        <span class="offer-link" aria-hidden="true">⇄</span>
+        <label class="offer-field">
+          <span class="offer-label">% of spot</span>
+          <span class="offer-input-wrap">
+            <input type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"
+              [ngModel]="offerPercent" (ngModelChange)="onOfferPercentChange($event)">
+            <span class="offer-affix">%</span>
+          </span>
+        </label>
+      </div>
+      <div class="offer-note">of ${{ grandTotals.spotValue.toFixed(2) }} combined spot</div>
+    </div>
+    }
   </div>
   }
 </div>

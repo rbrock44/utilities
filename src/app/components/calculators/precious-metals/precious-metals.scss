@@ -183,29 +183,6 @@
   cursor: not-allowed;
 }
 
-.calculate-btn {
-  width: 100%;
-  padding: 0.5rem;
-  background: var(--brand);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin: 0.4rem 0;
-}
-
-.calculate-btn:hover:not(:disabled) {
-  background: var(--brand-deep);
-}
-
-.calculate-btn:disabled {
-  background: var(--border-strong);
-  cursor: not-allowed;
-}
-
 .grand-totals {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -252,6 +229,92 @@
 .detail-row.large {
   font-size: 1rem;
   padding: 0.3rem 0;
+}
+
+.offer-toggle {
+  display: block;
+  margin: 0.4rem 0 0 auto;
+  padding: 0.3rem 0.75rem;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.offer-toggle:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.offer-panel {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px;
+}
+
+.offer-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.offer-field {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.offer-label {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.offer-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 4px;
+}
+
+.offer-input-wrap input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0.4rem 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+}
+
+.offer-input-wrap:focus-within {
+  outline: 2px solid white;
+}
+
+.offer-affix {
+  color: var(--text-faint);
+  font-size: 0.9rem;
+}
+
+.offer-link {
+  padding-bottom: 0.4rem;
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+.offer-note {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
 }
 
 /* Mobile Responsiveness */
