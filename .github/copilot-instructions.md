@@ -62,4 +62,5 @@ There is no lint script, and CI deliberately has no lint gate.
 `.github/workflows/deploy.yml` runs on every push to `master` (the default branch — not
 `main`): `npm ci`, tests, `npm run deploy`, copies `CNAME` into the output, and publishes
 `dist/utilities/browser` to `gh-pages` with `peaceiris/actions-gh-pages`. A failing test
-blocks the deploy.
+blocks the deploy. `.github/workflows/test.yml` runs the same tests on pull requests into
+`master`.
