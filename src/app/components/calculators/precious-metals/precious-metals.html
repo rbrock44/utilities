@@ -8,14 +8,28 @@
 
   @if (spotPrices) {
   <div class="spot-prices">
+    @for (metal of spotMetals; track metal.key) {
     <div class="spot-price-card">
-      <span class="metal-name">Gold</span>
-      <span class="price">${{ spotPrices.gold.toFixed(2) }}/oz</span>
+      <span class="metal-name">{{ metal.label }}</span>
+      @if (editingMetal === metal.key) {
+      <span class="price-edit">
+        $<input #priceInput type="number" inputmode="decimal" min="0" step="0.01" [(ngModel)]="editPrice"
+          [attr.aria-label]="metal.label + ' spot price per oz'" (keydown.enter)="commitPriceEdit()"
+          (keydown.escape)="cancelPriceEdit()" (blur)="commitPriceEdit()">/oz
+      </span>
+      } @else {
+      <button class="price" [class.edited]="overridden[metal.key]" (click)="startPriceEdit(metal.key)"
+        [title]="'Edit ' + metal.label.toLowerCase() + ' spot price'">
+        ${{ spotPrices[metal.key].toFixed(2) }}/oz
+      </button>
+      }
+      @if (overridden[metal.key] && editingMetal !== metal.key) {
+      <button class="reset-price" (click)="resetPrice(metal.key)"
+        [title]="'Reset to live $' + livePrices[metal.key].toFixed(2)"
+        [attr.aria-label]="'Reset ' + metal.label.toLowerCase() + ' to live price'">↺</button>
+      }
     </div>
-    <div class="spot-price-card">
-      <span class="metal-name">Silver</span>
-      <span class="price">${{ spotPrices.silver.toFixed(2) }}/oz</span>
-    </div>
+    }
     <div class="timestamp">
       Updated: {{ spotPrices.timestamp | date:'short' }}
     </div>

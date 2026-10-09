@@ -93,4 +93,55 @@ describe('PreciousMetalsComponent', () => {
       expect(component.offerAmount).toBe(1011.49);
     });
   });
+
+  describe('spot price edit', () => {
+    beforeEach(() => {
+      component.livePrices = { gold: 2000, silver: 25, timestamp: new Date() };
+      component.spotPrices = { ...component.livePrices };
+      const row = component.goldRows[0];
+      row.type = goldTypes[0].name;
+      row.weight = 1;
+      row.unit = 'toz';
+      component.calculate();
+    });
+
+    it('applies a manual price and recalculates', () => {
+      component.startPriceEdit('gold');
+      component.editPrice = 1900;
+      component.commitPriceEdit();
+
+      expect(component.spotPrices.gold).toBe(1900);
+      expect(component.overridden.gold).toBe(true);
+      expect(component.goldTotals.spotValue).toBeCloseTo(1898.1);
+    });
+
+    it('ignores blank or non-positive prices', () => {
+      component.startPriceEdit('gold');
+      component.editPrice = null;
+      component.commitPriceEdit();
+
+      expect(component.spotPrices.gold).toBe(2000);
+      expect(component.overridden.gold).toBe(false);
+      expect(component.editingMetal).toBeNull();
+    });
+
+    it('cancels without changing the price', () => {
+      component.startPriceEdit('silver');
+      component.editPrice = 30;
+      component.cancelPriceEdit();
+
+      expect(component.spotPrices.silver).toBe(25);
+    });
+
+    it('resets to the live price', () => {
+      component.startPriceEdit('gold');
+      component.editPrice = 1900;
+      component.commitPriceEdit();
+      component.resetPrice('gold');
+
+      expect(component.spotPrices.gold).toBe(2000);
+      expect(component.overridden.gold).toBe(false);
+      expect(component.goldTotals.spotValue).toBeCloseTo(1998);
+    });
+  });
 });

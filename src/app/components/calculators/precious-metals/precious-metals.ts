@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
 import { emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
+
+type SpotMetal = 'gold' | 'silver';
 
 @Component({
   selector: 'app-precious-metals',
@@ -20,7 +22,21 @@ export class PreciousMetalsComponent implements OnInit {
     silver: -1.00,
     timestamp: new Date()
   };
+  livePrices: SpotPrices = this.spotPrices;
   loading = true;
+
+  readonly spotMetals: { key: SpotMetal; label: string }[] = [
+    { key: 'gold', label: 'Gold' },
+    { key: 'silver', label: 'Silver' }
+  ];
+  editingMetal: SpotMetal | null = null;
+  editPrice: number | null = null;
+  overridden: Record<SpotMetal, boolean> = { gold: false, silver: false };
+
+  @ViewChild('priceInput') set priceInput(input: ElementRef<HTMLInputElement> | undefined) {
+    input?.nativeElement.focus();
+    input?.nativeElement.select();
+  }
 
   goldRows: MetalRow[] = [{ id: 1, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
   silverRows: MetalRow[] = [{ id: 1, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
@@ -63,7 +79,9 @@ export class PreciousMetalsComponent implements OnInit {
     this.loading = true;
     this.spotPriceService.getSpotPrices().subscribe({
       next: (prices) => {
-        this.spotPrices = prices;
+        this.livePrices = prices;
+        this.spotPrices = { ...prices };
+        this.overridden = { gold: false, silver: false };
         this.loading = false;
         this.calculate();
         this.cdr.markForCheck();
@@ -150,6 +168,33 @@ export class PreciousMetalsComponent implements OnInit {
       value70: this.goldTotals.value70 + this.silverTotals.value70
     };
     this.syncOffer();
+  }
+
+  startPriceEdit(metal: SpotMetal) {
+    this.editingMetal = metal;
+    this.editPrice = this.spotPrices[metal] > 0 ? this.spotPrices[metal] : null;
+  }
+
+  /** Applies the typed price; blank or non-positive input leaves the price unchanged. */
+  commitPriceEdit() {
+    const metal = this.editingMetal;
+    if (!metal) return;
+    this.editingMetal = null;
+
+    if (this.editPrice == null || this.editPrice <= 0) return;
+    this.spotPrices = { ...this.spotPrices, [metal]: this.editPrice };
+    this.overridden = { ...this.overridden, [metal]: this.editPrice !== this.livePrices[metal] };
+    this.calculate();
+  }
+
+  cancelPriceEdit() {
+    this.editingMetal = null;
+  }
+
+  resetPrice(metal: SpotMetal) {
+    this.spotPrices = { ...this.spotPrices, [metal]: this.livePrices[metal] };
+    this.overridden = { ...this.overridden, [metal]: false };
+    this.calculate();
   }
 
   toggleOffer() {

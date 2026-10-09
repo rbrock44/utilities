@@ -66,9 +66,60 @@
 }
 
 .price {
+  padding: 0;
+  background: none;
+  border: none;
+  border-bottom: 1px dashed transparent;
+  font: inherit;
   font-size: 1rem;
   font-weight: bold;
   color: var(--brand);
+  cursor: pointer;
+}
+
+.price:hover,
+.price:focus-visible {
+  border-bottom-color: currentColor;
+}
+
+.price.edited {
+  color: var(--warning);
+  border-bottom-color: currentColor;
+}
+
+.price-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-weight: bold;
+  color: var(--brand);
+}
+
+.price-edit input {
+  width: 6.5rem;
+  padding: 0.15rem 0.3rem;
+  border: 1px solid var(--brand);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.reset-price {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.reset-price:hover {
+  background: var(--surface);
 }
 
 .timestamp {
