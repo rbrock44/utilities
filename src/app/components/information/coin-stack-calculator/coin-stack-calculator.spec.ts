@@ -1,8 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
-import { COIN_OPTIONS, CoinStackCalculatorComponent, pureTozPerCoin } from './coin-stack-calculator';
+import {
+  COIN_OPTIONS,
+  CoinStackCalculatorComponent,
+  decodeStack,
+  encodeStack,
+  pureTozPerCoin,
+} from './coin-stack-calculator';
 import { SpotPriceService } from '../../../services/spot-price';
+import { CoinStacksService } from '../../../services/coin-stacks';
 
 const morganId = COIN_OPTIONS.find(c => c.spec.name === 'Morgan Dollar')!.id;
 const eagleId = COIN_OPTIONS.find(c => c.spec.name === 'American Gold Eagle')!.id;
@@ -13,6 +21,12 @@ describe('COIN_OPTIONS', () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(COIN_OPTIONS.some(c => c.metal === 'gold')).toBe(true);
     expect(COIN_OPTIONS.some(c => c.metal === 'silver')).toBe(true);
+  });
+
+  it('should use stable slug ids built from metal, name, and dates', () => {
+    expect(morganId).toBe('silver-morgan-dollar-1878-1921');
+    expect(eagleId).toBe('gold-american-gold-eagle-1-oz-22k');
+    expect(COIN_OPTIONS.every(c => /^(gold|silver)-[a-z0-9-]+$/.test(c.id))).toBe(true);
   });
 
   it('should tell the two Kennedy halves apart by year', () => {
@@ -26,14 +40,46 @@ describe('COIN_OPTIONS', () => {
   });
 });
 
+describe('stack links', () => {
+  it('should round-trip a stack through the link format', () => {
+    const items = [{ id: morganId, quantity: 10 }, { id: eagleId, quantity: 1 }];
+    const encoded = encodeStack(items);
+
+    expect(encoded).toBe(`${morganId}~10_${eagleId}~1`);
+    expect(encodeURIComponent(encoded)).toBe(encoded);
+    expect(decodeStack(encoded)).toEqual({ items, skipped: 0 });
+  });
+
+  it('should skip unknown coins and bad quantities but keep the rest', () => {
+    const decoded = decodeStack(`${morganId}~3_gold-not-a-coin~1_${eagleId}~0_${eagleId}~1.5_${eagleId}~abc_`);
+    expect(decoded).toEqual({ items: [{ id: morganId, quantity: 3 }], skipped: 4 });
+  });
+});
+
 describe('CoinStackCalculatorComponent', () => {
   let component: CoinStackCalculatorComponent;
   let fixture: ComponentFixture<CoinStackCalculatorComponent>;
+  let store: Record<string, string>;
 
-  const setup = async (gold: number, silver: number) => {
+  beforeEach(() => {
+    store = {};
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => store[key] ?? null,
+      setItem: (key: string, value: string) => { store[key] = value; },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const setup = async (gold: number, silver: number, query: Record<string, string> = {}) => {
     await TestBed.configureTestingModule({
       imports: [CoinStackCalculatorComponent],
-      providers: [{ provide: SpotPriceService, useValue: { getSpotPrices: () => of({ gold, silver, timestamp: new Date() }) } }]
+      providers: [
+        { provide: SpotPriceService, useValue: { getSpotPrices: () => of({ gold, silver, timestamp: new Date() }) } },
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap(query) } } },
+      ]
     })
     .compileComponents();
 
@@ -132,5 +178,81 @@ describe('CoinStackCalculatorComponent', () => {
     expect(component.money(null)).toBe('—');
     expect(component.money(1234.5)).toContain('1,234.50');
     expect(component.toz(0.77346)).toBe('0.7735 oz t');
+  });
+
+  it('should load a shared stack and its name from the link', async () => {
+    await setup(2000, 30, { stack: `${morganId}~10_${eagleId}~1`, name: 'Grandpa' });
+
+    expect(component.rows.map(r => [r.coin.id, r.quantity])).toEqual([[morganId, 10], [eagleId, 1]]);
+    expect(component.stackName).toBe('Grandpa');
+    expect(component.notice).toBe('Loaded a shared stack of 2 coin types.');
+  });
+
+  it('should say how much of a shared link it could not read', async () => {
+    await setup(2000, 30, { stack: `${morganId}~1_gold-gone~2` });
+
+    expect(component.rows.length).toBe(1);
+    expect(component.notice).toBe('Loaded a shared stack of 1 coin type. 1 entry in the link wasn\'t recognized.');
+  });
+
+  it('should copy a share link that loads the same stack', async () => {
+    await setup(2000, 30);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    component.addCoin(morganId);
+    component.rows[0].quantity = 4;
+    component.stackName = 'Dimes & more';
+
+    await component.copyShareLink();
+
+    const url = new URL(writeText.mock.calls[0][0]);
+    expect(url.searchParams.get('stack')).toBe(`${morganId}~4`);
+    expect(url.searchParams.get('name')).toBe('Dimes & more');
+    expect(component.justCopied).toBe(true);
+  });
+
+  it('should leave zero-quantity rows out of links and saves', async () => {
+    await setup(2000, 30);
+    component.addCoin(morganId);
+    component.addCoin(eagleId);
+    component.rows[1].quantity = 0;
+
+    expect(component.items).toEqual([{ id: morganId, quantity: 1 }]);
+  });
+
+  it('should need a name and at least one coin to save', async () => {
+    await setup(2000, 30);
+    expect(component.canSave).toBe(false);
+
+    component.addCoin(morganId);
+    expect(component.canSave).toBe(false);
+
+    component.stackName = '  ';
+    expect(component.canSave).toBe(false);
+
+    component.stackName = 'Mine';
+    expect(component.canSave).toBe(true);
+  });
+
+  it('should save, reload, and delete a named stack', async () => {
+    await setup(2000, 30);
+    const stacks = TestBed.inject(CoinStacksService);
+    component.addCoin(morganId);
+    component.rows[0].quantity = 7;
+    component.stackName = 'Morgans';
+
+    component.saveStack();
+    expect(stacks.stacks().map(s => s.name)).toEqual(['Morgans']);
+    expect(JSON.parse(store['utilities-coin-stacks'])[0].items).toEqual([{ id: morganId, quantity: 7 }]);
+
+    component.clear();
+    component.stackName = '';
+    component.loadStack(stacks.stacks()[0]);
+    expect(component.rows.map(r => r.quantity)).toEqual([7]);
+    expect(component.stackName).toBe('Morgans');
+
+    component.deleteStack(stacks.stacks()[0]);
+    expect(stacks.stacks()).toEqual([]);
+    expect(component.notice).toBe('Deleted “Morgans”.');
   });
 });

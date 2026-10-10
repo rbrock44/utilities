@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
 import { GOLD_COIN_DATABASE, SILVER_COIN_DATABASE } from '../../../constants/coins';
 import { TROY_OZ_IN_GRAMS } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
+import { CoinStacksService, SavedStack, StackItem } from '../../../services/coin-stacks';
 
 export type Metal = 'gold' | 'silver';
 
@@ -20,15 +22,56 @@ export interface StackRow {
   quantity: number | null;
 }
 
-/** Names repeat across years (two Kennedy halves), so ids come from metal and position. */
-export const COIN_OPTIONS: CoinOption[] = [
-  ...GOLD_COIN_DATABASE.map((spec, i) => toOption(spec, 'gold', i)),
-  ...SILVER_COIN_DATABASE.map((spec, i) => toOption(spec, 'silver', i)),
-];
+/**
+ * Ids are slugs of metal, name, and date range (`silver-morgan-dollar-1878-1921`), not list
+ * positions, so shared links and saved stacks keep working when coins are added to the list.
+ * Names repeat across years (two Kennedy halves), which is why the description is included.
+ */
+export const COIN_OPTIONS: CoinOption[] = buildOptions();
 
-function toOption(spec: CoinSpec, metal: Metal, index: number): CoinOption {
-  const label = spec.description ? `${spec.name} · ${spec.description}` : spec.name;
-  return { id: `${metal}-${index}`, label, metal, spec };
+function buildOptions(): CoinOption[] {
+  const taken = new Set<string>();
+  const toOption = (spec: CoinSpec, metal: Metal): CoinOption => {
+    const base = `${metal}-${slugify(`${spec.name} ${spec.description ?? ''}`)}`;
+    let id = base;
+    for (let n = 2; taken.has(id); n++) {
+      id = `${base}-${n}`;
+    }
+    taken.add(id);
+    const label = spec.description ? `${spec.name} · ${spec.description}` : spec.name;
+    return { id, label, metal, spec };
+  };
+
+  return [
+    ...GOLD_COIN_DATABASE.map(spec => toOption(spec, 'gold')),
+    ...SILVER_COIN_DATABASE.map(spec => toOption(spec, 'silver')),
+  ];
+}
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+/** `id~quantity` pairs joined by `_`: characters that never need escaping in a URL. */
+export function encodeStack(items: StackItem[]): string {
+  return items.map(item => `${item.id}~${item.quantity}`).join('_');
+}
+
+/** Reads a shared stack, keeping recognizable coins and counting the ones it had to skip. */
+export function decodeStack(text: string): { items: StackItem[]; skipped: number } {
+  const items: StackItem[] = [];
+  let skipped = 0;
+
+  for (const pair of text.split('_').filter(Boolean)) {
+    const [id, count] = pair.split('~');
+    const quantity = Number(count);
+    if (COIN_OPTIONS.some(coin => coin.id === id) && Number.isInteger(quantity) && quantity > 0) {
+      items.push({ id, quantity });
+    } else {
+      skipped++;
+    }
+  }
+  return { items, skipped };
 }
 
 export function pureTozPerCoin(spec: CoinSpec): number {
@@ -51,6 +94,13 @@ export class CoinStackCalculatorComponent implements OnInit {
   loadingPrices = false;
   pricesFailed = false;
   pickerValue: string | null = null;
+  stackName = '';
+  notice: string | null = null;
+  justCopied = false;
+  private copiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  readonly savedStacks = inject(CoinStacksService);
+  private readonly route = inject(ActivatedRoute, { optional: true });
 
   readonly comboOptions: ComboBoxOption[] = COIN_OPTIONS.map(coin => ({
     id: coin.id,
@@ -63,6 +113,7 @@ export class CoinStackCalculatorComponent implements OnInit {
   constructor(private spotPriceService: SpotPriceService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
+    this.loadFromLink();
     this.loadingPrices = true;
     this.spotPriceService.getSpotPrices().subscribe(prices => {
       this.loadingPrices = false;
@@ -99,6 +150,68 @@ export class CoinStackCalculatorComponent implements OnInit {
       this.pickerValue = null;
       this.cdr.markForCheck();
     });
+  }
+
+  get items(): StackItem[] {
+    return this.rows
+      .filter(row => this.isWholeOrZero(row.quantity) && row.quantity! > 0)
+      .map(row => ({ id: row.coin.id, quantity: row.quantity! }));
+  }
+
+  get canSave(): boolean {
+    return this.stackName.trim() !== '' && this.items.length > 0;
+  }
+
+  get shareLink(): string {
+    const params = new URLSearchParams({ stack: encodeStack(this.items) });
+    if (this.stackName.trim()) {
+      params.set('name', this.stackName.trim());
+    }
+    return `${location.origin}${location.pathname}?${params.toString()}`;
+  }
+
+  saveStack(): void {
+    if (!this.canSave) {
+      return;
+    }
+    const name = this.stackName.trim();
+    this.savedStacks.save(name, this.items);
+    this.notice = `Saved “${name}” in this browser.`;
+    this.cdr.markForCheck();
+  }
+
+  loadStack(stack: SavedStack): void {
+    this.applyItems(stack.items);
+    this.stackName = stack.name;
+    this.notice = `Loaded “${stack.name}”.`;
+    this.cdr.markForCheck();
+  }
+
+  deleteStack(stack: SavedStack): void {
+    this.savedStacks.remove(stack.name);
+    this.notice = `Deleted “${stack.name}”.`;
+    this.cdr.markForCheck();
+  }
+
+  async copyShareLink(): Promise<void> {
+    if (this.items.length === 0) {
+      return;
+    }
+    await navigator.clipboard.writeText(this.shareLink);
+
+    this.justCopied = true;
+    this.cdr.markForCheck();
+    if (this.copiedTimeout) {
+      clearTimeout(this.copiedTimeout);
+    }
+    this.copiedTimeout = setTimeout(() => {
+      this.justCopied = false;
+      this.cdr.markForCheck();
+    }, 2000);
+  }
+
+  savedCoinCount(stack: SavedStack): number {
+    return stack.items.reduce((sum, item) => sum + item.quantity, 0);
   }
 
   removeRow(row: StackRow): void {
@@ -164,6 +277,28 @@ export class CoinStackCalculatorComponent implements OnInit {
 
   toz(value: number): string {
     return `${value.toFixed(4)} oz t`;
+  }
+
+  private loadFromLink(): void {
+    const params = this.route?.snapshot.queryParamMap;
+    const shared = params?.get('stack');
+    if (!shared) {
+      return;
+    }
+
+    const { items, skipped } = decodeStack(shared);
+    this.applyItems(items);
+    this.stackName = params?.get('name') ?? '';
+    const loaded = `Loaded a shared stack of ${items.length} coin type${items.length === 1 ? '' : 's'}.`;
+    const unread = skipped === 1 ? '1 entry in the link wasn\'t' : `${skipped} entries in the link weren't`;
+    this.notice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
+  }
+
+  private applyItems(items: StackItem[]): void {
+    this.rows = items.flatMap(item => {
+      const coin = COIN_OPTIONS.find(option => option.id === item.id);
+      return coin ? [{ coin, quantity: item.quantity }] : [];
+    });
   }
 
   private totalToz(metal: Metal): number {
