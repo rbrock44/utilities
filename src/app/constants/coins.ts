@@ -270,6 +270,14 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     // Historical Mexican
     { name: 'Mexican Silver Peso', weightGrams: 27.07, purity: 0.903, description: '1920-1945' },
     { name: 'Mexican Onza', weightGrams: 33.625, purity: 0.925, description: '1949-1980' },
+
+    // Asian Coins
+    { name: 'Hong Kong 10 Cents', weightGrams: 2.72, purity: 0.800, description: '1863-1905 (Queen Victoria)' },
+    { name: 'Japan 10 Sen', weightGrams: 2.70, purity: 0.800, description: '1873-1906 (Meiji, dragon)' },
+    { name: 'Japan 10 Sen', weightGrams: 2.25, purity: 0.720, description: '1907-1917 (Meiji 40 - Taisho 6)' },
+    { name: 'Japan 50 Sen', weightGrams: 4.95, purity: 0.720, description: '1922-1938 (Taisho 11 - Showa 13)' },
+    { name: 'Japan 100 Yen', weightGrams: 4.80, purity: 0.600, description: '1957-1958 (phoenix)' },
+    { name: 'Japan 100 Yen', weightGrams: 4.80, purity: 0.600, description: '1959-1966 (rice stalks)' },
     
     // Libertad Sets (for convenience)
     { name: 'Mexican Libertad Set (6 coins)', weightGrams: 121.302, purity: 0.999, description: '2 oz + 1 oz + 1/2 oz + 1/4 oz + 1/10 oz + 1/20 oz' },
