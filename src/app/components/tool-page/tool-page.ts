@@ -20,6 +20,7 @@ import { PageData } from '../../constants/site';
 export class ToolPageComponent {
   private readonly data = inject(ActivatedRoute).snapshot.data as PageData;
 
+  readonly heading = this.data.heading ?? '';
   readonly component = signal<Type<unknown> | null>(null);
   readonly inputs = this.data.tool?.inputs ?? {};
 

@@ -10,4 +10,5 @@ export interface PageData {
   description: string;
   noindex?: boolean;
   tool?: ToolDefinition;
+  heading?: string;
 }

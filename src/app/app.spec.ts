@@ -48,7 +48,8 @@ describe('App', () => {
 
   it('should render the dashboard header and tile grid on the home page', async () => {
     const page = await render('/');
-    expect(page.querySelector('h1')?.textContent).toContain('Dashboard');
+    expect(page.querySelector('.logo')?.textContent).toContain('Dashboard');
+    expect(page.querySelectorAll('h1').length).toBe(1);
     expect(page.querySelector('app-tile-grid')).toBeTruthy();
   }, SLOW_TEST_MS);
 
@@ -56,6 +57,7 @@ describe('App', () => {
     const page = await render('/right-angle-calculator');
     expect(page.querySelector('app-tile-grid')).toBeNull();
     expect(page.querySelector('app-back-button')).toBeTruthy();
+    expect(page.querySelector('h1')?.textContent).toBe('Right Angle Calculator');
     expect(await waitFor(page, 'app-right-angle-calculator')).toBeTruthy();
   }, SLOW_TEST_MS);
 

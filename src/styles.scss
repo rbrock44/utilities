@@ -135,3 +135,13 @@ body {
   height: 100%;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* Page headings that search engines and screen readers need but the layout already shows. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

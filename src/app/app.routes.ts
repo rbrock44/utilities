@@ -14,7 +14,7 @@ export const redirectLegacyTile: CanActivateFn = route => {
 
 function toolRoute(param: string, title: string, description: string): Routes[number] {
   const tool = TOOLS[param];
-  const data: PageData = { description, tool, noindex: !!tool.unlisted };
+  const data: PageData = { description, tool, heading: title, noindex: !!tool.unlisted };
   return { path: param, component: ToolPageComponent, title: `${title} – Utilities`, data };
 }
 
