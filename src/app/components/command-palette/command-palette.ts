@@ -1,7 +1,9 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
   HostListener,
@@ -39,6 +41,8 @@ export class CommandPaletteComponent {
 
   readonly query = signal('');
   readonly activeIndex = signal(0);
+  /** The phone jump button tucks away while scrolling down so it doesn't cover content. */
+  readonly fabTucked = signal(false);
   private readonly input = viewChild<ElementRef<HTMLInputElement>>('input');
   private returnFocusTo: HTMLElement | null = null;
 
@@ -87,6 +91,25 @@ export class CommandPaletteComponent {
     });
     effect(() => {
       this.input()?.nativeElement.focus();
+    });
+
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      let lastY = window.scrollY;
+      const onScroll = () => {
+        const y = window.scrollY;
+        // A few pixels of slack so small scroll jitter doesn't flicker the button.
+        if (y < 80 || y < lastY - 8) {
+          this.fabTucked.set(false);
+        } else if (y > lastY + 8) {
+          this.fabTucked.set(true);
+        }
+        if (Math.abs(y - lastY) > 8 || y < 80) {
+          lastY = y;
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
     });
   }
 

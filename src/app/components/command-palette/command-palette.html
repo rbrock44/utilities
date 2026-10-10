@@ -1,23 +1,42 @@
+<button
+  type="button"
+  class="fab"
+  [class.tucked]="fabTucked() || palette.isOpen()"
+  aria-label="Jump to a tool"
+  aria-haspopup="dialog"
+  (click)="palette.open()"
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+  </svg>
+</button>
+
 @if (palette.isOpen()) {
   <div class="backdrop" (click)="close()"></div>
   <div class="palette" role="dialog" aria-modal="true" aria-label="Jump to a tool">
-    <input
-      #input
-      class="query"
-      type="text"
-      role="combobox"
-      aria-label="Search tools"
-      aria-autocomplete="list"
-      aria-expanded="true"
-      aria-controls="palette-list"
-      [attr.aria-activedescendant]="activeId()"
-      placeholder="Jump to a tool…"
-      autocomplete="off"
-      spellcheck="false"
-      [value]="query()"
-      (input)="onQuery($any($event.target).value)"
-      (keydown)="onKeydown($event)"
-    />
+    <div class="query-row">
+      <input
+        #input
+        class="query"
+        type="text"
+        inputmode="search"
+        enterkeyhint="go"
+        role="combobox"
+        aria-label="Search tools"
+        aria-autocomplete="list"
+        aria-expanded="true"
+        aria-controls="palette-list"
+        [attr.aria-activedescendant]="activeId()"
+        placeholder="Jump to a tool…"
+        autocomplete="off"
+        spellcheck="false"
+        [value]="query()"
+        (input)="onQuery($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+      />
+      <button type="button" class="cancel" (click)="close()">Cancel</button>
+    </div>
 
     <div id="palette-list" class="list" role="listbox" aria-label="Tools">
       @for (section of sections(); track section.label) {

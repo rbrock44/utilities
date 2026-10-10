@@ -22,11 +22,17 @@
   overflow: hidden;
 }
 
+.query-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
 .query {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 1rem 1.25rem;
   border: none;
-  border-bottom: 1px solid var(--border);
   background: transparent;
   color: var(--text);
   font: inherit;
@@ -116,10 +122,75 @@ kbd {
   font: inherit;
 }
 
-@media (max-width: 480px) {
+.cancel,
+.fab {
+  display: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cancel {
+  padding: 0 1rem;
+  align-self: stretch;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.fab {
+  position: fixed;
+  z-index: 99;
+  right: calc(1rem + env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease, visibility 0.2s;
+}
+
+.fab svg {
+  width: 24px;
+  height: 24px;
+}
+
+// Tucked below the screen edge and out of the tab order.
+.fab.tucked {
+  transform: translateY(calc(100% + 2rem + env(safe-area-inset-bottom)));
+  visibility: hidden;
+}
+
+// Phones and other touch screens: no Ctrl K, so a thumb-reach button opens the palette.
+@media (max-width: 600px), (hover: none) and (pointer: coarse) {
+  .fab {
+    display: flex;
+  }
+
+  .item {
+    min-height: 48px;
+  }
+}
+
+// Small screens get a full-screen sheet with a Cancel button, since there's no Esc key.
+@media (max-width: 600px) {
   .palette {
-    top: 1rem;
-    max-height: 80vh;
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .cancel {
+    display: block;
   }
 
   .hints {

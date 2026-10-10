@@ -182,4 +182,55 @@ describe('CommandPaletteComponent', () => {
     expect(component.query()).toBe('');
     expect(activeTitle()).toBe(titles()[0]);
   });
+
+  it('should open from the floating button and tuck it away while open', () => {
+    const fab = element().querySelector('.fab') as HTMLButtonElement;
+    expect(fab.classList).not.toContain('tucked');
+
+    fab.click();
+    fixture.detectChanges();
+
+    expect(palette.isOpen()).toBe(true);
+    expect(fab.classList).toContain('tucked');
+  });
+
+  it('should close from the Cancel button', () => {
+    palette.open();
+    fixture.detectChanges();
+
+    (element().querySelector('.cancel') as HTMLButtonElement).click();
+    expect(palette.isOpen()).toBe(false);
+  });
+
+  it('should tuck the floating button while scrolling down and bring it back on the way up', () => {
+    const scrollTo = (y: number) => {
+      Object.defineProperty(window, 'scrollY', { value: y, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+    };
+
+    scrollTo(400);
+    expect(component.fabTucked()).toBe(true);
+
+    scrollTo(300);
+    expect(component.fabTucked()).toBe(false);
+
+    scrollTo(302);
+    expect(component.fabTucked()).toBe(false);
+
+    scrollTo(600);
+    expect(component.fabTucked()).toBe(true);
+
+    scrollTo(20);
+    expect(component.fabTucked()).toBe(false);
+    scrollTo(0);
+  });
+
+  it('should give the search box a mobile keyboard Go key', () => {
+    palette.open();
+    fixture.detectChanges();
+
+    const input = element().querySelector('.query') as HTMLInputElement;
+    expect(input.getAttribute('enterkeyhint')).toBe('go');
+    expect(input.getAttribute('inputmode')).toBe('search');
+  });
 });
