@@ -1,9 +1,9 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BackButtonComponent } from '../back-button/back-button';
 import { PageData } from '../../constants/site';
-import { findTool } from '../../constants/tool-index';
+import { findTool, relatedTools } from '../../constants/tool-index';
 import { FavoritesService } from '../../services/favorites';
 
 /**
@@ -14,7 +14,7 @@ import { FavoritesService } from '../../services/favorites';
 @Component({
   selector: 'app-tool-page',
   standalone: true,
-  imports: [NgComponentOutlet, BackButtonComponent],
+  imports: [NgComponentOutlet, BackButtonComponent, RouterLink],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +26,8 @@ export class ToolPageComponent {
   readonly param = this.route.routeConfig?.path ?? '';
   /** Unlisted tools have no tile, so there is nowhere to pin them. */
   readonly canPin = findTool(this.param) !== undefined;
+  /** Rendered in the page shell, not the widget, so prerendered pages carry these links. */
+  readonly related = relatedTools(this.param);
 
   readonly heading = this.data.heading ?? '';
   readonly component = signal<Type<unknown> | null>(null);

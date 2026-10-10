@@ -1,4 +1,4 @@
-import { findTool, searchTools, TOOL_INDEX } from './tool-index';
+import { findTool, relatedTools, searchTools, TOOL_INDEX } from './tool-index';
 
 describe('tool index', () => {
   it('should hold every home-page tool with its category', () => {
@@ -34,5 +34,36 @@ describe('tool index', () => {
   it('should be case-insensitive and return nothing for nonsense', () => {
     expect(searchTools('LOAN').map(tool => tool.param)).toContain('loan-calculator');
     expect(searchTools('zzqx')).toEqual([]);
+  });
+});
+
+describe('relatedTools', () => {
+  const params = (param: string, count?: number) => relatedTools(param, count).map(tool => tool.param);
+
+  it('should put hand-picked tools first, then fill from the same category', () => {
+    expect(params('jwt-decoder')).toEqual([
+      'base64-converter', 'json-formatter', 'timestamp-converter', 'cron-translator'
+    ]);
+  });
+
+  it('should wrap around the category when filling', () => {
+    // Generators run hex, guid, qr. After qr's two picks, the fill wraps to hex then guid.
+    expect(params('qr-code-generator')).toEqual([
+      'url-encoder', 'email-link-generator', 'hex-generator', 'guid-generator'
+    ]);
+  });
+
+  it('should never repeat a tool or include the tool itself', () => {
+    const related = params('stair-stringer-calculator', 10);
+    expect(related).not.toContain('stair-stringer-calculator');
+    expect(new Set(related).size).toBe(related.length);
+  });
+
+  it('should stop at the requested count', () => {
+    expect(params('precious-metals', 2)).toEqual(['gold-in-coins', 'silver-in-coins']);
+  });
+
+  it('should return nothing for unknown tools', () => {
+    expect(relatedTools('nope')).toEqual([]);
   });
 });

@@ -1,5 +1,6 @@
 import { CATEGORIES } from './categories';
 import { resolveLegacyTile, TOOLS } from './tools';
+import { relatedTools } from './tool-index';
 
 describe('TOOLS', () => {
   const tileParams = CATEGORIES.flatMap(category => category.tiles.map(tile => tile.param));
@@ -18,6 +19,20 @@ describe('TOOLS', () => {
 
   it('should not list a tool on the home page twice', () => {
     expect(new Set(tileParams).size).toBe(tileParams.length);
+  });
+
+  it('should only list related tools that exist on the home page and are not the tool itself', () => {
+    const bad = Object.entries(TOOLS).flatMap(([param, tool]) =>
+      (tool.related ?? [])
+        .filter(related => related === param || !tileParams.includes(related))
+        .map(related => `${param} -> ${related}`)
+    );
+    expect(bad).toEqual([]);
+  });
+
+  it('should give every home-page tool at least three related tools', () => {
+    const thin = tileParams.filter(param => relatedTools(param).length < 3);
+    expect(thin).toEqual([]);
   });
 
   it('should use unique legacy aliases that never collide with a param', () => {

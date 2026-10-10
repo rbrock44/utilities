@@ -14,8 +14,31 @@
   }
 </app-back-button>
 
-@if (component(); as component) {
-  <ng-container *ngComponentOutlet="component; inputs: inputs" />
-} @else {
-  <p class="tool-loading">Loading…</p>
-}
+<div class="tool-layout">
+  <div class="tool-main">
+    @if (component(); as component) {
+      <ng-container *ngComponentOutlet="component; inputs: inputs" />
+    } @else {
+      <p class="tool-loading">Loading…</p>
+    }
+  </div>
+
+  @if (related.length > 0) {
+    <aside class="related" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related tools</h2>
+      <ul>
+        @for (tool of related; track tool.param) {
+          <li>
+            <a [routerLink]="['/', tool.param]">
+              <span class="icon" aria-hidden="true">{{ tool.icon }}</span>
+              <span class="text">
+                <span class="title">{{ tool.title }}</span>
+                <span class="desc">{{ tool.description }}</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </aside>
+  }
+</div>

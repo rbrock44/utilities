@@ -1,4 +1,5 @@
 import { CATEGORIES } from './categories';
+import { TOOLS } from './tools';
 
 export interface IndexedTool extends Tile {
   category: string;
@@ -41,4 +42,31 @@ export function searchTools(query: string): IndexedTool[] {
     .map(tool => ({ tool, rank: rank(tool) }))
     .sort((a, b) => a.rank - b.rank)
     .map(({ tool }) => tool);
+}
+
+/**
+ * The hand-picked `related` tools first, then the tools that follow this one in its own
+ * category (wrapping around), so siblings vary from page to page instead of every page
+ * linking the category's first few.
+ */
+export function relatedTools(param: string, count = 4): IndexedTool[] {
+  const self = findTool(param);
+  const picked: IndexedTool[] = [];
+  const add = (tool: IndexedTool | undefined) => {
+    if (tool && tool.param !== param && !picked.includes(tool) && picked.length < count) {
+      picked.push(tool);
+    }
+  };
+
+  (TOOLS[param]?.related ?? []).forEach(related => add(findTool(related)));
+
+  if (self) {
+    const siblings = TOOL_INDEX.filter(tool => tool.category === self.category);
+    const start = siblings.indexOf(self);
+    for (let offset = 1; offset < siblings.length; offset++) {
+      add(siblings[(start + offset) % siblings.length]);
+    }
+  }
+
+  return picked;
 }

@@ -61,6 +61,12 @@ describe('App', () => {
     expect(await waitFor(page, 'app-right-angle-calculator')).toBeTruthy();
   }, SLOW_TEST_MS);
 
+  it('should link related tools from the tool page', async () => {
+    const page = await render('/jwt-decoder');
+    const links = Array.from(page.querySelectorAll('aside.related a')).map(a => a.getAttribute('href'));
+    expect(links).toEqual(['/base64-converter', '/json-formatter', '/timestamp-converter', '/cron-translator']);
+  }, SLOW_TEST_MS);
+
   it('should pass route inputs through to a shared widget', async () => {
     const page = await render('/volume-converter');
     expect((await waitFor(page, 'app-unit-converter'))?.textContent).toContain('teaspoons');

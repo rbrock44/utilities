@@ -27,3 +27,95 @@
 .pin.pinned span {
   color: var(--warning);
 }
+
+.tool-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.tool-main {
+  min-width: 0;
+}
+
+.related {
+  width: 100%;
+  max-width: 1050px;
+  margin: 1rem auto 2rem;
+  padding: 0 1rem;
+}
+
+.related h2 {
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.related ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.related a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.related a:hover {
+  border-color: var(--brand-border);
+  background: var(--surface-alt);
+}
+
+.related .icon {
+  font-size: 1.5rem;
+}
+
+.related .text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.related .title {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.related .desc {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+// Wide enough for a widget plus a side column: the panel moves beside the tool and stays in view.
+@media (min-width: 1280px) {
+  .tool-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 0 1rem;
+  }
+
+  .related {
+    position: sticky;
+    top: 1rem;
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  .related ul {
+    grid-template-columns: 1fr;
+  }
+}
