@@ -26,17 +26,17 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'precious-metals': {
     alias: 'pm',
     load: () => import('../components/calculators/precious-metals/precious-metals').then(m => m.PreciousMetalsComponent),
-    related: ['gold-in-coins', 'silver-in-coins', 'weight-converter']
+    related: ['gold-in-coins', 'silver-in-coins', 'coin-stack-calculator', 'weight-converter']
   },
   'silver-in-coins': {
     alias: 'sic',
     load: () => import('../components/information/silver-in-coin/silver-in-coin').then(m => m.SilverInCoinComponent),
-    related: ['gold-in-coins', 'precious-metals', 'weight-converter']
+    related: ['gold-in-coins', 'coin-stack-calculator', 'precious-metals', 'weight-converter']
   },
   'gold-in-coins': {
     alias: 'gic',
     load: () => import('../components/information/gold-in-coin/gold-in-coin').then(m => m.GoldInCoinComponent),
-    related: ['silver-in-coins', 'precious-metals', 'weight-converter']
+    related: ['silver-in-coins', 'coin-stack-calculator', 'precious-metals', 'weight-converter']
   },
   'right-angle-calculator': {
     alias: 'rac',
@@ -87,7 +87,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'length-converter': {
     alias: 'lc',
     load: unitConverter,
-    related: ['board-foot-calculator'],
+    related: ['inch-fraction-converter', 'board-foot-calculator'],
     inputs: { title: 'Length Converter', units: LENGTH_UNITS }
   },
   'weight-converter': {
@@ -167,7 +167,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'board-foot-calculator': {
     alias: 'bfc',
     load: () => import('../components/calculators/board-foot-calculator/board-foot-calculator').then(m => m.BoardFootCalculatorComponent),
-    related: ['cut-list-optimizer', 'stair-stringer-calculator', 'length-converter']
+    related: ['cut-list-optimizer', 'stair-stringer-calculator', 'paint-drywall-calculator', 'length-converter']
   },
   'qr-code-generator': {
     alias: 'qr',
@@ -212,7 +212,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
   },
   'stair-stringer-calculator': {
     load: () => import('../components/calculators/stair-stringer-calculator/stair-stringer-calculator').then(m => m.StairStringerCalculatorComponent),
-    related: ['right-angle-calculator', 'board-foot-calculator', 'length-converter']
+    related: ['inch-fraction-converter', 'right-angle-calculator', 'board-foot-calculator', 'length-converter']
   },
   'cron-translator': {
     alias: 'crn',
