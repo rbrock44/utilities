@@ -1,7 +1,9 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoryComponent } from '../category/category';
 import { CATEGORIES } from '../../constants/categories';
+import { FavoritesService } from '../../services/favorites';
+import { CommandPaletteService } from '../../services/command-palette';
 
 @Component({
   selector: 'app-tile-grid',
@@ -16,6 +18,11 @@ import { CATEGORIES } from '../../constants/categories';
 })
 export class TileGridComponent {
   searchTerm = signal('');
+  readonly favorites = inject(FavoritesService);
+  readonly palette = inject(CommandPaletteService);
+
+  readonly pinnedCategory = computed<Category>(() => ({ name: 'Pinned', tiles: this.favorites.pinnedTools() }));
+  readonly recentCategory = computed<Category>(() => ({ name: 'Recent', tiles: this.favorites.recentTools() }));
 
   get filteredCategories(): Category[] {
     const term = this.searchTerm().trim().toLowerCase();

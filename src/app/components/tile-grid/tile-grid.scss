@@ -20,3 +20,20 @@
     outline: none;
     border-color: #667eea;
 }
+
+.hint {
+    margin: -0.5rem 0 2rem;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+}
+
+.hint-link {
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}

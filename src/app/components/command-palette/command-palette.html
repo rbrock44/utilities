@@ -1,0 +1,59 @@
+@if (palette.isOpen()) {
+  <div class="backdrop" (click)="close()"></div>
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Jump to a tool">
+    <input
+      #input
+      class="query"
+      type="text"
+      role="combobox"
+      aria-label="Search tools"
+      aria-autocomplete="list"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      [attr.aria-activedescendant]="activeId()"
+      placeholder="Jump to a tool…"
+      autocomplete="off"
+      spellcheck="false"
+      [value]="query()"
+      (input)="onQuery($any($event.target).value)"
+      (keydown)="onKeydown($event)"
+    />
+
+    <div id="palette-list" class="list" role="listbox" aria-label="Tools">
+      @for (section of sections(); track section.label) {
+        <div role="group" [attr.aria-label]="section.label">
+          <div class="section" aria-hidden="true">{{ section.label }}</div>
+          @for (item of section.items; track item.tool.param) {
+            <div
+              class="item"
+              role="option"
+              [id]="'palette-option-' + item.index"
+              [class.active]="item.index === activeIndex()"
+              [attr.aria-selected]="item.index === activeIndex()"
+              (mousemove)="activeIndex.set(item.index)"
+              (click)="go(item.tool)"
+            >
+              <span class="icon" aria-hidden="true">{{ item.tool.icon }}</span>
+              <span class="text">
+                <span class="title">{{ item.tool.title }}</span>
+                <span class="desc">{{ item.tool.description }}</span>
+              </span>
+              @if (favorites.isPinned(item.tool.param)) {
+                <span class="star" aria-hidden="true">★</span>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="empty">No tools match “{{ query() }}”</p>
+      }
+    </div>
+
+    <div class="hints" aria-hidden="true">
+      <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
+      <span><kbd>Enter</kbd> open</span>
+      <span><kbd>Shift</kbd><kbd>Enter</kbd> pin</span>
+      <span><kbd>Esc</kbd> close</span>
+    </div>
+  </div>
+}

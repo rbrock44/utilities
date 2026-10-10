@@ -1,5 +1,18 @@
 <h1 class="visually-hidden">{{ heading }}</h1>
-<app-back-button></app-back-button>
+<app-back-button>
+  @if (canPin) {
+    <button
+      type="button"
+      class="pin"
+      [class.pinned]="favorites.isPinned(param)"
+      [attr.aria-pressed]="favorites.isPinned(param)"
+      (click)="favorites.toggle(param)"
+    >
+      <span aria-hidden="true">{{ favorites.isPinned(param) ? '★' : '☆' }}</span>
+      {{ favorites.isPinned(param) ? 'Pinned' : 'Pin' }}
+    </button>
+  }
+</app-back-button>
 
 @if (component(); as component) {
   <ng-container *ngComponentOutlet="component; inputs: inputs" />

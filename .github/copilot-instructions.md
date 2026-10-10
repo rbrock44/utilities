@@ -35,6 +35,11 @@ There is no lint script, and CI deliberately has no lint gate.
 - **History.** `App` slots a home entry under a deep-linked page so browser back and the
   back button (`location.back()`) land home instead of leaving the site.
 - The home page search matches on category name, tile title, and description.
+- **Favorites.** `FavoritesService` keeps pinned and recent tools in `localStorage`
+  (`utilities-pinned`, `utilities-recent`). Tiles and tool pages have a pin star; the home
+  page shows Pinned and Recent rows. `CommandPaletteComponent` (Ctrl/⌘ K or `/` anywhere,
+  or the header button) lists pinned, recent, then all tools, searched via
+  `searchTools()` in `src/app/constants/tool-index.ts`.
 - Widgets live in `src/app/components/<group>/<folder>/`, where group is `calculators/`
   (math and conversion), `information/` (reference data), or `utilities/` (everything
   else). The group and the home-page category are independent.

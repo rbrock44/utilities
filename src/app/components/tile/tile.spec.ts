@@ -22,4 +22,18 @@ describe('TileComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should toggle the pin from the star button', async () => {
+    vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => undefined });
+    fixture.componentRef.setInput('tile', { title: 'JWT Decoder', description: 'Decode', icon: '🔑', param: 'jwt-decoder' });
+    fixture.detectChanges();
+    const pin = (fixture.nativeElement as HTMLElement).querySelector('.pin') as HTMLButtonElement;
+
+    pin.click();
+    fixture.detectChanges();
+    expect(component.favorites.isPinned('jwt-decoder')).toBe(true);
+    expect(pin.getAttribute('aria-pressed')).toBe('true');
+    expect(pin.textContent).toBe('★');
+    vi.unstubAllGlobals();
+  });
 });

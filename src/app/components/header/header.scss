@@ -66,3 +66,48 @@ nav {
     width: 18px;
     height: 18px;
 }
+
+.palette-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 38px;
+    padding: 0 0.75rem;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.palette-trigger:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.palette-trigger svg {
+    width: 16px;
+    height: 16px;
+}
+
+.palette-trigger kbd {
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    font: inherit;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 600px) {
+    .trigger-label,
+    .palette-trigger kbd {
+        display: none;
+    }
+
+    .palette-trigger {
+        width: 38px;
+        justify-content: center;
+        padding: 0;
+    }
+}

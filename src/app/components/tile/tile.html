@@ -5,3 +5,10 @@
     </div>
     <p class="description">{{ tile.description }}</p>
 </a>
+<button
+    type="button"
+    class="pin"
+    [class.pinned]="favorites.isPinned(tile.param)"
+    [attr.aria-pressed]="favorites.isPinned(tile.param)"
+    [attr.aria-label]="'Pin ' + tile.title"
+    (click)="favorites.toggle(tile.param)">{{ favorites.isPinned(tile.param) ? '★' : '☆' }}</button>

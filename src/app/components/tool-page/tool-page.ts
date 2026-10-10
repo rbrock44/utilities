@@ -3,6 +3,8 @@ import { NgComponentOutlet } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../back-button/back-button';
 import { PageData } from '../../constants/site';
+import { findTool } from '../../constants/tool-index';
+import { FavoritesService } from '../../services/favorites';
 
 /**
  * Hosts one tool. The widget is only loaded in the browser (afterNextRender never runs
@@ -18,7 +20,12 @@ import { PageData } from '../../constants/site';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToolPageComponent {
-  private readonly data = inject(ActivatedRoute).snapshot.data as PageData;
+  private readonly route = inject(ActivatedRoute).snapshot;
+  private readonly data = this.route.data as PageData;
+  readonly favorites = inject(FavoritesService);
+  readonly param = this.route.routeConfig?.path ?? '';
+  /** Unlisted tools have no tile, so there is nowhere to pin them. */
+  readonly canPin = findTool(this.param) !== undefined;
 
   readonly heading = this.data.heading ?? '';
   readonly component = signal<Type<unknown> | null>(null);
@@ -26,6 +33,7 @@ export class ToolPageComponent {
 
   constructor() {
     afterNextRender(() => {
+      this.favorites.recordVisit(this.param);
       this.data.tool?.load().then(component => this.component.set(component));
     });
   }

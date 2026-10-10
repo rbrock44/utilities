@@ -2,6 +2,20 @@
     <h1 class="visually-hidden">Everyday Calculators &amp; Conversion Tools</h1>
     <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" placeholder="Search by category, name, or description..."
         class="search-input" aria-label="Search widgets">
+    @if (!searchTerm().trim()) {
+        @if (pinnedCategory().tiles.length > 0) {
+            <app-category [category]="pinnedCategory()"></app-category>
+        } @else {
+            <p class="hint">
+                Tip: hover a tile and click ☆ to pin it here, or press
+                <button type="button" class="hint-link" (click)="palette.open()">Ctrl K</button>
+                on any page to jump straight to a tool.
+            </p>
+        }
+        @if (recentCategory().tiles.length > 0) {
+            <app-category [category]="recentCategory()"></app-category>
+        }
+    }
     <app-category *ngFor="let category of filteredCategories" [category]="category">
     </app-category>
 </div>

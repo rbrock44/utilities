@@ -3,11 +3,12 @@ import { isPlatformBrowser, Location } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, take } from 'rxjs';
 import { HeaderComponent } from './components/header/header';
+import { CommandPaletteComponent } from './components/command-palette/command-palette';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HeaderComponent, RouterOutlet],
+  imports: [HeaderComponent, RouterOutlet, CommandPaletteComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
