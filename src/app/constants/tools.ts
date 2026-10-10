@@ -198,6 +198,10 @@ export const TOOLS: Record<string, ToolDefinition> = {
     load: () => import('../components/calculators/inch-fraction-converter/inch-fraction-converter').then(m => m.InchFractionConverterComponent),
     related: ['length-converter', 'stair-stringer-calculator', 'board-foot-calculator', 'cut-list-optimizer']
   },
+  'paint-drywall-calculator': {
+    load: () => import('../components/calculators/paint-drywall-calculator/paint-drywall-calculator').then(m => m.PaintDrywallCalculatorComponent),
+    related: ['inch-fraction-converter', 'board-foot-calculator', 'stair-stringer-calculator']
+  },
   'compound-interest-calculator': {
     load: () => import('../components/calculators/compound-interest-calculator/compound-interest-calculator').then(m => m.CompoundInterestCalculatorComponent),
     related: ['loan-calculator', 'currency-converter']

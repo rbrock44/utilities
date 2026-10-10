@@ -148,6 +148,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Stair risers, treads, stringer length, and angle with code checks',
                 icon: '🪜',
                 param: 'stair-stringer-calculator'
+            },
+            {
+                title: 'Paint & Drywall Calculator',
+                description: 'Paint gallons and drywall sheets for a room, minus doors and windows',
+                icon: '🖌️',
+                param: 'paint-drywall-calculator'
             }
         ]
     },

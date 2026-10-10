@@ -1,0 +1,73 @@
+<section class="widget-container">
+  <h2>Paint &amp; Drywall Calculator</h2>
+  <p class="description">
+    Enter the room in feet. Doors count as 3′ × 7′ and windows as 3′ × 5′.
+  </p>
+
+  <fieldset>
+    <legend>Room</legend>
+    <div class="inputs">
+      <label for="lengthInput">Length (ft)<input id="lengthInput" type="number" min="0" step="0.5" [(ngModel)]="length" /></label>
+      <label for="widthInput">Width (ft)<input id="widthInput" type="number" min="0" step="0.5" [(ngModel)]="width" /></label>
+      <label for="heightInput">Wall height (ft)<input id="heightInput" type="number" min="0" step="0.5" [(ngModel)]="height" /></label>
+      <label for="doorsInput">Doors<input id="doorsInput" type="number" min="0" step="1" [(ngModel)]="doors" /></label>
+      <label for="windowsInput">Windows<input id="windowsInput" type="number" min="0" step="1" [(ngModel)]="windows" /></label>
+    </div>
+    <label class="toggle" for="ceilingInput">
+      <input id="ceilingInput" type="checkbox" [(ngModel)]="includeCeiling" />
+      Include the ceiling
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Paint and drywall</legend>
+    <div class="inputs">
+      <label for="coatsInput">Coats<input id="coatsInput" type="number" min="1" step="1" [(ngModel)]="coats" /></label>
+      <label for="coverageInput">Sq ft per gallon<input id="coverageInput" type="number" min="1" step="25" [(ngModel)]="coverage" /></label>
+      <label for="sheetInput">
+        Sheet size
+        <select id="sheetInput" [(ngModel)]="sheetSqft">
+          @for (size of sheetSizes; track size.sqft) {
+            <option [ngValue]="size.sqft">{{ size.label }}</option>
+          }
+        </select>
+      </label>
+      <label for="wasteInput">Drywall waste (%)<input id="wasteInput" type="number" min="0" step="5" [(ngModel)]="wastePercent" /></label>
+    </div>
+  </fieldset>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (result; as result) {
+    <div class="results" aria-live="polite">
+      <div class="cards">
+        <div class="card">
+          <span class="card-label">Wall paint</span>
+          <span class="card-value">{{ result.walls.buyLabel }}</span>
+          <span class="card-sub">{{ result.walls.gallons.toFixed(2) }} gal needed</span>
+        </div>
+        @if (result.ceiling; as ceiling) {
+          <div class="card">
+            <span class="card-label">Ceiling paint</span>
+            <span class="card-value">{{ ceiling.buyLabel }}</span>
+            <span class="card-sub">{{ ceiling.gallons.toFixed(2) }} gal needed</span>
+          </div>
+        }
+        <div class="card">
+          <span class="card-label">Drywall</span>
+          <span class="card-value">{{ result.sheets }} sheets</span>
+          <span class="card-sub">includes {{ wastePercent }}% waste</span>
+        </div>
+      </div>
+
+      <div class="result-row"><span>Wall area</span><strong>{{ formatArea(result.wallArea) }}</strong></div>
+      <div class="result-row"><span>Minus doors and windows</span><strong>−{{ formatArea(result.openingsArea) }}</strong></div>
+      @if (includeCeiling) {
+        <div class="result-row"><span>Ceiling</span><strong>{{ formatArea(result.ceilingArea) }}</strong></div>
+      }
+      <div class="result-row"><span>Drywall area</span><strong>{{ formatArea(result.drywallArea) }}</strong></div>
+    </div>
+  }
+</section>
