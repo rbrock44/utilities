@@ -47,6 +47,12 @@ const RUN_ONLY = {
   },
 };
 
+/**
+ * The full home grid has two focusable controls per tile, and axe walks every one; under a
+ * parallel CI run that takes longer than vitest's 5s default.
+ */
+const AXE_FULL_GRID_MS = 30_000;
+
 /** Runs axe against an element and fails with the rule ids and offending selectors. */
 async function expectNoViolations(element: HTMLElement): Promise<void> {
   const results = await axe.run(element, RUN_ONLY);
@@ -76,7 +82,7 @@ describe('accessibility', () => {
 
     it('should render the full widget dashboard with no aria/role violations', async () => {
       await expectNoViolations(fixture.nativeElement as HTMLElement);
-    });
+    }, AXE_FULL_GRID_MS);
 
     it('should still pass once a search narrows the visible tiles', async () => {
       fixture.componentInstance.searchTerm.set('convert');
@@ -84,7 +90,7 @@ describe('accessibility', () => {
       await fixture.whenStable();
 
       await expectNoViolations(fixture.nativeElement as HTMLElement);
-    });
+    }, AXE_FULL_GRID_MS);
   });
 
   describe('CategoryComponent', () => {
