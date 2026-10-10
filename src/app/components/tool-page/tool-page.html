@@ -1,0 +1,7 @@
+<app-back-button></app-back-button>
+
+@if (component(); as component) {
+  <ng-container *ngComponentOutlet="component; inputs: inputs" />
+} @else {
+  <p class="tool-loading">Loading…</p>
+}

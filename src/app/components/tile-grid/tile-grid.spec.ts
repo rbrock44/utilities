@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { TileGridComponent } from './tile-grid';
 
@@ -8,7 +9,8 @@ describe('TileGridComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TileGridComponent]
+      imports: [TileGridComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

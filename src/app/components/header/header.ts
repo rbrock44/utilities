@@ -1,24 +1,19 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SettingsService } from '../../services/settings';
+import { RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './header.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './header.scss',
 })
 export class HeaderComponent {
   constructor(
-    private settingsService: SettingsService,
     public themeService: ThemeService
   ) {
-  }
-
-  goHome() {
-    this.settingsService.goHome();
   }
 }

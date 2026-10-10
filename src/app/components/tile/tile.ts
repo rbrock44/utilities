@@ -1,11 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SettingsService } from '../../services/settings';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-tile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './tile.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile.scss',
@@ -17,13 +17,4 @@ export class TileComponent {
     icon: '',
     param: ''
   };
-
-  constructor(
-    private settingsService: SettingsService
-  ) {
-  }
-
-  handleClick() {
-    this.settingsService.openTile(this.tile.param);
-  }
 }

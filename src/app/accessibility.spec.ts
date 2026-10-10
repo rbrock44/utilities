@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import axe from 'axe-core';
+import { provideRouter } from '@angular/router';
 
 import { TileGridComponent } from './components/tile-grid/tile-grid';
 import { TileComponent } from './components/tile/tile';
@@ -56,6 +57,10 @@ async function expectNoViolations(element: HTMLElement): Promise<void> {
 }
 
 describe('accessibility', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+  });
+
   describe('TileGridComponent', () => {
     let fixture: ComponentFixture<TileGridComponent>;
 

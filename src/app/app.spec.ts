@@ -1,62 +1,98 @@
-import { DeferBlockBehavior, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { DOCUMENT } from '@angular/core';
+import { provideRouter, Router, TitleStrategy } from '@angular/router';
+import { provideLocationMocks } from '@angular/common/testing';
+import { Location } from '@angular/common';
 import { App } from './app';
-import { RightAngleCalculatorComponent } from './components/calculators/right-angle-calculator/right-angle-calculator';
+import { routes } from './app.routes';
+import { SeoTitleStrategy } from './services/seo';
 
-@Component({
-  selector: 'app-right-angle-calculator',
-  standalone: true,
-  template: '<div data-testid="mock-right-angle">Mock Right Angle Calculator</div>'
-})
-class MockRightAngleCalculatorComponent {}
-
-/**
- * App imports every widget in the site, so building it takes several seconds — long
- * enough to trip vitest's 10s default when a CI runner is compiling the other suites at
- * the same time.
- */
+/** Tool pages lazy-load real widgets, which can be slow when CI compiles suites in parallel. */
 const SLOW_TEST_MS = 60_000;
 
 describe('App', () => {
+  let router: Router;
+  let location: Location;
+  let document: Document;
+
+  async function render(url: string): Promise<HTMLElement> {
+    const fixture = TestBed.createComponent(App);
+    await router.navigateByUrl(url);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  /** afterNextRender kicks off the widget import, which resolves on its own schedule. */
+  async function waitFor(page: HTMLElement, selector: string): Promise<Element | null> {
+    for (let i = 0; i < 100 && !page.querySelector(selector); i++) {
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    return page.querySelector(selector);
+  }
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      // Every widget in app.html sits behind `@defer (on immediate)`, and TestBed leaves
-      // defer blocks in their placeholder unless it is told to play them through.
-      deferBlockBehavior: DeferBlockBehavior.Playthrough,
-    })
-      .overrideComponent(App, {
-        remove: {
-          imports: [RightAngleCalculatorComponent]
-        },
-        add: {
-          imports: [MockRightAngleCalculatorComponent]
-        }
-      })
-      .compileComponents();
+      providers: [
+        provideRouter(routes),
+        provideLocationMocks(),
+        { provide: TitleStrategy, useClass: SeoTitleStrategy }
+      ]
+    }).compileComponents();
+
+    router = TestBed.inject(Router);
+    location = TestBed.inject(Location);
+    document = TestBed.inject(DOCUMENT);
   }, SLOW_TEST_MS);
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  it('should render the dashboard header and tile grid on the home page', async () => {
+    const page = await render('/');
+    expect(page.querySelector('h1')?.textContent).toContain('Dashboard');
+    expect(page.querySelector('app-tile-grid')).toBeTruthy();
   }, SLOW_TEST_MS);
 
-  it('should render dashboard header', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Dashboard');
+  it('should load a tool on its own route', async () => {
+    const page = await render('/right-angle-calculator');
+    expect(page.querySelector('app-tile-grid')).toBeNull();
+    expect(page.querySelector('app-back-button')).toBeTruthy();
+    expect(await waitFor(page, 'app-right-angle-calculator')).toBeTruthy();
   }, SLOW_TEST_MS);
 
-  it('should use the right-angle mock in app tests', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.componentInstance.settingsService.setSelectedTile('rac');
-    fixture.detectChanges();
-    await fixture.whenStable();
+  it('should pass route inputs through to a shared widget', async () => {
+    const page = await render('/volume-converter');
+    expect((await waitFor(page, 'app-unit-converter'))?.textContent).toContain('teaspoons');
+  }, SLOW_TEST_MS);
 
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('[data-testid="mock-right-angle"]')).toBeTruthy();
+  it('should redirect a legacy short-alias link to the tool route', async () => {
+    await render('/?tile=rac');
+    expect(location.path()).toBe('/right-angle-calculator');
+  }, SLOW_TEST_MS);
+
+  it('should redirect a legacy full-param link to the tool route', async () => {
+    await render('/?tile=jwt-decoder');
+    expect(location.path()).toBe('/jwt-decoder');
+  }, SLOW_TEST_MS);
+
+  it('should stay home for an unknown legacy tile', async () => {
+    const page = await render('/?tile=nope');
+    expect(page.querySelector('app-tile-grid')).toBeTruthy();
+  }, SLOW_TEST_MS);
+
+  it('should send unknown paths home', async () => {
+    await render('/not-a-tool');
+    expect(location.path()).toBe('/');
+  }, SLOW_TEST_MS);
+
+  it('should set per-tool title, description, and robots tags', async () => {
+    await render('/jwt-decoder');
+    expect(document.title).toBe('JWT Decoder – Utilities');
+    expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBeTruthy();
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('index, follow');
+  }, SLOW_TEST_MS);
+
+  it('should mark unlisted tools noindex', async () => {
+    await render('/cleaning-payout-calculator');
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex');
   }, SLOW_TEST_MS);
 });

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
 
 export type Theme = 'light' | 'dark';
 
@@ -8,6 +8,7 @@ const STORAGE_KEY = 'utilities-theme';
   providedIn: 'root'
 })
 export class ThemeService {
+  private readonly document = inject(DOCUMENT);
   readonly theme = signal<Theme>(this.readInitialTheme());
 
   constructor() {
@@ -22,7 +23,7 @@ export class ThemeService {
   }
 
   private readInitialTheme(): Theme {
-    const current = document.documentElement.getAttribute('data-theme');
+    const current = this.document.documentElement.getAttribute('data-theme');
     if (current === 'light' || current === 'dark') {
       return current;
     }
@@ -36,7 +37,7 @@ export class ThemeService {
   }
 
   private applyTheme(theme: Theme): void {
-    document.documentElement.setAttribute('data-theme', theme);
+    this.document.documentElement.setAttribute('data-theme', theme);
   }
 
   // localStorage is missing in the test runner and blocked outright in some privacy modes.

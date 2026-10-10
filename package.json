@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "ng build --base-href=https://utilities.ryan-brock.com"
+    "deploy": "ng build && node scripts/finish-static-build.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -31,7 +31,9 @@
     "@angular/forms": "^22.2.0",
     "@angular/material": "~22.2.1",
     "@angular/platform-browser": "^22.2.0",
+    "@angular/platform-server": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "@angular/ssr": "^22.2.0",
     "jspdf": "^4.2.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.2.108",

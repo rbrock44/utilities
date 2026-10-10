@@ -9,19 +9,18 @@ description: >
 
 # Adding a Utility to the Utilities App
 
-Angular 22, standalone components, no Angular Router routes for widgets. `app.html`
-is one big `@if` switch keyed off `SettingsService.getSelectedTile()`, which is fed
-by the `?tile=` query param. Adding a utility means creating 3 files and touching 3
-existing files.
+Angular 22, standalone components. Every tool has its own route (`/<param>`), built from
+`categories.ts` + `constants/tools.ts` and prerendered to a static page at build time.
+Adding a utility means creating 3 files and touching 2 existing files.
 
 Repo-wide architecture and conventions live in `.github/copilot-instructions.md`; read
 it first if you haven't this session.
 
 **Files created:** `src/app/components/<group>/<folder>/<folder>.{ts,html,scss}`
-**Files edited:** `src/app/app.ts`, `src/app/app.html`, `src/app/constants/categories.ts`
+**Files edited:** `src/app/constants/tools.ts`, `src/app/constants/categories.ts`
 
-Nothing else needs to change — not `app.routes.ts` (intentionally empty), not
-`index.html`, not `sitemap.xml` (single-URL site), not the deploy workflow.
+Nothing else needs to change — not `app.routes.ts`, not `app.html`, not `index.html`,
+not the sitemap (generated from the prerendered pages), not the deploy workflow.
 
 ---
 
@@ -36,7 +35,6 @@ infer from their request; pick sensible defaults for the rest and state them.
 | Tile description | `Generate random GUIDs (UUID v4)` | One short line, no trailing period |
 | Emoji icon | `🆔` | Single emoji, must not duplicate an existing tile's |
 | Tile param | `guid-generator` | kebab-case, **identical to the folder name** |
-| Short alias | `gg` | 2–4 lowercase letters, unique across `app.html` |
 | Category | `Generators` | Existing name from `categories.ts`, or a new one |
 | Folder group | `utilities` | One of `calculators/`, `information/`, `utilities/` |
 | Folder / file base | `guid-generator` | kebab-case |
@@ -57,8 +55,6 @@ Rough mapping for the group: `calculators/` = math/conversion/derived numbers,
 
 - Categories: `Converters`, `PDF Utilities`, `Calculators`, `Information`,
   `Email`, `Image Utilities`, `Developer Tools`, `Generators`
-- Aliases: `pm` `sic` `gic` `rac` `cpc` `dsc` `itp` `pmc` `ppu` `elg` `hg` `gg`
-  `lc` `wc` `vc` `tc` `cc` `nbc` `b64` `tsc` `clr` `lnc` `imr`
 - Icons: 📏 ⚖️ 🥄 🌡️ 💱 🧮 📄 📑 ✂️ ⚖ 📐 🏦 🥇 🥈 ✉️ 🖼️ 🔤 ⏰ 🎨 🔢 🆔
 
 ---
@@ -161,46 +157,27 @@ on result regions that update in place.
 
 ---
 
-## Step 4 — Register in `src/app/app.ts`
+## Step 4 — Register in `src/app/constants/tools.ts`
 
-Two edits:
+Add an entry keyed by the param, with a lazy `load` so the widget stays its own chunk:
 
-1. Import next to the other component imports (they're grouped loosely by category —
-   put it with its neighbors):
-   ```typescript
-   import { GuidGeneratorComponent } from './components/utilities/guid-generator/guid-generator';
-   ```
-2. Add the class to the `@Component` `imports` array, near the related widgets.
-
-If the widget needs shared constant data (like `unit-converter` does), also expose it
-as a `protected readonly` field on `App` and pass it through the template binding.
-
----
-
-## Step 5 — Add the switch branch in `src/app/app.html`
-
-Inside the outer `@if (this.settingsService.getSelectedTile() !== null) { ... }`
-block, after the last existing branch, following the established two-key pattern:
-
-```html
-@if (isTile('gg', 'guid-generator')) {
-  @defer (on immediate) {
-    <app-guid-generator></app-guid-generator>
-  } @placeholder {
-    <p class="tool-loading">Loading…</p>
-  }
-}
+```typescript
+'guid-generator': {
+  load: () => import('../components/utilities/guid-generator/guid-generator').then(m => m.GuidGeneratorComponent)
+},
 ```
 
-The `@defer` wrapper is what makes each widget its own lazy-loaded chunk — never add a
-branch without it.
-
-Both keys are intentional: the short alias is the legacy URL form and the kebab param
-is the current one, so old `?tile=gg` links keep working. New widgets get both.
+- **No `alias`.** Aliases only exist so pre-routing `?tile=gg` links keep redirecting;
+  a new tool never had one.
+- If the widget takes inputs (like `unit-converter` does), pass them as `inputs`.
+- A tool that should be reachable by URL but hidden from the home page and sitemap gets
+  `unlisted: { title, description }` and no tile.
+- Widgets are only ever rendered in the browser (`ToolPageComponent` loads them in
+  `afterNextRender`), so `window`, canvas, and storage are safe to use directly.
 
 ---
 
-## Step 6 — Add the tile in `src/app/constants/categories.ts`
+## Step 5 — Add the tile in `src/app/constants/categories.ts`
 
 Append to the matching category's `tiles` array (4-space indentation, single quotes,
 no trailing comma on the last property):
@@ -214,8 +191,9 @@ no trailing comma on the last property):
 }
 ```
 
-`param` must be the **kebab** form from the `app.html` branch, not the short alias —
-that's what `TileComponent.handleClick()` writes into the URL.
+`param` must match the `tools.ts` key exactly — it is the route path, and
+`src/app/constants/tools.spec.ts` fails if a tile has no tool or a tool has no tile.
+The tile's `title` and `description` also become the page `<title>` and meta description.
 
 If the category doesn't exist, append a new `{ name, tiles: [...] }` object to
 `CATEGORIES`. Order in the file is the order shown on the home page; new categories
@@ -224,21 +202,24 @@ matches on, so make the description contain the words a user would actually type
 
 ---
 
-## Step 7 — Verify
+## Step 6 — Verify
 
 Run both, from `C:\workspace\utilities`:
 
 ```
-npm run build
+npm run deploy
 npx ng test --watch=false
 ```
 
 Both must exit 0 — the deploy workflow (`.github/workflows/deploy.yml`) runs tests
 before building on every push to `master`. Errors are never acceptable; check that
-**you** didn't add a new warning. Exactly two are pre-existing and expected:
+**you** didn't add a new warning. Pre-existing and expected:
 
-- `bundle initial exceeded maximum budget` (1MB budget, app is over)
-- `cleaning-payout-calculator.scss exceeded maximum budget` (4.20kB)
+- `exceeded maximum budget` for `precious-metals`, `pdf-combiner`,
+  `cleaning-payout-calculator`, and `image-to-pdf` stylesheets
+- `is not ESM` for modules pulled in by `jspdf`, `pdf-lib`, and `canvg`
+
+The build log should say `Prerendered <n> static routes` with `n` one higher than before.
 
 **Write a spec whenever the widget has pure logic worth pinning** — parsers,
 numeric conversion, validation, financial math. Skip it only for a thin wrapper
@@ -254,7 +235,7 @@ and the fix was to state the actual behavior (an auto-detected unit, a lossy
 round-trip tolerance) instead of loosening the assertion.
 
 Then confirm manually with `npm start` and visit
-`http://localhost:4200/?tile=<param>`, checking both themes via the header toggle.
+`http://localhost:4200/<param>`, checking both themes via the header toggle.
 
 ---
 
@@ -264,9 +245,8 @@ Then confirm manually with `npm start` and visit
 - [ ] `OnPush` + `standalone: true`, `@if`/`@for` control flow, `markForCheck()` after async
 - [ ] Timers and object URLs cleaned up in `ngOnDestroy`
 - [ ] SCSS uses theme tokens only, has a mobile breakpoint, compiles under 4kB
-- [ ] Imported and listed in `app.ts`
-- [ ] `@if` branch in `app.html` with both the alias and the kebab key
-- [ ] Tile in `categories.ts` with `param` matching the folder name
-- [ ] Emoji and short alias don't collide with an existing utility
+- [ ] Entry in `tools.ts` with a lazy `load`, keyed by the param
+- [ ] Tile in `categories.ts` with `param` matching the folder name and `tools.ts` key
+- [ ] Emoji doesn't collide with an existing utility
 - [ ] Spec added if the widget has non-trivial logic
-- [ ] `npm run build` and `npx ng test --watch=false` both pass with no new warnings
+- [ ] `npm run deploy` and `npx ng test --watch=false` both pass with no new warnings

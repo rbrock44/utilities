@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoryComponent } from '../category/category';
-import { SettingsService } from '../../services/settings';
+import { CATEGORIES } from '../../constants/categories';
 
 @Component({
   selector: 'app-tile-grid',
@@ -17,18 +17,13 @@ import { SettingsService } from '../../services/settings';
 export class TileGridComponent {
   searchTerm = signal('');
 
-  constructor(
-    public settingsService: SettingsService
-  ) {
-  }
-
   get filteredCategories(): Category[] {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
-      return this.settingsService.categories;
+      return CATEGORIES;
     }
 
-    return this.settingsService.categories
+    return CATEGORIES
       .map(category => {
         const categoryMatches = category.name.toLowerCase().includes(term);
         const tiles = categoryMatches
