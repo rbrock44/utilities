@@ -1,0 +1,98 @@
+<section class="widget-container">
+  <h2>Compound Interest Calculator</h2>
+  <p class="description">
+    See how savings grow with compound interest and a monthly contribution, year by year.
+  </p>
+
+  <div class="inputs-grid">
+    <label for="principalInput">
+      Starting amount
+      <input id="principalInput" type="number" min="0" step="100" [(ngModel)]="principal" (ngModelChange)="calculate()" />
+    </label>
+
+    <label for="contributionInput">
+      Monthly contribution
+      <input id="contributionInput" type="number" min="0" step="50" [(ngModel)]="monthlyContribution" (ngModelChange)="calculate()" />
+    </label>
+
+    <label for="rateInput">
+      Annual interest rate (%)
+      <input id="rateInput" type="number" min="0" step="0.1" [(ngModel)]="rate" (ngModelChange)="calculate()" />
+    </label>
+
+    <label for="yearsInput">
+      Years
+      <input id="yearsInput" type="number" min="1" step="1" [(ngModel)]="years" (ngModelChange)="calculate()" />
+    </label>
+
+    <label for="compoundingInput">
+      Compounding
+      <select id="compoundingInput" [(ngModel)]="periodsPerYear" (ngModelChange)="calculate()">
+        @for (option of compoundingOptions; track option.periods) {
+          <option [ngValue]="option.periods">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (summary) {
+    <div class="summary" aria-live="polite">
+      <div class="headline">
+        <span class="headline-label">Final balance</span>
+        <span class="headline-value">{{ money(summary.finalBalance) }}</span>
+      </div>
+
+      <div class="share-bar" aria-hidden="true">
+        <span class="share-contributed" [style.width.%]="100 - interestShare"></span>
+      </div>
+
+      <div class="summary-rows">
+        <div class="summary-row">
+          <span>You put in</span>
+          <strong>{{ money(summary.totalContributed) }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Interest earned</span>
+          <strong>{{ money(summary.totalInterest) }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Interest share</span>
+          <strong>{{ interestShare.toFixed(1) }}%</strong>
+        </div>
+        <div class="summary-row">
+          <span>Doubles every</span>
+          <strong>{{ summary.doublingYears === null ? 'Never at 0%' : summary.doublingYears.toFixed(1) + ' years' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <h3>Year by year</h3>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Year</th>
+            <th scope="col">Contributions</th>
+            <th scope="col">Interest</th>
+            <th scope="col">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of yearRows; track row.year) {
+            <tr>
+              <td>{{ row.year }}</td>
+              <td>{{ money(row.contributions) }}</td>
+              <td class="interest">{{ money(row.interest) }}</td>
+              <td>{{ money(row.balance) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

@@ -162,6 +162,9 @@ export const TOOLS: Record<string, ToolDefinition> = {
     alias: 'clo',
     load: () => import('../components/calculators/cut-list-optimizer/cut-list-optimizer').then(m => m.CutListOptimizerComponent)
   },
+  'compound-interest-calculator': {
+    load: () => import('../components/calculators/compound-interest-calculator/compound-interest-calculator').then(m => m.CompoundInterestCalculatorComponent)
+  },
   'stair-stringer-calculator': {
     load: () => import('../components/calculators/stair-stringer-calculator/stair-stringer-calculator').then(m => m.StairStringerCalculatorComponent)
   },

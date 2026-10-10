@@ -120,6 +120,12 @@ export const CATEGORIES: Category[] = [
                 param: 'loan-calculator'
             },
             {
+                title: 'Compound Interest Calculator',
+                description: 'Savings growth with compound interest and monthly contributions',
+                icon: '📈',
+                param: 'compound-interest-calculator'
+            },
+            {
                 title: 'Board Foot Calculator',
                 description: 'Board feet, linear feet, and cost for a lumber list',
                 icon: '🪵',
