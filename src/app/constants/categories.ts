@@ -260,7 +260,7 @@ export const CATEGORIES: Category[] = [
             },
             {
                 title: 'GUID Generator',
-                description: 'Generate random GUIDs (UUID v4)',
+                description: 'Generate GUIDs: random UUID v4 or time-ordered UUID v7',
                 icon: '🆔',
                 param: 'guid-generator'
             },
