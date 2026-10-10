@@ -11,12 +11,12 @@ description: >
 
 Angular 22, standalone components. Every tool has its own route (`/<param>`), built from
 `categories.ts` + `constants/tools.ts` and prerendered to a static page at build time.
-Adding a utility means creating 3 files and touching 2 existing files.
+Adding a utility means creating 4 files (component + spec) and touching 2 existing files.
 
 Repo-wide architecture and conventions live in `.github/copilot-instructions.md`; read
 it first if you haven't this session.
 
-**Files created:** `src/app/components/<group>/<folder>/<folder>.{ts,html,scss}`
+**Files created:** `src/app/components/<group>/<folder>/<folder>.{ts,html,scss,spec.ts}`
 **Files edited:** `src/app/constants/tools.ts`, `src/app/constants/categories.ts`
 
 Nothing else needs to change — not `app.routes.ts`, not `app.html`, not `index.html`,
@@ -202,7 +202,40 @@ matches on, so make the description contain the words a user would actually type
 
 ---
 
-## Step 6 — Verify
+## Step 6 — Write the spec
+
+**Every new widget gets a `<folder>.spec.ts`. No exceptions** — not for "thin" widgets,
+not for ones that are mostly a form. A form still has validation, defaults, and an
+empty state, and those are what regress.
+
+Cover, at minimum:
+
+- the default state right after creation (and after `ngOnInit` if it generates something)
+- the main happy path with a concrete, hand-checked expected value
+- each validation/error message the widget can show
+- edge inputs: empty, zero, negative, non-numeric, out of range, as the widget allows
+- any clipboard/copy action, with `navigator.clipboard` stubbed via
+  `Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })`
+
+Test through the component's public API with `TestBed`. Canvas, object URLs, and the
+clipboard don't exist in jsdom, so set state fields directly and assert on getters and
+public fields rather than driving the DOM. Tests run on vitest via
+`@angular/build:unit-test`; follow the style in
+`src/app/components/calculators/number-base-converter/number-base-converter.spec.ts`
+or `src/app/components/utilities/pdf-page-utility/pdf-page-utility.spec.ts`.
+
+Treat a failing new test as a real question, not a nuisance: twice while building
+these, the test was wrong about the requirement rather than the code being broken,
+and the fix was to state the actual behavior (an auto-detected unit, a lossy
+round-trip tolerance) instead of loosening the assertion.
+
+---
+
+## Step 7 — Verify
+
+**Do not report the widget as done until both commands below have actually been run
+and exit 0.** Paste the test totals line (`Tests  <n> passed`) in the final report;
+the count should be higher than before by the number of tests you added.
 
 Run both, from `C:\workspace\utilities`:
 
@@ -221,19 +254,6 @@ before building on every push to `master`. Errors are never acceptable; check th
 
 The build log should say `Prerendered <n> static routes` with `n` one higher than before.
 
-**Write a spec whenever the widget has pure logic worth pinning** — parsers,
-numeric conversion, validation, financial math. Skip it only for a thin wrapper
-around a form. Test through the component's public API with `TestBed`; canvas and
-clipboard APIs don't exist in jsdom, so set state fields directly and assert on
-getters rather than driving the DOM. Tests run on vitest via
-`@angular/build:unit-test`; follow the style in
-`src/app/components/calculators/number-base-converter/number-base-converter.spec.ts`.
-
-Treat a failing new test as a real question, not a nuisance: twice while building
-these, the test was wrong about the requirement rather than the code being broken,
-and the fix was to state the actual behavior (an auto-detected unit, a lossy
-round-trip tolerance) instead of loosening the assertion.
-
 Then confirm manually with `npm start` and visit
 `http://localhost:4200/<param>`, checking both themes via the header toggle.
 
@@ -248,5 +268,6 @@ Then confirm manually with `npm start` and visit
 - [ ] Entry in `tools.ts` with a lazy `load`, keyed by the param
 - [ ] Tile in `categories.ts` with `param` matching the folder name and `tools.ts` key
 - [ ] Emoji doesn't collide with an existing utility
-- [ ] Spec added if the widget has non-trivial logic
-- [ ] `npm run deploy` and `npx ng test --watch=false` both pass with no new warnings
+- [ ] `<folder>.spec.ts` written, covering defaults, happy path, every error, and edge inputs
+- [ ] `npm run deploy` and `npx ng test --watch=false` both run and pass, with no new warnings
+- [ ] Final report quotes the test totals line

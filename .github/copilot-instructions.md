@@ -53,7 +53,7 @@ There is no lint script, and CI deliberately has no lint gate.
 ## Conventions
 
 - Adding a widget: use the `add-utility` skill in `.claude/skills/add-utility/`. It
-  covers the 3 files to create, the 2 files to edit, and the styling rules.
+  covers the 4 files to create (component + spec), the 2 files to edit, and the styling rules.
 - `standalone: true`, `ChangeDetectionStrategy.OnPush`, and `cdr.markForCheck()` after
   async work. New templates use `@if`/`@for`/`@switch`, never `*ngIf`/`*ngFor`.
 - Styles use theme tokens only — no raw hex except `#ffffff` on a `var(--brand)` button.
@@ -62,7 +62,7 @@ There is no lint script, and CI deliberately has no lint gate.
   platform APIs over new dependencies. `jspdf`, `pdf-lib`, `pdfjs-dist`, and `qrcode` are
   the available libraries for document and image work.
 - No section banner comments. Comments explain *why*, never label a region.
-- Specs for any widget with real logic (parsers, conversions, money math). Canvas and
+- Every widget has a spec; new widgets must ship with one. Canvas and
   clipboard APIs don't exist in jsdom, so set state directly and assert on getters.
   `src/app/accessibility.spec.ts` runs axe-core against the app.
 
