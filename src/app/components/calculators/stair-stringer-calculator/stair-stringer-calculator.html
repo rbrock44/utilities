@@ -1,0 +1,63 @@
+<section class="widget-container">
+  <h2>Stair Stringer Calculator</h2>
+  <p class="description">
+    Enter the total rise from finished floor to finished floor. All measurements are in inches.
+  </p>
+
+  <div class="inputs">
+    <label for="totalRiseInput">
+      Total Rise
+      <input id="totalRiseInput" type="number" min="0" step="0.0625" [(ngModel)]="totalRise" />
+    </label>
+
+    <label for="targetRiserInput">
+      Target Riser Height
+      <input id="targetRiserInput" type="number" min="0" step="0.0625" [(ngModel)]="targetRiser" />
+    </label>
+
+    <label for="treadDepthInput">
+      Tread Depth (Run)
+      <input id="treadDepthInput" type="number" min="0" step="0.0625" [(ngModel)]="treadDepth" />
+    </label>
+
+    <label for="treadThicknessInput">
+      Tread Thickness
+      <input id="treadThicknessInput" type="number" min="0" step="0.0625" [(ngModel)]="treadThickness" />
+    </label>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (layout; as layout) {
+    <div class="results" aria-live="polite">
+      <h3>Layout</h3>
+      <div class="result-row"><span>Risers</span><strong>{{ layout.risers }} × {{ formatInches(layout.riserHeight) }}</strong></div>
+      <div class="result-row"><span>Treads</span><strong>{{ layout.treads }} × {{ formatInches(treadDepth!) }}</strong></div>
+      <div class="result-row"><span>Total run</span><strong>{{ formatFeet(layout.totalRun) }}</strong></div>
+      <div class="result-row"><span>Stringer length</span><strong>{{ formatFeet(layout.stringerLength) }}</strong></div>
+      <div class="result-row">
+        <span>Board to buy</span>
+        <strong>{{ layout.boardLengthFt ? layout.boardLengthFt + ' ft 2×12' : 'Over 20 ft, splice or use LVL' }}</strong>
+      </div>
+      <div class="result-row"><span>Stair angle</span><strong>{{ formatDegrees(layout.angle) }}</strong></div>
+      <div class="result-row"><span>Cut bottom riser to</span><strong>{{ formatInches(layout.bottomRiserCut) }}</strong></div>
+
+      <p class="square-tip">
+        Framing square: set {{ formatInches(layout.riserHeight) }} on the tongue and
+        {{ formatInches(treadDepth!) }} on the blade, then step off {{ layout.treads }} times.
+      </p>
+
+      <ul class="checks">
+        @for (check of codeChecks; track check.label) {
+          <li [class.fail]="!check.pass">
+            <span aria-hidden="true">{{ check.pass ? '✓' : '✗' }}</span>
+            {{ check.label }}
+            <span class="visually-hidden">{{ check.pass ? 'passes' : 'fails' }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</section>

@@ -130,6 +130,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Lay a cut list out on stock boards with kerf',
                 icon: '🪚',
                 param: 'cut-list-optimizer'
+            },
+            {
+                title: 'Stair Stringer Calculator',
+                description: 'Stair risers, treads, stringer length, and angle with code checks',
+                icon: '🪜',
+                param: 'stair-stringer-calculator'
             }
         ]
     },

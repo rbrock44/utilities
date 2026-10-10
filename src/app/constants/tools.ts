@@ -162,6 +162,9 @@ export const TOOLS: Record<string, ToolDefinition> = {
     alias: 'clo',
     load: () => import('../components/calculators/cut-list-optimizer/cut-list-optimizer').then(m => m.CutListOptimizerComponent)
   },
+  'stair-stringer-calculator': {
+    load: () => import('../components/calculators/stair-stringer-calculator/stair-stringer-calculator').then(m => m.StairStringerCalculatorComponent)
+  },
   'cron-translator': {
     alias: 'crn',
     load: () => import('../components/utilities/cron-translator/cron-translator').then(m => m.CronTranslatorComponent)
