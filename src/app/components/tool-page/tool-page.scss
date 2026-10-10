@@ -6,6 +6,17 @@
   color: var(--text-soft);
 }
 
+.retry {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--brand);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .pin {
   display: inline-flex;
   align-items: center;

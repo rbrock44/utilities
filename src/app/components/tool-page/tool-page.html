@@ -18,6 +18,11 @@
   <div class="tool-main">
     @if (component(); as component) {
       <ng-container *ngComponentOutlet="component; inputs: inputs" />
+    } @else if (loadFailed()) {
+      <div class="tool-loading" role="alert">
+        <p>This tool couldn't load. Check your connection and try again.</p>
+        <button type="button" class="retry" (click)="retry()">Try again</button>
+      </div>
     } @else {
       <p class="tool-loading">Loading…</p>
     }
