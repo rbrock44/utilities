@@ -21,7 +21,8 @@ There is no lint script, and CI deliberately has no lint gate.
 - **Routes.** `src/app/app.routes.ts` builds one route per tool at `/<param>` from two
   sources: `src/app/constants/categories.ts` (the home-page catalog: `title`,
   `description`, `icon`, `param`) and `src/app/constants/tools.ts` (param → lazy `load`,
-  optional `inputs`, legacy `alias`, `unlisted`). `tools.spec.ts` fails if they drift.
+  optional `inputs`, `related`, legacy `alias`, `unlisted`). `tools.spec.ts` fails if they
+  drift.
 - **Prerendering.** `app.routes.server.ts` prerenders every route. `ToolPageComponent`
   loads the widget in `afterNextRender`, which never runs during prerendering, so widgets
   stay browser-only and can use `window`/canvas/storage freely. The static page carries
@@ -30,6 +31,12 @@ There is no lint script, and CI deliberately has no lint gate.
   tags, canonical (with trailing slash, the URL Pages actually serves), and robots from
   route data. Unlisted tools (`cleaning-payout-calculator`) get `noindex` and are left out
   of the sitemap.
+- **Related tools.** `ToolPageComponent` shows up to 4 related tools from
+  `relatedTools()` in `src/app/constants/tool-index.ts`: the hand-picked `related` params
+  from `tools.ts` first, then the tools after this one in its own category, wrapping
+  around. It's a sticky right column at 1280px and up and a card grid under the widget
+  below that. It's rendered in the page shell, so the prerendered pages carry the links.
+  `tools.spec.ts` requires every home-page tool to have at least 3.
 - **Legacy links.** Old `/?tile=<alias|param>` URLs redirect to `/<param>` through the
   `redirectLegacyTile` guard on the home route. Never remove an existing `alias`.
 - **History.** `App` slots a home entry under a deep-linked page so browser back and the

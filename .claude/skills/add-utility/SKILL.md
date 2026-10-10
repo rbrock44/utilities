@@ -163,12 +163,23 @@ Add an entry keyed by the param, with a lazy `load` so the widget stays its own 
 
 ```typescript
 'guid-generator': {
-  load: () => import('../components/utilities/guid-generator/guid-generator').then(m => m.GuidGeneratorComponent)
+  load: () => import('../components/utilities/guid-generator/guid-generator').then(m => m.GuidGeneratorComponent),
+  related: ['hex-generator', 'json-formatter', 'base64-converter']
 },
 ```
 
 - **No `alias`.** Aliases only exist so pre-routing `?tile=gg` links keep redirecting;
   a new tool never had one.
+- **Give it a `related` list.** It feeds the Related tools panel on the tool page (a side
+  column on wide screens, cards under the widget otherwise). `relatedTools()` in
+  `constants/tool-index.ts` takes these hand-picked params first, best first, then tops up
+  to 4 with the tools that follow this one in its own category. So pick the links its
+  category *can't* supply: the cross-category neighbors a user would want next
+  (inch fraction converter → stair stringer, precious metals → weight converter).
+  Two or three is plenty. `tools.spec.ts` fails if a param doesn't exist, points at the
+  tool itself, or leaves any home-page tool with fewer than 3 related tools.
+- **Link back.** Add the new tool to the `related` list of its one or two most natural
+  partners, or nothing will point to it until category fill happens to reach it.
 - If the widget takes inputs (like `unit-converter` does), pass them as `inputs`.
 - A tool that should be reachable by URL but hidden from the home page and sitemap gets
   `unlisted: { title, description }` and no tile.
@@ -265,7 +276,8 @@ Then confirm manually with `npm start` and visit
 - [ ] `OnPush` + `standalone: true`, `@if`/`@for` control flow, `markForCheck()` after async
 - [ ] Timers and object URLs cleaned up in `ngOnDestroy`
 - [ ] SCSS uses theme tokens only, has a mobile breakpoint, compiles under 4kB
-- [ ] Entry in `tools.ts` with a lazy `load`, keyed by the param
+- [ ] Entry in `tools.ts` with a lazy `load` and a `related` list, keyed by the param
+- [ ] New tool added to the `related` list of its closest partner tools
 - [ ] Tile in `categories.ts` with `param` matching the folder name and `tools.ts` key
 - [ ] Emoji doesn't collide with an existing utility
 - [ ] `<folder>.spec.ts` written, covering defaults, happy path, every error, and edge inputs
