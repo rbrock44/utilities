@@ -172,6 +172,12 @@ export const CATEGORIES: Category[] = [
                 icon: '🥈',
                 param: 'silver-in-coins'
             },
+            {
+                title: 'Coin Stack Value',
+                description: 'Total melt value of a mix of gold and silver coins at live spot prices',
+                icon: '🪙',
+                param: 'coin-stack-calculator'
+            },
         ]
     },
     {

@@ -1,0 +1,98 @@
+<section class="widget-container">
+  <h2>Coin Stack Value</h2>
+  <p class="description">
+    Add the gold and silver coins you have and see what the whole stack is worth at melt,
+    and what a dealer paying a percentage of melt would offer.
+  </p>
+
+  <div class="inputs">
+    <label for="spotGoldInput">
+      Gold spot ($/oz t)
+      <input id="spotGoldInput" type="number" min="0" step="1" [(ngModel)]="spotGold" />
+    </label>
+    <label for="spotSilverInput">
+      Silver spot ($/oz t)
+      <input id="spotSilverInput" type="number" min="0" step="0.01" [(ngModel)]="spotSilver" />
+    </label>
+    <label for="dealerInput">
+      Dealer pays (% of melt)
+      <input id="dealerInput" type="number" min="0" max="100" step="1" [(ngModel)]="dealerPercent" />
+    </label>
+  </div>
+
+  @if (loadingPrices) {
+    <p class="note">Loading live spot prices…</p>
+  } @else if (pricesFailed) {
+    <p class="note">Couldn't load live spot prices. Type them in above.</p>
+  }
+
+  <div class="picker">
+    <app-combo-box
+      [options]="comboOptions"
+      [value]="pickerValue"
+      placeholder="Add a coin: Morgan, Eagle, Maple Leaf…"
+      ariaLabel="Add a coin"
+      (valueChange)="addCoin($event)"
+    ></app-combo-box>
+  </div>
+
+  @if (rows.length === 0) {
+    <p class="empty">No coins yet. Search above to add one.</p>
+  } @else {
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Coin</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Pure</th>
+            <th scope="col">Melt</th>
+            <th scope="col"><span class="visually-hidden">Remove</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track row.coin.id) {
+            <tr>
+              <td>
+                <span class="metal" [class.gold]="row.coin.metal === 'gold'">{{ row.coin.metal === 'gold' ? 'Au' : 'Ag' }}</span>
+                {{ row.coin.label }}
+              </td>
+              <td>
+                <input
+                  class="qty"
+                  type="number"
+                  min="0"
+                  step="1"
+                  [attr.aria-label]="'Quantity of ' + row.coin.spec.name"
+                  [(ngModel)]="row.quantity"
+                />
+              </td>
+              <td>{{ toz(rowToz(row)) }}</td>
+              <td>{{ money(rowValue(row)) }}</td>
+              <td>
+                <button type="button" class="remove" [attr.aria-label]="'Remove ' + row.coin.spec.name" (click)="removeRow(row)">✕</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <div class="results" aria-live="polite">
+      <div class="headline">
+        <span>Melt value</span>
+        <span class="headline-value">{{ money(meltValue) }}</span>
+      </div>
+      <div class="result-row"><span>Dealer offer at {{ dealerPercent }}%</span><strong>{{ money(dealerValue) }}</strong></div>
+      <div class="result-row"><span>Coins</span><strong>{{ coinCount }}</strong></div>
+      <div class="result-row"><span>Pure gold</span><strong>{{ toz(goldToz) }}</strong></div>
+      <div class="result-row"><span>Pure silver</span><strong>{{ toz(silverToz) }}</strong></div>
+    </div>
+
+    <button type="button" class="btn-secondary" (click)="clear()">Clear stack</button>
+  }
+</section>
