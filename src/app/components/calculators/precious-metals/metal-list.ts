@@ -1,4 +1,4 @@
-import { goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_SILVER, goldTypes, silverTypes } from '../../../constants/constants';
 
 export type ListMetal = 'gold' | 'silver';
 
@@ -9,17 +9,30 @@ export interface MetalListItem {
   weight: number;
   unit: 'grams' | 'toz';
   note?: string;
+  /** Percent fine, only for custom silver. */
+  purity?: number;
 }
 
 function typesFor(metal: ListMetal): MetalType[] {
   return metal === 'gold' ? goldTypes : silverTypes;
 }
 
+function isPercent(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 && value <= 100;
+}
+
+function hasValidType(item: MetalListItem): boolean {
+  if (item.metal === 'silver' && item.type === CUSTOM_SILVER) {
+    return isPercent(item.purity);
+  }
+  return item.purity === undefined && typesFor(item.metal).some(type => type.name === item.type);
+}
+
 export function isMetalItem(value: unknown): value is MetalListItem {
   const item = value as MetalListItem;
   return (
     (item?.metal === 'gold' || item?.metal === 'silver') &&
-    typesFor(item.metal).some(type => type.name === item.type) &&
+    hasValidType(item) &&
     typeof item.weight === 'number' && Number.isFinite(item.weight) && item.weight > 0 &&
     (item.unit === 'grams' || item.unit === 'toz') &&
     (item.note === undefined || typeof item.note === 'string')
@@ -33,11 +46,13 @@ export function isMetalItems(value: unknown): value is MetalListItem[] {
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
- * `[g|s, type, weight, g|t, note?]` to keep links short.
+ * `[g|s, type, weight, g|t, note?]` to keep links short; a custom silver row puts its
+ * percent (a number) where the type name would be.
  */
 export function encodeMetalList(items: MetalListItem[]): string {
   const rows = items.map(item => {
-    const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', item.type, item.weight, item.unit === 'toz' ? 't' : 'g'];
+    const type = item.type === CUSTOM_SILVER ? item.purity! : item.type;
+    const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, item.unit === 'toz' ? 't' : 'g'];
     if (item.note) {
       row.push(item.note);
     }
@@ -71,7 +86,8 @@ export function decodeMetalList(text: string): { items: MetalListItem[]; skipped
     const [metal, type, weight, unit, note] = Array.isArray(row) ? row : [];
     const item: MetalListItem = {
       metal: metal === 'g' ? 'gold' : 'silver',
-      type,
+      type: typeof type === 'number' ? CUSTOM_SILVER : type,
+      ...(typeof type === 'number' ? { purity: type } : {}),
       weight,
       unit: unit === 't' ? 'toz' : 'grams',
       ...(typeof note === 'string' && note.trim() ? { note: note.trim() } : {}),

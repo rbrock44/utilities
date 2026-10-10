@@ -45,11 +45,13 @@
 
     <div class="rows-container">
       <div class="row" *ngFor="let row of goldRows">
-        <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select">
-          <option *ngFor="let type of goldMetalTypes" [value]="type.name">
-            {{ type.name }}
-          </option>
-        </select>
+        <span class="type-cell">
+          <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Gold type">
+            <option *ngFor="let type of goldMetalTypes" [value]="type.name">
+              {{ type.name }}
+            </option>
+          </select>
+        </span>
 
         <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
@@ -58,12 +60,22 @@
           <option value="toz">oz t</option>
         </select>
 
-        <button class="remove-btn" (click)="removeGoldRow(row.id)">
+        @if (hasNote(row)) {
+        <span></span>
+        } @else {
+        <button class="note-toggle" [class.open]="isNoteOpen(row)" (click)="toggleNote(row)"
+          [attr.aria-expanded]="isNoteOpen(row)" [attr.aria-label]="isNoteOpen(row) ? 'Hide note' : 'Add a note'"
+          [title]="isNoteOpen(row) ? 'Hide note' : 'Add a note'">✎</button>
+        }
+
+        <button class="remove-btn" (click)="removeGoldRow(row.id)" aria-label="Remove row">
           ×
         </button>
 
+        @if (isNoteOpen(row) || hasNote(row)) {
         <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
-          placeholder="Note (optional), e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+        }
       </div>
     </div>
 
@@ -81,11 +93,20 @@
 
     <div class="rows-container">
       <div class="row" *ngFor="let row of silverRows">
-        <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select">
-          <option *ngFor="let type of silverMetalTypes" [value]="type.name">
-            {{ type.name }}
-          </option>
-        </select>
+        <span class="type-cell">
+          <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Silver type">
+            <option *ngFor="let type of silverMetalTypes" [value]="type.name">
+              {{ type.name }}
+            </option>
+            <option [value]="customSilver">Custom %…</option>
+          </select>
+          @if (row.type === customSilver) {
+          <span class="purity-wrap">
+            <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
+              min="1" max="100" step="0.1" placeholder="70" aria-label="Silver percent">%
+          </span>
+          }
+        </span>
 
         <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
@@ -94,12 +115,22 @@
           <option value="toz">oz t</option>
         </select>
 
-        <button class="remove-btn" (click)="removeSilverRow(row.id)">
+        @if (hasNote(row)) {
+        <span></span>
+        } @else {
+        <button class="note-toggle" [class.open]="isNoteOpen(row)" (click)="toggleNote(row)"
+          [attr.aria-expanded]="isNoteOpen(row)" [attr.aria-label]="isNoteOpen(row) ? 'Hide note' : 'Add a note'"
+          [title]="isNoteOpen(row) ? 'Hide note' : 'Add a note'">✎</button>
+        }
+
+        <button class="remove-btn" (click)="removeSilverRow(row.id)" aria-label="Remove row">
           ×
         </button>
 
+        @if (isNoteOpen(row) || hasNote(row)) {
         <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
-          placeholder="Note (optional), e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+        }
       </div>
     </div>
 

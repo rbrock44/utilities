@@ -39,6 +39,26 @@ describe('metal list links', () => {
   });
 });
 
+describe('custom silver in links', () => {
+  const odd: MetalListItem = { metal: 'silver', type: 'Custom %', purity: 70, weight: 20, unit: 'grams', note: 'old bracelet' };
+
+  it('should round-trip a custom percent as a number in the type slot', () => {
+    const encoded = encodeMetalList([odd]);
+    const raw = JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')));
+
+    expect(raw).toEqual([['s', 70, 20, 'g', 'old bracelet']]);
+    expect(decodeMetalList(encoded).items).toEqual([odd]);
+  });
+
+  it('should reject custom percents out of range and custom gold', () => {
+    const tampered = btoa(JSON.stringify([['s', 0, 1, 'g'], ['s', 101, 1, 'g'], ['g', 70, 1, 'g'], ['s', 60, 1, 'g']]));
+    expect(decodeMetalList(tampered)).toEqual({
+      items: [{ metal: 'silver', type: 'Custom %', purity: 60, weight: 1, unit: 'grams' }],
+      skipped: 3,
+    });
+  });
+});
+
 describe('isMetalItems', () => {
   it('should accept valid saved lists and reject anything else', () => {
     expect(isMetalItems([ring, bar])).toBe(true);
@@ -47,5 +67,8 @@ describe('isMetalItems', () => {
     expect(isMetalItems([{ ...ring, weight: 0 }])).toBe(false);
     expect(isMetalItems([{ ...ring, note: 5 }])).toBe(false);
     expect(isMetalItems('nope')).toBe(false);
+    expect(isMetalItems([{ ...bar, type: 'Custom %', purity: 65 }])).toBe(true);
+    expect(isMetalItems([{ ...bar, type: 'Custom %' }])).toBe(false);
+    expect(isMetalItems([{ ...bar, purity: 65 }])).toBe(false);
   });
 });

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
-import { emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_SILVER, emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
@@ -63,6 +63,10 @@ export class PreciousMetalsComponent implements OnInit {
   offerPercent: number | null = null;
   private offerSource: 'amount' | 'percent' = 'amount';
 
+  readonly customSilver = CUSTOM_SILVER;
+  /** Rows whose empty note box is expanded; a note with text always shows. */
+  private openNotes = new Set<MetalRow>();
+
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
 
@@ -87,6 +91,22 @@ export class PreciousMetalsComponent implements OnInit {
     this.loadSpotPrices();
   }
 
+  hasNote(row: MetalRow): boolean {
+    return !!row.note?.trim();
+  }
+
+  isNoteOpen(row: MetalRow): boolean {
+    return this.openNotes.has(row);
+  }
+
+  toggleNote(row: MetalRow) {
+    if (this.openNotes.has(row)) {
+      this.openNotes.delete(row);
+    } else {
+      this.openNotes.add(row);
+    }
+  }
+
   /** Every row with a weight, in on-screen order: gold first, then silver. */
   get items(): MetalListItem[] {
     const toItems = (metal: 'gold' | 'silver', rows: MetalRow[]) => rows
@@ -97,6 +117,7 @@ export class PreciousMetalsComponent implements OnInit {
         weight: row.weight,
         unit: row.unit,
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
+        ...(row.type === CUSTOM_SILVER ? { purity: row.purity } : {}),
       }));
     return [...toItems('gold', this.goldRows), ...toItems('silver', this.silverRows)];
   }
@@ -136,7 +157,14 @@ export class PreciousMetalsComponent implements OnInit {
     const toRows = (metal: 'gold' | 'silver', nextId: () => number, defaultType: string): MetalRow[] => {
       const rows = items
         .filter(item => item.metal === metal)
-        .map(item => ({ id: nextId(), type: item.type, weight: item.weight, unit: item.unit, note: item.note ?? '' }));
+        .map(item => ({
+          id: nextId(),
+          type: item.type,
+          weight: item.weight,
+          unit: item.unit,
+          note: item.note ?? '',
+          ...(item.purity !== undefined ? { purity: item.purity } : {}),
+        }));
       return rows.length > 0 ? rows : [{ id: nextId(), type: defaultType, weight: 0, unit: 'grams' }];
     };
 

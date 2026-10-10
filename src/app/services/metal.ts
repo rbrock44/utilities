@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+import { CUSTOM_SILVER, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,7 @@ export class MetalService {
     rows.forEach(row => {
       if (row.weight <= 0) return;
 
-      const metalType = types.find(t => t.name === row.type);
+      const metalType = this.typeFor(row, types);
       if (!metalType) return;
 
       const weightGrams = row.unit === 'grams' ? row.weight : row.weight * TROY_OZ_IN_GRAMS;
@@ -35,7 +35,7 @@ export class MetalService {
       const value70 = spotValue * 0.7;
 
       breakdowns.push({
-        type: row.type,
+        type: metalType.name,
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
         weightGrams,
         weightToz,
@@ -68,5 +68,16 @@ export class MetalService {
       breakdowns: breakdowns,
       totals: totals
     }
+  }
+
+  /** A custom silver row becomes a one-off type named after its percent, e.g. "Silver 70%". */
+  private typeFor(row: MetalRow, types: MetalType[]): MetalType | undefined {
+    if (row.type === CUSTOM_SILVER && types === silverTypes) {
+      const percent = row.purity;
+      return percent !== undefined && Number.isFinite(percent) && percent > 0 && percent <= 100
+        ? { name: `Silver ${percent}%`, purity: percent / 100 }
+        : undefined;
+    }
+    return types.find(t => t.name === row.type);
   }
 }

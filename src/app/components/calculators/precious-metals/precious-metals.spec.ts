@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
@@ -251,5 +252,52 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     component.loadList(component.savedLists.lists()[0]);
     expect(component.items).toEqual([ring]);
     expect(component.describeList(component.savedLists.lists()[0].items)).toBe('1 piece');
+  });
+
+  it('should keep empty notes collapsed until toggled, and always show a note with text', async () => {
+    await setup();
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+
+    expect(el().querySelectorAll('.note-input').length).toBe(0);
+    expect(el().querySelectorAll('.note-toggle').length).toBe(2);
+
+    (el().querySelector('.note-toggle') as HTMLButtonElement).click();
+    render();
+    expect(el().querySelectorAll('.note-input').length).toBe(1);
+    expect(el().querySelector('.note-toggle')?.getAttribute('aria-expanded')).toBe('true');
+
+    component.toggleNote(component.goldRows[0]);
+    component.silverRows[0].note = 'spoon set';
+    render();
+    expect(el().querySelectorAll('.note-input').length).toBe(1);
+    expect(component.isNoteOpen(component.silverRows[0])).toBe(false);
+    expect(el().querySelectorAll('.note-toggle').length).toBe(1);
+  });
+
+  it('should show notes expanded on rows loaded from a shared link', async () => {
+    await setup({ metals: encodeMetalList([ring, bar]) });
+    const inputs = (fixture.nativeElement as HTMLElement).querySelectorAll('.note-input');
+
+    expect(inputs.length).toBe(1);
+    expect(component.hasNote(component.goldRows[0])).toBe(true);
+  });
+
+  it('should take a custom silver percent and carry it through save and share', async () => {
+    await setup();
+    Object.assign(component.silverRows[0], { type: 'Custom %', purity: 70, weight: 31.1035, unit: 'grams' });
+    component.calculate();
+    fixture.componentRef.changeDetectorRef.markForCheck();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('.purity-input')).toBeTruthy();
+    expect(component.silverBreakdowns[0].type).toBe('Silver 70%');
+    expect(component.silverTotals.spotValue).toBeCloseTo(0.7 * 25, 4);
+
+    const item = component.items.find(i => i.metal === 'silver')!;
+    expect(item).toEqual({ metal: 'silver', type: 'Custom %', purity: 70, weight: 31.1035, unit: 'grams' });
+
+    component.loadList({ name: 'x', savedAt: '', items: [item] });
+    expect(component.silverRows[0].purity).toBe(70);
   });
 });

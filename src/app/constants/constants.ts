@@ -6,6 +6,9 @@ export const goldTypes: MetalType[] = [
     { name: '10K Gold (41.7%)', purity: 0.417 }
 ];
 
+/** Silver pieces come in odd finenesses (60%, 70%…), so a row can take its own percent. */
+export const CUSTOM_SILVER = 'Custom %';
+
 export const silverTypes: MetalType[] = [
     { name: 'Fine Silver (99.9%)', purity: 0.999 },
     { name: 'Sterling Silver (92.5%)', purity: 0.925 },
