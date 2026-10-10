@@ -60,6 +60,13 @@
     color: var(--text);
   }
 
+  .row-note {
+    display: block;
+    color: var(--text-soft);
+    font-size: 0.8em;
+    font-weight: 400;
+  }
+
   .highlight-col {
     font-weight: 700;
     color: var(--brand);

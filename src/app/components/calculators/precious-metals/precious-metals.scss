@@ -202,6 +202,22 @@
   color: var(--text);
 }
 
+.note-input {
+  grid-column: 1 / 4;
+  padding: 0.3rem 0.4rem;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--text);
+}
+
+.link-notice {
+  margin: 0.5rem 0;
+  color: var(--success-deep);
+  font-weight: 600;
+}
+
 .unit-select {
   padding: 0.3rem 0.2rem;
   border: 1px solid var(--border);

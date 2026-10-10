@@ -3,4 +3,5 @@ interface MetalRow {
   type: string;
   weight: number;
   unit: 'grams' | 'toz';
+  note?: string;
 }

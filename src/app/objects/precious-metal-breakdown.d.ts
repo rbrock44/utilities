@@ -1,5 +1,6 @@
 interface PreciousMetalBreakdown {
   type: string;
+  note?: string;
   weightGrams: number;
   weightToz: number;
   pureWeightGrams: number;

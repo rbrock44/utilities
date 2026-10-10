@@ -61,6 +61,9 @@
         <button class="remove-btn" (click)="removeGoldRow(row.id)">
           ×
         </button>
+
+        <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+          placeholder="Note (optional), e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
       </div>
     </div>
 
@@ -94,6 +97,9 @@
         <button class="remove-btn" (click)="removeSilverRow(row.id)">
           ×
         </button>
+
+        <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+          placeholder="Note (optional), e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
       </div>
     </div>
 
@@ -101,6 +107,10 @@
       totalsTitle="Silver Totals" totalsClass="silver-totals">
     </app-precious-metal-breakdown>
   </div>
+
+  @if (linkNotice) {
+  <p class="link-notice" role="status">{{ linkNotice }}</p>
+  }
 
   <!-- GRAND TOTALS -->
   @if (grandTotals.spotValue > 0) {
@@ -153,4 +163,17 @@
     }
   </div>
   }
+
+  <app-save-share
+    [store]="savedLists"
+    [items]="itemsOrNull"
+    [shareValue]="shareValue"
+    shareParam="metals"
+    [describe]="describeList"
+    noun="list"
+    nameLabel="List name"
+    placeholder="e.g. Smith estate, Oct 10"
+    [(name)]="listName"
+    (loadList)="loadList($event)"
+  ></app-save-share>
 </div>

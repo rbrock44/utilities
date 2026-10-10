@@ -36,6 +36,7 @@ export class MetalService {
 
       breakdowns.push({
         type: row.type,
+        ...(row.note?.trim() ? { note: row.note.trim() } : {}),
         weightGrams,
         weightToz,
         pureWeightGrams,

@@ -12,7 +12,12 @@
     </div>
 
     <div class="breakdown-table-row" *ngFor="let item of breakdowns">
-      <span class="row-label">{{ item.type }}</span>
+      <span class="row-label">
+        {{ item.type }}
+        @if (item.note) {
+          <span class="row-note">{{ item.note }}</span>
+        }
+      </span>
       <span>{{ item.weightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
       <span>{{ item.pureWeightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
       <span class="highlight-col">${{ item.spotValue.toFixed(2) }}</span>

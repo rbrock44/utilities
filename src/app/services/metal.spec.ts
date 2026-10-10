@@ -31,6 +31,18 @@ describe('MetalService', () => {
     expect(result.totals.spotValue).toBeCloseTo(0.999 * 2000, 5);
   });
 
+  it('should carry a trimmed note into the breakdown and leave blank notes out', () => {
+    const rows: MetalRow[] = [
+      { id: 1, type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: '  nugget ring ' },
+      { id: 2, type: '10K Gold (41.7%)', weight: 3, unit: 'grams', note: '   ' },
+    ];
+
+    const result = service.calculateGoldPrice(spotPrices, rows);
+
+    expect(result.breakdowns[0].note).toBe('nugget ring');
+    expect('note' in result.breakdowns[1]).toBe(false);
+  });
+
   it('should convert grams to troy ounces', () => {
     const rows: MetalRow[] = [
       { id: 1, type: 'Fine Silver (99.9%)', weight: TROY_OZ_IN_GRAMS, unit: 'grams' }
