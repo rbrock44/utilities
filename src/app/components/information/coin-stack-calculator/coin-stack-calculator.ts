@@ -6,9 +6,21 @@ import { ComboBoxComponent } from '../../combo-box/combo-box';
 import { GOLD_COIN_DATABASE, SILVER_COIN_DATABASE } from '../../../constants/coins';
 import { TROY_OZ_IN_GRAMS } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
-import { CoinStacksService, SavedStack, StackItem } from '../../../services/coin-stacks';
+import { SavedList, SavedListStore } from '../../../services/saved-lists';
+import { SaveShareComponent } from '../../save-share/save-share';
 
 export type Metal = 'gold' | 'silver';
+
+export interface StackItem {
+  id: string;
+  quantity: number;
+}
+
+function isStackItems(value: unknown): value is StackItem[] {
+  return Array.isArray(value) && value.every(
+    item => typeof item?.id === 'string' && Number.isInteger(item.quantity)
+  );
+}
 
 export interface CoinOption {
   id: string;
@@ -81,7 +93,7 @@ export function pureTozPerCoin(spec: CoinSpec): number {
 @Component({
   selector: 'app-coin-stack-calculator',
   standalone: true,
-  imports: [CommonModule, FormsModule, ComboBoxComponent],
+  imports: [CommonModule, FormsModule, ComboBoxComponent, SaveShareComponent],
   templateUrl: './coin-stack-calculator.html',
   styleUrl: './coin-stack-calculator.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,11 +107,12 @@ export class CoinStackCalculatorComponent implements OnInit {
   pricesFailed = false;
   pickerValue: string | null = null;
   stackName = '';
-  notice: string | null = null;
-  justCopied = false;
-  private copiedTimeout: ReturnType<typeof setTimeout> | null = null;
+  /** Set when a shared link is opened, to say what was loaded from it. */
+  linkNotice: string | null = null;
 
-  readonly savedStacks = inject(CoinStacksService);
+  readonly savedStacks = new SavedListStore<StackItem[]>('utilities-coin-stacks', isStackItems);
+  readonly describeStack = (items: StackItem[]) =>
+    `${items.reduce((sum, item) => sum + item.quantity, 0)} coins`;
   private readonly route = inject(ActivatedRoute, { optional: true });
 
   readonly comboOptions: ComboBoxOption[] = COIN_OPTIONS.map(coin => ({
@@ -158,60 +171,21 @@ export class CoinStackCalculatorComponent implements OnInit {
       .map(row => ({ id: row.coin.id, quantity: row.quantity! }));
   }
 
-  get canSave(): boolean {
-    return this.stackName.trim() !== '' && this.items.length > 0;
+  /** Null until there's at least one coin, which disables Save and the share link. */
+  get itemsOrNull(): StackItem[] | null {
+    const items = this.items;
+    return items.length > 0 ? items : null;
   }
 
-  get shareLink(): string {
-    const params = new URLSearchParams({ stack: encodeStack(this.items) });
-    if (this.stackName.trim()) {
-      params.set('name', this.stackName.trim());
-    }
-    return `${location.origin}${location.pathname}?${params.toString()}`;
+  get shareValue(): string | null {
+    const items = this.items;
+    return items.length > 0 ? encodeStack(items) : null;
   }
 
-  saveStack(): void {
-    if (!this.canSave) {
-      return;
-    }
-    const name = this.stackName.trim();
-    this.savedStacks.save(name, this.items);
-    this.notice = `Saved “${name}” in this browser.`;
+  loadStack(list: SavedList<StackItem[]>): void {
+    this.applyItems(list.items);
+    this.linkNotice = null;
     this.cdr.markForCheck();
-  }
-
-  loadStack(stack: SavedStack): void {
-    this.applyItems(stack.items);
-    this.stackName = stack.name;
-    this.notice = `Loaded “${stack.name}”.`;
-    this.cdr.markForCheck();
-  }
-
-  deleteStack(stack: SavedStack): void {
-    this.savedStacks.remove(stack.name);
-    this.notice = `Deleted “${stack.name}”.`;
-    this.cdr.markForCheck();
-  }
-
-  async copyShareLink(): Promise<void> {
-    if (this.items.length === 0) {
-      return;
-    }
-    await navigator.clipboard.writeText(this.shareLink);
-
-    this.justCopied = true;
-    this.cdr.markForCheck();
-    if (this.copiedTimeout) {
-      clearTimeout(this.copiedTimeout);
-    }
-    this.copiedTimeout = setTimeout(() => {
-      this.justCopied = false;
-      this.cdr.markForCheck();
-    }, 2000);
-  }
-
-  savedCoinCount(stack: SavedStack): number {
-    return stack.items.reduce((sum, item) => sum + item.quantity, 0);
   }
 
   removeRow(row: StackRow): void {
@@ -291,7 +265,7 @@ export class CoinStackCalculatorComponent implements OnInit {
     this.stackName = params?.get('name') ?? '';
     const loaded = `Loaded a shared stack of ${items.length} coin type${items.length === 1 ? '' : 's'}.`;
     const unread = skipped === 1 ? '1 entry in the link wasn\'t' : `${skipped} entries in the link weren't`;
-    this.notice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
+    this.linkNotice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
   }
 
   private applyItems(items: StackItem[]): void {

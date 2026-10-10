@@ -36,24 +36,8 @@
     ></app-combo-box>
   </div>
 
-  @if (notice) {
-    <p class="notice" role="status">{{ notice }}</p>
-  }
-
-  @if (savedStacks.stacks().length > 0) {
-    <div class="saved">
-      <h3>Saved stacks</h3>
-      <ul>
-        @for (stack of savedStacks.stacks(); track stack.name) {
-          <li>
-            <span class="saved-name">{{ stack.name }}</span>
-            <span class="saved-meta">{{ savedCoinCount(stack) }} coins</span>
-            <button type="button" class="link-btn" [attr.aria-label]="'Load ' + stack.name" (click)="loadStack(stack)">Load</button>
-            <button type="button" class="link-btn danger" [attr.aria-label]="'Delete ' + stack.name" (click)="deleteStack(stack)">Delete</button>
-          </li>
-        }
-      </ul>
-    </div>
+  @if (linkNotice) {
+    <p class="notice" role="status">{{ linkNotice }}</p>
   }
 
   @if (rows.length === 0) {
@@ -113,19 +97,19 @@
       <div class="result-row"><span>Pure silver</span><strong>{{ toz(silverToz) }}</strong></div>
     </div>
 
-    <div class="share">
-      <label for="stackNameInput">
-        Stack name
-        <input id="stackNameInput" type="text" placeholder="e.g. Grandpa's coins" [(ngModel)]="stackName" />
-      </label>
-      <div class="share-actions">
-        <button type="button" class="btn-primary" [disabled]="!canSave" (click)="saveStack()">Save</button>
-        <button type="button" class="btn-secondary" [disabled]="items.length === 0" (click)="copyShareLink()">
-          {{ justCopied ? 'Link copied!' : 'Copy share link' }}
-        </button>
-        <button type="button" class="btn-secondary" (click)="clear()">Clear stack</button>
-      </div>
-      <p class="hint">Saved stacks stay in this browser. A share link works anywhere and can be bookmarked.</p>
-    </div>
+    <button type="button" class="btn-secondary" (click)="clear()">Clear stack</button>
   }
+
+  <app-save-share
+    [store]="savedStacks"
+    [items]="itemsOrNull"
+    [shareValue]="shareValue"
+    shareParam="stack"
+    [describe]="describeStack"
+    noun="stack"
+    nameLabel="Stack name"
+    placeholder="e.g. Grandpa's coins"
+    [(name)]="stackName"
+    (loadList)="loadStack($event)"
+  ></app-save-share>
 </section>

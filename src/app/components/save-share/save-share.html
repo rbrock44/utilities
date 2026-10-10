@@ -1,0 +1,39 @@
+<div class="save-share">
+  <label for="saveShareName">
+    {{ nameLabel() }}
+    <input
+      id="saveShareName"
+      type="text"
+      autocomplete="off"
+      [placeholder]="placeholder()"
+      [ngModel]="name()"
+      (ngModelChange)="name.set($event)"
+    />
+  </label>
+
+  <div class="actions">
+    <button type="button" class="btn-primary" [disabled]="!canSave()" (click)="save()">Save</button>
+    <button type="button" class="btn-secondary" [disabled]="!canShare()" (click)="copyLink()">
+      {{ justCopied() ? 'Link copied!' : 'Copy share link' }}
+    </button>
+  </div>
+  <p class="hint">Saved {{ noun() }}s stay in this browser. A share link works anywhere and can be bookmarked.</p>
+
+  @if (notice()) {
+    <p class="notice" role="status">{{ notice() }}</p>
+  }
+
+  @if (store().lists().length > 0) {
+    <h3>Saved {{ noun() }}s</h3>
+    <ul>
+      @for (list of store().lists(); track list.name) {
+        <li>
+          <span class="list-name">{{ list.name }}</span>
+          <span class="meta">{{ describe()(list.items) }}</span>
+          <button type="button" class="link-btn" [attr.aria-label]="'Load ' + list.name" (click)="load(list)">Load</button>
+          <button type="button" class="link-btn danger" [attr.aria-label]="'Delete ' + list.name" (click)="remove(list)">Delete</button>
+        </li>
+      }
+    </ul>
+  }
+</div>

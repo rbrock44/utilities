@@ -1,0 +1,112 @@
+.save-share {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #ffffff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.hint,
+.meta {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+}
+
+.notice {
+  margin: 0.75rem 0 0;
+  color: var(--success-deep);
+  font-weight: 600;
+}
+
+h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-btn.danger {
+  color: var(--error-text);
+}
+
+@media (max-width: 480px) {
+  .actions > button {
+    width: 100%;
+  }
+}

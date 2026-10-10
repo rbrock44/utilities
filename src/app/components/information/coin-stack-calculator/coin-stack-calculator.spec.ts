@@ -10,7 +10,6 @@ import {
   pureTozPerCoin,
 } from './coin-stack-calculator';
 import { SpotPriceService } from '../../../services/spot-price';
-import { CoinStacksService } from '../../../services/coin-stacks';
 
 const morganId = COIN_OPTIONS.find(c => c.spec.name === 'Morgan Dollar')!.id;
 const eagleId = COIN_OPTIONS.find(c => c.spec.name === 'American Gold Eagle')!.id;
@@ -185,30 +184,14 @@ describe('CoinStackCalculatorComponent', () => {
 
     expect(component.rows.map(r => [r.coin.id, r.quantity])).toEqual([[morganId, 10], [eagleId, 1]]);
     expect(component.stackName).toBe('Grandpa');
-    expect(component.notice).toBe('Loaded a shared stack of 2 coin types.');
+    expect(component.linkNotice).toBe('Loaded a shared stack of 2 coin types.');
   });
 
   it('should say how much of a shared link it could not read', async () => {
     await setup(2000, 30, { stack: `${morganId}~1_gold-gone~2` });
 
     expect(component.rows.length).toBe(1);
-    expect(component.notice).toBe('Loaded a shared stack of 1 coin type. 1 entry in the link wasn\'t recognized.');
-  });
-
-  it('should copy a share link that loads the same stack', async () => {
-    await setup(2000, 30);
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
-    component.addCoin(morganId);
-    component.rows[0].quantity = 4;
-    component.stackName = 'Dimes & more';
-
-    await component.copyShareLink();
-
-    const url = new URL(writeText.mock.calls[0][0]);
-    expect(url.searchParams.get('stack')).toBe(`${morganId}~4`);
-    expect(url.searchParams.get('name')).toBe('Dimes & more');
-    expect(component.justCopied).toBe(true);
+    expect(component.linkNotice).toBe('Loaded a shared stack of 1 coin type. 1 entry in the link wasn\'t recognized.');
   });
 
   it('should leave zero-quantity rows out of links and saves', async () => {
@@ -218,41 +201,50 @@ describe('CoinStackCalculatorComponent', () => {
     component.rows[1].quantity = 0;
 
     expect(component.items).toEqual([{ id: morganId, quantity: 1 }]);
+    expect(component.shareValue).toBe(`${morganId}~1`);
   });
 
-  it('should need a name and at least one coin to save', async () => {
+  it('should have nothing to save or share until a coin is added', async () => {
     await setup(2000, 30);
-    expect(component.canSave).toBe(false);
+    expect(component.itemsOrNull).toBeNull();
+    expect(component.shareValue).toBeNull();
 
     component.addCoin(morganId);
-    expect(component.canSave).toBe(false);
-
-    component.stackName = '  ';
-    expect(component.canSave).toBe(false);
-
-    component.stackName = 'Mine';
-    expect(component.canSave).toBe(true);
+    expect(component.itemsOrNull).toEqual([{ id: morganId, quantity: 1 }]);
   });
 
-  it('should save, reload, and delete a named stack', async () => {
+  it('should save, reload, and delete a stack through the panel', async () => {
     await setup(2000, 30);
-    const stacks = TestBed.inject(CoinStacksService);
     component.addCoin(morganId);
     component.rows[0].quantity = 7;
     component.stackName = 'Morgans';
+    fixture.detectChanges();
 
-    component.saveStack();
-    expect(stacks.stacks().map(s => s.name)).toEqual(['Morgans']);
+    const panel = () => fixture.nativeElement as HTMLElement;
+    const click = (label: string) => {
+      const button = Array.from(panel().querySelectorAll('app-save-share button'))
+        .find(b => b.textContent?.trim() === label || b.getAttribute('aria-label') === label) as HTMLButtonElement;
+      button.click();
+      fixture.detectChanges();
+    };
+
+    click('Save');
+    expect(component.savedStacks.lists().map(l => l.name)).toEqual(['Morgans']);
     expect(JSON.parse(store['utilities-coin-stacks'])[0].items).toEqual([{ id: morganId, quantity: 7 }]);
+    expect(panel().textContent).toContain('7 coins');
 
     component.clear();
-    component.stackName = '';
-    component.loadStack(stacks.stacks()[0]);
+    const nameInput = panel().querySelector('#saveShareName') as HTMLInputElement;
+    nameInput.value = 'Something else';
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(component.stackName).toBe('Something else');
+
+    click('Load Morgans');
     expect(component.rows.map(r => r.quantity)).toEqual([7]);
     expect(component.stackName).toBe('Morgans');
 
-    component.deleteStack(stacks.stacks()[0]);
-    expect(stacks.stacks()).toEqual([]);
-    expect(component.notice).toBe('Deleted “Morgans”.');
+    click('Delete Morgans');
+    expect(component.savedStacks.lists()).toEqual([]);
   });
 });
