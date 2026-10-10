@@ -1,0 +1,144 @@
+.widget-container {
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.description {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
+}
+
+code {
+  padding: 0 0.25rem;
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+.inputs {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.inputs .grow {
+  flex: 1;
+  min-width: 220px;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: var(--error-text);
+  font-weight: 600;
+}
+
+.results {
+  margin-top: 1rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 10px;
+  background: var(--brand-soft);
+  padding: 0.8rem;
+  color: var(--text);
+}
+
+.headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.headline-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--brand-soft-text);
+}
+
+.note {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.result-row + .result-row {
+  margin-top: 0.4rem;
+}
+
+.result-row strong {
+  color: var(--brand-soft-text);
+}
+
+.chart {
+  margin-top: 1rem;
+  color: var(--text);
+}
+
+.chart summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  padding: 0.35rem 0.6rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+th {
+  color: var(--text-soft);
+}
+
+@media (max-width: 480px) {
+  .widget-container {
+    margin: 0.5rem;
+    padding: 0.75rem;
+  }
+}

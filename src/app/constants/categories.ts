@@ -60,6 +60,12 @@ export const CATEGORIES: Category[] = [
                 description: 'Convert between binary, octal, decimal, and hexadecimal',
                 icon: '🧮',
                 param: 'number-base-converter'
+            },
+            {
+                title: 'Inch Fraction Converter',
+                description: 'Convert inch fractions, decimals, and mm, and add or subtract tape measurements',
+                icon: '➗',
+                param: 'inch-fraction-converter'
             }
         ]
     },

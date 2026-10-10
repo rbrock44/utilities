@@ -1,0 +1,72 @@
+<section class="widget-container">
+  <h2>Inch Fraction Converter</h2>
+  <p class="description">
+    Convert tape-measure fractions, decimal inches, and millimeters, or add and subtract
+    measurements like <code>3 5/8 + 1 3/16 - 1/2</code>. Feet work too: <code>5' 3 1/2"</code>.
+  </p>
+
+  <div class="inputs">
+    <label for="lengthInput" class="grow">
+      Measurement
+      <input
+        id="lengthInput"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        [(ngModel)]="input"
+      />
+    </label>
+
+    <label for="precisionInput">
+      Round to
+      <select id="precisionInput" [(ngModel)]="precision">
+        @for (option of precisions; track option) {
+          <option [ngValue]="option">1/{{ option }}″</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (fraction) {
+    <div class="results" aria-live="polite">
+      <div class="headline">
+        <span class="headline-value">{{ fractionLabel }}</span>
+        @if (roundingNote) {
+          <span class="note">{{ roundingNote }}</span>
+        }
+      </div>
+      <div class="result-row"><span>Decimal inches</span><strong>{{ decimalLabel }}</strong></div>
+      @if (feetLabel) {
+        <div class="result-row"><span>Feet and inches</span><strong>{{ feetLabel }}</strong></div>
+      }
+      <div class="result-row"><span>Millimeters</span><strong>{{ mmLabel }}</strong></div>
+      <div class="result-row"><span>Centimeters</span><strong>{{ cmLabel }}</strong></div>
+    </div>
+  }
+
+  <details class="chart">
+    <summary>Sixteenths chart</summary>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Fraction</th>
+          <th scope="col">Decimal</th>
+          <th scope="col">mm</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of chart; track row.decimal) {
+          <tr>
+            <td>{{ row.fraction }}</td>
+            <td>{{ row.decimal }}</td>
+            <td>{{ row.mm }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </details>
+</section>
