@@ -259,20 +259,32 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     const el = () => fixture.nativeElement as HTMLElement;
     const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
 
-    expect(el().querySelectorAll('.note-input').length).toBe(0);
-    expect(el().querySelectorAll('.note-toggle').length).toBe(2);
+    const toggles = () => el().querySelectorAll<HTMLButtonElement>('.note-toggle');
 
-    (el().querySelector('.note-toggle') as HTMLButtonElement).click();
+    expect(el().querySelectorAll('.note-input').length).toBe(0);
+    expect(toggles().length).toBe(2);
+    expect(toggles()[0].textContent!.trim()).toBe('+ note');
+
+    toggles()[0].click();
     render();
     expect(el().querySelectorAll('.note-input').length).toBe(1);
-    expect(el().querySelector('.note-toggle')?.getAttribute('aria-expanded')).toBe('true');
+    expect(toggles()[0].getAttribute('aria-expanded')).toBe('true');
+    expect(toggles()[0].textContent!.trim()).toBe('− note');
 
-    component.toggleNote(component.goldRows[0]);
+    toggles()[0].click();
+    render();
+    expect(el().querySelectorAll('.note-input').length).toBe(0);
+
     component.silverRows[0].note = 'spoon set';
     render();
     expect(el().querySelectorAll('.note-input').length).toBe(1);
-    expect(component.isNoteOpen(component.silverRows[0])).toBe(false);
-    expect(el().querySelectorAll('.note-toggle').length).toBe(1);
+    expect(toggles().length).toBe(2);
+    expect(toggles()[1].disabled).toBe(true);
+    expect(toggles()[1].title).toBe('Clear the note to hide it');
+
+    component.toggleNote(component.silverRows[0]);
+    render();
+    expect(el().querySelectorAll('.note-input').length).toBe(1);
   });
 
   it('should show notes expanded on rows loaded from a shared link', async () => {

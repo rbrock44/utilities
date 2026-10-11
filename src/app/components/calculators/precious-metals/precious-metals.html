@@ -80,19 +80,16 @@
           <option value="toz">oz t</option>
         </select>
 
-        @if (hasNote(row)) {
-        <span></span>
-        } @else {
-        <button class="note-toggle" [class.open]="isNoteOpen(row)" (click)="toggleNote(row)"
-          [attr.aria-expanded]="isNoteOpen(row)" [attr.aria-label]="isNoteOpen(row) ? 'Hide note' : 'Add a note'"
-          [title]="isNoteOpen(row) ? 'Hide note' : 'Add a note'">✎</button>
-        }
+        <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+          {{ isNoteShown(row) ? '−' : '+' }} note
+        </button>
 
         <button class="remove-btn" (click)="removeGoldRow(row.id)" aria-label="Remove row">
           ×
         </button>
 
-        @if (isNoteOpen(row) || hasNote(row)) {
+        @if (isNoteShown(row)) {
         <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
           placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
         }
@@ -135,19 +132,16 @@
           <option value="toz">oz t</option>
         </select>
 
-        @if (hasNote(row)) {
-        <span></span>
-        } @else {
-        <button class="note-toggle" [class.open]="isNoteOpen(row)" (click)="toggleNote(row)"
-          [attr.aria-expanded]="isNoteOpen(row)" [attr.aria-label]="isNoteOpen(row) ? 'Hide note' : 'Add a note'"
-          [title]="isNoteOpen(row) ? 'Hide note' : 'Add a note'">✎</button>
-        }
+        <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+          {{ isNoteShown(row) ? '−' : '+' }} note
+        </button>
 
         <button class="remove-btn" (click)="removeSilverRow(row.id)" aria-label="Remove row">
           ×
         </button>
 
-        @if (isNoteOpen(row) || hasNote(row)) {
+        @if (isNoteShown(row)) {
         <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
           placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
         }

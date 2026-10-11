@@ -218,7 +218,7 @@
 // around 8 digits, so letting them stretch left a 500px dropdown beside a short number.
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 7rem) auto 28px 28px;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 7rem) auto auto 28px;
   justify-content: start;
   gap: 0.5rem;
   align-items: center;
@@ -250,20 +250,26 @@
 }
 
 .note-toggle {
-  width: 28px;
   height: 28px;
-  padding: 0;
+  padding: 0 0.35rem;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
   color: var(--text-faint);
+  font-size: 0.75rem;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.note-toggle:hover,
+.note-toggle:hover:not(:disabled),
 .note-toggle.open {
   border-color: var(--brand-border);
   color: var(--brand);
+}
+
+.note-toggle:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .type-select {
@@ -511,7 +517,7 @@
 
   // The type (plus a custom percent) gets its own line so it never squeezes to nothing.
   .row {
-    grid-template-columns: minmax(0, 1fr) auto 28px 28px;
+    grid-template-columns: minmax(0, 1fr) auto auto 28px;
   }
 
   .type-cell,

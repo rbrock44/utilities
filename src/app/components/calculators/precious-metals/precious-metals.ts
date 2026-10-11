@@ -105,7 +105,18 @@ export class PreciousMetalsComponent implements OnInit {
     return this.openNotes.has(row);
   }
 
+  /** A note with text always shows; a blank one shows only while toggled open. */
+  isNoteShown(row: MetalRow): boolean {
+    return this.hasNote(row) || this.isNoteOpen(row);
+  }
+
+  noteToggleTitle(row: MetalRow): string {
+    if (this.hasNote(row)) return 'Clear the note to hide it';
+    return this.isNoteOpen(row) ? 'Hide note' : 'Add a note';
+  }
+
   toggleNote(row: MetalRow) {
+    if (this.hasNote(row)) return;
     if (this.openNotes.has(row)) {
       this.openNotes.delete(row);
     } else {
