@@ -34,6 +34,8 @@ export class SaveShareComponent<T> implements OnDestroy {
   /** The encoded list for the share link's query parameter. */
   readonly shareValue = input<string | null>(null);
   readonly shareParam = input('list');
+  /** More query parameters for the link, e.g. the prices a list was valued at. */
+  readonly extraParams = input<Record<string, string>>({});
   /** What a saved list holds, e.g. "12 coins", shown beside its name. */
   readonly describe = input<(items: T) => string>(() => '');
   readonly noun = input('list');
@@ -72,7 +74,7 @@ export class SaveShareComponent<T> implements OnDestroy {
   }
 
   shareLink(): string {
-    const params = new URLSearchParams({ [this.shareParam()]: this.shareValue() ?? '' });
+    const params = new URLSearchParams({ [this.shareParam()]: this.shareValue() ?? '', ...this.extraParams() });
     if (this.name().trim()) {
       params.set('name', this.name().trim());
     }

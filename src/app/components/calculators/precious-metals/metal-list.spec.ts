@@ -1,4 +1,4 @@
-import { decodeMetalList, encodeMetalList, isMetalItems, MetalListItem } from './metal-list';
+import { decodeMetalList, decodeSpotPrices, encodeMetalList, encodeSpotPrices, isMetalItems, MetalListItem } from './metal-list';
 
 const ring: MetalListItem = { metal: 'gold', type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: 'nugget ring' };
 const chain: MetalListItem = { metal: 'gold', type: '10K Gold (41.7%)', weight: 12, unit: 'grams' };
@@ -70,5 +70,31 @@ describe('isMetalItems', () => {
     expect(isMetalItems([{ ...bar, type: 'Custom %', purity: 65 }])).toBe(true);
     expect(isMetalItems([{ ...bar, type: 'Custom %' }])).toBe(false);
     expect(isMetalItems([{ ...bar, purity: 65 }])).toBe(false);
+  });
+});
+
+describe('spot prices in links', () => {
+  const at = new Date('2026-10-10T21:10:00Z');
+
+  it('should round-trip prices and the time they were taken', () => {
+    const text = encodeSpotPrices({ gold: 3985.4, silver: 48.12, timestamp: at });
+
+    expect(text).toBe(`3985.4_48.12_${at.getTime()}`);
+    expect(decodeSpotPrices(text)).toEqual({ gold: 3985.4, silver: 48.12, timestamp: at });
+  });
+
+  it('should leave prices out until both are known', () => {
+    expect(encodeSpotPrices({ gold: -1, silver: -1, timestamp: at })).toBeNull();
+    expect(encodeSpotPrices({ gold: 2000, silver: 0, timestamp: at })).toBeNull();
+  });
+
+  it('should ignore missing or damaged prices', () => {
+    expect(decodeSpotPrices(null)).toBeNull();
+    expect(decodeSpotPrices('')).toBeNull();
+    expect(decodeSpotPrices('2000_25')).toBeNull();
+    expect(decodeSpotPrices('2000__1')).toBeNull();
+    expect(decodeSpotPrices('abc_25_1')).toBeNull();
+    expect(decodeSpotPrices('-5_25_1')).toBeNull();
+    expect(decodeSpotPrices('2000_25_soon')).toBeNull();
   });
 });

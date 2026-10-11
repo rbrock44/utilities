@@ -1,7 +1,7 @@
 <div class="calculator-container">
   <div class="header">
     <h2>Precious Metals Calculator</h2>
-    <button class="refresh-btn" (click)="loadSpotPrices()" [disabled]="loading">
+    <button class="refresh-btn" (click)="refreshPrices()" [disabled]="loading">
       {{ loading ? 'Loading...' : 'Refresh Prices' }}
     </button>
   </div>
@@ -33,6 +33,26 @@
     <div class="timestamp">
       Updated: {{ spotPrices.timestamp | date:'short' }}
     </div>
+  </div>
+  }
+
+  @if (pricePrompt && sharedPrices) {
+  <div class="price-choice" role="group" aria-labelledby="priceChoiceTitle">
+    <p id="priceChoiceTitle">This list was shared with spot prices from {{ sharedPrices.timestamp | date:'medium' }}. Which prices should it use?</p>
+    <button class="choice shared-choice" (click)="useSharedPrices()">
+      <strong>Shared prices · {{ sharedPrices.timestamp | date:'mediumDate' }}</strong>
+      <span>Gold ${{ sharedPrices.gold.toFixed(2) }} · Silver ${{ sharedPrices.silver.toFixed(2) }}</span>
+      <span class="choice-total">Total ${{ spotTotalAt(sharedPrices)?.toFixed(2) }}</span>
+    </button>
+    <button class="choice today-choice" (click)="useTodaysPrices()" [disabled]="loading || livePrices.gold <= 0">
+      <strong>Today's prices</strong>
+      @if (livePrices.gold > 0) {
+      <span>Gold ${{ livePrices.gold.toFixed(2) }} · Silver ${{ livePrices.silver.toFixed(2) }}</span>
+      <span class="choice-total">Total ${{ spotTotalAt(livePrices)?.toFixed(2) }}</span>
+      } @else {
+      <span>{{ loading ? 'Loading live prices…' : 'Live prices unavailable' }}</span>
+      }
+    </button>
   </div>
   }
 
@@ -203,6 +223,7 @@
     [items]="itemsOrNull"
     [shareValue]="shareValue"
     shareParam="metals"
+    [extraParams]="shareExtras"
     [describe]="describeList"
     noun="list"
     nameLabel="List name"

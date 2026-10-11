@@ -93,6 +93,14 @@ describe('SaveShareComponent', () => {
     expect(component.justCopied()).toBe(true);
   });
 
+  it('should add the host\'s extra parameters to the link', () => {
+    set({ shareValue: 'abc', shareParam: 'metals', extraParams: { spot: '2000_25_1' } });
+
+    const url = new URL(component.shareLink());
+    expect(url.searchParams.get('metals')).toBe('abc');
+    expect(url.searchParams.get('spot')).toBe('2000_25_1');
+  });
+
   it('should leave the name out of the link when blank and not copy without a list', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });

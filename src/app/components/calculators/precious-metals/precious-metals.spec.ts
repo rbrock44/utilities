@@ -1,12 +1,12 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { PreciousMetalsComponent } from './precious-metals';
 import { goldTypes, silverTypes } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
-import { encodeMetalList, MetalListItem } from './metal-list';
+import { encodeMetalList, encodeSpotPrices, MetalListItem } from './metal-list';
 
 describe('PreciousMetalsComponent', () => {
   let component: PreciousMetalsComponent;
@@ -159,11 +159,11 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
   const ring: MetalListItem = { metal: 'gold', type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: 'nugget ring' };
   const bar: MetalListItem = { metal: 'silver', type: 'Fine Silver (99.9%)', weight: 1, unit: 'toz' };
 
-  const setup = async (query: Record<string, string> = {}) => {
+  const setup = async (query: Record<string, string> = {}, prices = () => of({ gold: 2000, silver: 25, timestamp: new Date() })) => {
     await TestBed.configureTestingModule({
       imports: [PreciousMetalsComponent],
       providers: [
-        { provide: SpotPriceService, useValue: { getSpotPrices: () => of({ gold: 2000, silver: 25, timestamp: new Date() }) } },
+        { provide: SpotPriceService, useValue: { getSpotPrices: prices } },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap(query) } } },
       ]
     })
@@ -318,5 +318,89 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
     component.toggleOffer();
     expect(component.quote.offer).toEqual({ amount: 1500, percent: component.offerPercent });
+  });
+
+  describe('shared spot prices', () => {
+    // 1 oz t of 24K gold and 1 oz t of fine silver.
+    const pieces: MetalListItem[] = [
+      { metal: 'gold', type: goldTypes[0].name, weight: 1, unit: 'toz' },
+      { metal: 'silver', type: 'Fine Silver (99.9%)', weight: 1, unit: 'toz' },
+    ];
+    const sharedAt = new Date('2026-09-01T12:00:00Z');
+    const link = { metals: encodeMetalList(pieces), spot: encodeSpotPrices({ gold: 1000, silver: 10, timestamp: sharedAt })! };
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+
+    it('should put the prices in use into the share link', async () => {
+      await setup();
+      expect(component.shareExtras['spot']).toMatch(/^2000_25_\d+$/);
+    });
+
+    it('should not ask about prices for a link without them', async () => {
+      await setup({ metals: link.metals });
+
+      expect(component.pricePrompt).toBe(false);
+      expect(el().querySelector('.price-choice')).toBeNull();
+    });
+
+    it('should offer the shared and today\'s prices, each with its numbers', async () => {
+      await setup(link);
+
+      const shared = el().querySelector('.shared-choice')!.textContent!;
+      const today = el().querySelector('.today-choice')!.textContent!;
+      expect(shared).toContain('Gold $1000.00');
+      expect(shared).toContain('Silver $10.00');
+      expect(shared).toContain(`Total $${(999 + 9.99).toFixed(2)}`);
+      expect(today).toContain('Gold $2000.00');
+      expect(today).toContain(`Total $${(1998 + 24.975).toFixed(2)}`);
+    });
+
+    it('should value the list at the shared prices when chosen, marked as set by hand', async () => {
+      await setup(link);
+
+      (el().querySelector('.shared-choice') as HTMLButtonElement).click();
+      render();
+
+      expect(el().querySelector('.price-choice')).toBeNull();
+      expect(component.spotPrices).toEqual({ gold: 1000, silver: 10, timestamp: sharedAt });
+      expect(component.overridden).toEqual({ gold: true, silver: true });
+      expect(component.grandTotals.spotValue).toBeCloseTo(1008.99, 2);
+    });
+
+    it('should value the list at today\'s prices when chosen', async () => {
+      await setup(link);
+
+      component.useTodaysPrices();
+
+      expect(component.pricePrompt).toBe(false);
+      expect(component.spotPrices.gold).toBe(2000);
+      expect(component.overridden).toEqual({ gold: false, silver: false });
+      expect(component.grandTotals.spotValue).toBeCloseTo(2022.975, 3);
+    });
+
+    it('should keep shared prices when live prices arrive later, and wait to offer today\'s', async () => {
+      const live = new Subject<SpotPrices>();
+      await setup(link, () => live);
+
+      expect(el().querySelector('.today-choice')!.textContent).toContain('Loading live prices');
+      expect((el().querySelector('.today-choice') as HTMLButtonElement).disabled).toBe(true);
+
+      component.useSharedPrices();
+      live.next({ gold: 2000, silver: 25, timestamp: new Date() });
+
+      expect(component.spotPrices.gold).toBe(1000);
+      expect(component.livePrices.gold).toBe(2000);
+      expect(component.overridden).toEqual({ gold: true, silver: true });
+    });
+
+    it('should go back to live prices on refresh', async () => {
+      await setup(link);
+      component.useSharedPrices();
+
+      component.refreshPrices();
+
+      expect(component.spotPrices.gold).toBe(2000);
+      expect(component.overridden).toEqual({ gold: false, silver: false });
+    });
   });
 });

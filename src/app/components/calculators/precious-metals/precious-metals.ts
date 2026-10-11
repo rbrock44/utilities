@@ -8,7 +8,7 @@ import { CUSTOM_SILVER, emptyMetalTotal, goldTypes, silverTypes } from '../../..
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
-import { decodeMetalList, encodeMetalList, isMetalItems, MetalListItem } from './metal-list';
+import { decodeMetalList, decodeSpotPrices, encodeMetalList, encodeSpotPrices, isMetalItems, MetalListItem } from './metal-list';
 import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
 
 type SpotMetal = 'gold' | 'silver';
@@ -74,6 +74,11 @@ export class PreciousMetalsComponent implements OnInit {
   private nextGoldId = 2;
   private nextSilverId = 2;
 
+  /** Prices a shared link was valued at; the user picks those or today's before they apply. */
+  sharedPrices: SpotPrices | null = null;
+  pricePrompt = false;
+  private usingSharedPrices = false;
+
   listName = '';
   /** Set when a shared link is opened, to say what was loaded from it. */
   linkNotice: string | null = null;
@@ -134,6 +139,51 @@ export class PreciousMetalsComponent implements OnInit {
     return items.length > 0 ? encodeMetalList(items) : null;
   }
 
+  /** The prices in use go in the link so the person it's sent to can see the same numbers. */
+  get shareExtras(): Record<string, string> {
+    const spot = encodeSpotPrices(this.spotPrices);
+    return spot ? { spot } : {};
+  }
+
+  /** Combined spot value of the current rows at the given prices, or null without prices. */
+  spotTotalAt(prices: SpotPrices): number | null {
+    if (!(prices.gold > 0 && prices.silver > 0)) return null;
+    return this.metalService.calculateGoldPrice(prices, this.goldRows).totals.spotValue +
+      this.metalService.calculateSilverPrice(prices, this.silverRows).totals.spotValue;
+  }
+
+  useSharedPrices() {
+    this.pricePrompt = false;
+    this.usingSharedPrices = true;
+    this.applySharedPrices();
+  }
+
+  useTodaysPrices() {
+    this.pricePrompt = false;
+    this.usingSharedPrices = false;
+    if (this.livePrices.gold > 0) {
+      this.spotPrices = { ...this.livePrices };
+    }
+    this.overridden = { gold: false, silver: false };
+    this.calculate();
+  }
+
+  /** The shared prices count as set by hand, so the reset button goes back to live once live prices arrive. */
+  private applySharedPrices() {
+    const shared = this.sharedPrices;
+    if (!shared) return;
+    const differs = (metal: SpotMetal) => this.livePrices[metal] > 0 && shared[metal] !== this.livePrices[metal];
+    this.spotPrices = { ...shared };
+    this.overridden = { gold: differs('gold'), silver: differs('silver') };
+    this.calculate();
+  }
+
+  refreshPrices() {
+    this.usingSharedPrices = false;
+    this.pricePrompt = false;
+    this.loadSpotPrices();
+  }
+
   loadList(list: SavedList<MetalListItem[]>) {
     this.applyItems(list.items);
     this.linkNotice = null;
@@ -148,6 +198,8 @@ export class PreciousMetalsComponent implements OnInit {
     const { items, skipped } = decodeMetalList(shared);
     this.applyItems(items);
     this.listName = params?.get('name') ?? '';
+    this.sharedPrices = decodeSpotPrices(params?.get('spot'));
+    this.pricePrompt = this.sharedPrices !== null;
     const loaded = `Loaded a shared list of ${items.length} piece${items.length === 1 ? '' : 's'}.`;
     const unread = skipped === 1 ? '1 entry in the link wasn\'t' : `${skipped} entries in the link weren't`;
     this.linkNotice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
@@ -179,10 +231,14 @@ export class PreciousMetalsComponent implements OnInit {
     this.spotPriceService.getSpotPrices().subscribe({
       next: (prices) => {
         this.livePrices = prices;
-        this.spotPrices = { ...prices };
-        this.overridden = { gold: false, silver: false };
         this.loading = false;
-        this.calculate();
+        if (this.usingSharedPrices) {
+          this.applySharedPrices();
+        } else {
+          this.spotPrices = { ...prices };
+          this.overridden = { gold: false, silver: false };
+          this.calculate();
+        }
         this.cdr.markForCheck();
       },
       error: (error) => {

@@ -100,3 +100,24 @@ export function decodeMetalList(text: string): { items: MetalListItem[]; skipped
   }
   return { items, skipped };
 }
+
+/** Spot prices ride along in a share link as `gold_silver_time`, time in epoch milliseconds. */
+export function encodeSpotPrices(prices: SpotPrices): string | null {
+  const time = new Date(prices.timestamp).getTime();
+  if (!(prices.gold > 0 && prices.silver > 0 && Number.isFinite(time))) {
+    return null;
+  }
+  return `${prices.gold}_${prices.silver}_${time}`;
+}
+
+export function decodeSpotPrices(text: string | null | undefined): SpotPrices | null {
+  const parts = (text ?? '').split('_');
+  if (parts.length !== 3 || parts.some(part => part.trim() === '')) {
+    return null;
+  }
+  const [gold, silver, time] = parts.map(Number);
+  if (!(gold > 0 && silver > 0 && Number.isFinite(gold) && Number.isFinite(silver) && Number.isFinite(time))) {
+    return null;
+  }
+  return { gold, silver, timestamp: new Date(time) };
+}
