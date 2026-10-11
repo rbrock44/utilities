@@ -161,19 +161,19 @@
   @if (grandTotals.spotValue > 0) {
   <div class="grand-totals" *ngIf="grandTotals.spotValue > 0">
     <h3>Combined Totals</h3>
-    <div class="detail-row highlight large">
+    <div class="detail-row highlight">
       <span>Total Spot Value:</span>
       <span>${{ grandTotals.spotValue.toFixed(2) }}</span>
     </div>
-    <div class="detail-row large">
+    <div class="detail-row">
       <span>Total 90% Value:</span>
       <span>${{ grandTotals.value90.toFixed(2) }}</span>
     </div>
-    <div class="detail-row large">
+    <div class="detail-row">
       <span>Total 80% Value:</span>
       <span>${{ grandTotals.value80.toFixed(2) }}</span>
     </div>
-    <div class="detail-row large">
+    <div class="detail-row">
       <span>Total 70% Value:</span>
       <span>${{ grandTotals.value70.toFixed(2) }}</span>
     </div>
