@@ -4,6 +4,6 @@ interface MetalRow {
   weight: number;
   unit: 'grams' | 'toz';
   note?: string;
-  /** Percent fine, used only when `type` is the custom silver option. */
+  /** Percent fine, used only when `type` is the custom percent option. */
   purity?: number;
 }

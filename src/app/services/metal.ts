@@ -1,19 +1,19 @@
 import { Injectable } from "@angular/core";
-import { CUSTOM_SILVER, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+import { CUSTOM_PURITY, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MetalService {
   calculateGoldPrice(spotPrices: SpotPrices, rows: MetalRow[]): MetalCalculation {
-    return this.calculateMetal(spotPrices.gold, rows, goldTypes);
+    return this.calculateMetal(spotPrices.gold, rows, goldTypes, 'Gold');
   }
 
   calculateSilverPrice(spotPrices: SpotPrices, rows: MetalRow[]) {
-    return this.calculateMetal(spotPrices.silver, rows, silverTypes);
+    return this.calculateMetal(spotPrices.silver, rows, silverTypes, 'Silver');
   }
 
-  private calculateMetal(spotPriceForMetal: number, rows: MetalRow[], types: MetalType[]): MetalCalculation {
+  private calculateMetal(spotPriceForMetal: number, rows: MetalRow[], types: MetalType[], label: string): MetalCalculation {
     const breakdowns: PreciousMetalBreakdown[] = [];
     let totalWeightGrams = 0;
     let totalPureGrams = 0;
@@ -21,7 +21,7 @@ export class MetalService {
     rows.forEach(row => {
       if (row.weight <= 0) return;
 
-      const metalType = this.typeFor(row, types);
+      const metalType = this.typeFor(row, types, label);
       if (!metalType) return;
 
       const weightGrams = row.unit === 'grams' ? row.weight : row.weight * TROY_OZ_IN_GRAMS;
@@ -70,12 +70,12 @@ export class MetalService {
     }
   }
 
-  /** A custom silver row becomes a one-off type named after its percent, e.g. "Silver 70%". */
-  private typeFor(row: MetalRow, types: MetalType[]): MetalType | undefined {
-    if (row.type === CUSTOM_SILVER && types === silverTypes) {
+  /** A custom row becomes a one-off type named after its percent, e.g. "Silver 70%". */
+  private typeFor(row: MetalRow, types: MetalType[], label: string): MetalType | undefined {
+    if (row.type === CUSTOM_PURITY) {
       const percent = row.purity;
       return percent !== undefined && Number.isFinite(percent) && percent > 0 && percent <= 100
-        ? { name: `Silver ${percent}%`, purity: percent / 100 }
+        ? { name: `${label} ${percent}%`, purity: percent / 100 }
         : undefined;
     }
     return types.find(t => t.name === row.type);

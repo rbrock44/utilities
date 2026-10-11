@@ -53,15 +53,24 @@ describe('MetalService', () => {
     expect(result.totals.spotValue).toBeCloseTo(0.7 * 25, 5);
   });
 
-  it('should skip a custom silver row until it has a valid percent, and never treat gold as custom', () => {
+  it('should skip a custom row until it has a valid percent', () => {
     const silver: MetalRow[] = [
       { id: 1, type: 'Custom %', weight: 1, unit: 'toz' },
       { id: 2, type: 'Custom %', purity: 150, weight: 1, unit: 'toz' },
     ];
     expect(service.calculateSilverPrice(spotPrices, silver).breakdowns).toEqual([]);
 
-    const gold: MetalRow[] = [{ id: 1, type: 'Custom %', purity: 70, weight: 1, unit: 'toz' }];
+    const gold: MetalRow[] = [{ id: 1, type: 'Custom %', purity: 0, weight: 1, unit: 'toz' }];
     expect(service.calculateGoldPrice(spotPrices, gold).breakdowns).toEqual([]);
+  });
+
+  it('should value a custom gold row at its own percent and name it after the percent', () => {
+    const rows: MetalRow[] = [{ id: 1, type: 'Custom %', purity: 62.5, weight: 1, unit: 'toz' }];
+
+    const result = service.calculateGoldPrice(spotPrices, rows);
+
+    expect(result.breakdowns[0].type).toBe('Gold 62.5%');
+    expect(result.totals.spotValue).toBeCloseTo(0.625 * spotPrices.gold, 5);
   });
 
   it('should convert grams to troy ounces', () => {

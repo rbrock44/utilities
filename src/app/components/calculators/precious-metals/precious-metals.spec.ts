@@ -415,4 +415,17 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(component.overridden).toEqual({ gold: false, silver: false });
     });
   });
+
+  it('should take a custom gold percent and carry it into saved lists', async () => {
+    await setup();
+    Object.assign(component.goldRows[0], { type: 'Custom %', purity: 62.5, weight: 31.1035, unit: 'grams' });
+    component.calculate();
+    fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[aria-label="Gold percent"]')).toBeTruthy();
+    expect(component.goldBreakdowns[0].type).toBe('Gold 62.5%');
+    expect(component.goldTotals.spotValue).toBeCloseTo(0.625 * 2000, 4);
+    expect(component.items[0]).toEqual({ metal: 'gold', type: 'Custom %', purity: 62.5, weight: 31.1035, unit: 'grams' });
+  });
 });

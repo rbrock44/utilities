@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
-import { CUSTOM_SILVER, emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
@@ -64,7 +64,7 @@ export class PreciousMetalsComponent implements OnInit {
   offerPercent: number | null = null;
   private offerSource: 'amount' | 'percent' = 'amount';
 
-  readonly customSilver = CUSTOM_SILVER;
+  readonly customPurity = CUSTOM_PURITY;
   /** Rows whose empty note box is expanded; a note with text always shows. */
   private openNotes = new Set<MetalRow>();
 
@@ -134,7 +134,7 @@ export class PreciousMetalsComponent implements OnInit {
         weight: row.weight,
         unit: row.unit,
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
-        ...(row.type === CUSTOM_SILVER ? { purity: row.purity } : {}),
+        ...(row.type === CUSTOM_PURITY ? { purity: row.purity } : {}),
       }));
     return [...toItems('gold', this.goldRows), ...toItems('silver', this.silverRows)];
   }

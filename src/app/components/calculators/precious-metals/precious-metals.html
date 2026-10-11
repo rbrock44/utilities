@@ -70,7 +70,14 @@
             <option *ngFor="let type of goldMetalTypes" [value]="type.name">
               {{ type.name }}
             </option>
+            <option [value]="customPurity">Custom %…</option>
           </select>
+          @if (row.type === customPurity) {
+          <span class="purity-wrap">
+            <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
+              min="1" max="100" step="0.1" placeholder="58" aria-label="Gold percent">%
+          </span>
+          }
         </span>
 
         <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
@@ -115,9 +122,9 @@
             <option *ngFor="let type of silverMetalTypes" [value]="type.name">
               {{ type.name }}
             </option>
-            <option [value]="customSilver">Custom %…</option>
+            <option [value]="customPurity">Custom %…</option>
           </select>
-          @if (row.type === customSilver) {
+          @if (row.type === customPurity) {
           <span class="purity-wrap">
             <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
               min="1" max="100" step="0.1" placeholder="70" aria-label="Silver percent">%

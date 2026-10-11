@@ -39,7 +39,7 @@ describe('metal list links', () => {
   });
 });
 
-describe('custom silver in links', () => {
+describe('custom percents in links', () => {
   const odd: MetalListItem = { metal: 'silver', type: 'Custom %', purity: 70, weight: 20, unit: 'grams', note: 'old bracelet' };
 
   it('should round-trip a custom percent as a number in the type slot', () => {
@@ -50,8 +50,16 @@ describe('custom silver in links', () => {
     expect(decodeMetalList(encoded).items).toEqual([odd]);
   });
 
-  it('should reject custom percents out of range and custom gold', () => {
-    const tampered = btoa(JSON.stringify([['s', 0, 1, 'g'], ['s', 101, 1, 'g'], ['g', 70, 1, 'g'], ['s', 60, 1, 'g']]));
+  it('should carry custom gold the same way', () => {
+    const scrap: MetalListItem = { metal: 'gold', type: 'Custom %', purity: 62.5, weight: 3.1, unit: 'grams' };
+    const encoded = encodeMetalList([scrap]);
+
+    expect(JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')))).toEqual([['g', 62.5, 3.1, 'g']]);
+    expect(decodeMetalList(encoded).items).toEqual([scrap]);
+  });
+
+  it('should reject custom percents out of range', () => {
+    const tampered = btoa(JSON.stringify([['s', 0, 1, 'g'], ['s', 101, 1, 'g'], ['g', -5, 1, 'g'], ['s', 60, 1, 'g']]));
     expect(decodeMetalList(tampered)).toEqual({
       items: [{ metal: 'silver', type: 'Custom %', purity: 60, weight: 1, unit: 'grams' }],
       skipped: 3,
@@ -68,6 +76,7 @@ describe('isMetalItems', () => {
     expect(isMetalItems([{ ...ring, note: 5 }])).toBe(false);
     expect(isMetalItems('nope')).toBe(false);
     expect(isMetalItems([{ ...bar, type: 'Custom %', purity: 65 }])).toBe(true);
+    expect(isMetalItems([{ ...ring, type: 'Custom %', purity: 62.5 }])).toBe(true);
     expect(isMetalItems([{ ...bar, type: 'Custom %' }])).toBe(false);
     expect(isMetalItems([{ ...bar, purity: 65 }])).toBe(false);
   });

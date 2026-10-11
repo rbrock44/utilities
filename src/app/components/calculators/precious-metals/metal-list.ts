@@ -1,4 +1,4 @@
-import { CUSTOM_SILVER, goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_PURITY, goldTypes, silverTypes } from '../../../constants/constants';
 
 export type ListMetal = 'gold' | 'silver';
 
@@ -9,7 +9,7 @@ export interface MetalListItem {
   weight: number;
   unit: 'grams' | 'toz';
   note?: string;
-  /** Percent fine, only for custom silver. */
+  /** Percent fine, only for a custom percent row. */
   purity?: number;
 }
 
@@ -22,7 +22,7 @@ function isPercent(value: unknown): value is number {
 }
 
 function hasValidType(item: MetalListItem): boolean {
-  if (item.metal === 'silver' && item.type === CUSTOM_SILVER) {
+  if (item.type === CUSTOM_PURITY) {
     return isPercent(item.purity);
   }
   return item.purity === undefined && typesFor(item.metal).some(type => type.name === item.type);
@@ -46,12 +46,12 @@ export function isMetalItems(value: unknown): value is MetalListItem[] {
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
- * `[g|s, type, weight, g|t, note?]` to keep links short; a custom silver row puts its
+ * `[g|s, type, weight, g|t, note?]` to keep links short; a custom percent row puts its
  * percent (a number) where the type name would be.
  */
 export function encodeMetalList(items: MetalListItem[]): string {
   const rows = items.map(item => {
-    const type = item.type === CUSTOM_SILVER ? item.purity! : item.type;
+    const type = item.type === CUSTOM_PURITY ? item.purity! : item.type;
     const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, item.unit === 'toz' ? 't' : 'g'];
     if (item.note) {
       row.push(item.note);
@@ -86,7 +86,7 @@ export function decodeMetalList(text: string): { items: MetalListItem[]; skipped
     const [metal, type, weight, unit, note] = Array.isArray(row) ? row : [];
     const item: MetalListItem = {
       metal: metal === 'g' ? 'gold' : 'silver',
-      type: typeof type === 'number' ? CUSTOM_SILVER : type,
+      type: typeof type === 'number' ? CUSTOM_PURITY : type,
       ...(typeof type === 'number' ? { purity: type } : {}),
       weight,
       unit: unit === 't' ? 'toz' : 'grams',
