@@ -300,4 +300,23 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     component.loadList({ name: 'x', savedAt: '', items: [item] });
     expect(component.silverRows[0].purity).toBe(70);
   });
+
+  it('should build the quote from the current rows and only include an offer while the check is open', async () => {
+    await setup();
+    component.spotPrices = { gold: 2000, silver: 25, timestamp: new Date() };
+    Object.assign(component.goldRows[0], { type: goldTypes[0].name, weight: 1, unit: 'toz', note: 'bar' });
+    component.listName = 'Smith estate';
+    component.calculate();
+    component.onOfferAmountChange(1500);
+
+    expect(component.quote).toMatchObject({
+      name: 'Smith estate',
+      gold: [{ type: goldTypes[0].name, note: 'bar' }],
+      silver: [],
+      offer: null,
+    });
+
+    component.toggleOffer();
+    expect(component.quote.offer).toEqual({ amount: 1500, percent: component.offerPercent });
+  });
 });

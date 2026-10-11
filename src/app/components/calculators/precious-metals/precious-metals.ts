@@ -9,6 +9,7 @@ import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
 import { decodeMetalList, encodeMetalList, isMetalItems, MetalListItem } from './metal-list';
+import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
 
 type SpotMetal = 'gold' | 'silver';
 
@@ -293,6 +294,32 @@ export class PreciousMetalsComponent implements OnInit {
     this.spotPrices = { ...this.spotPrices, [metal]: this.livePrices[metal] };
     this.overridden = { ...this.overridden, [metal]: false };
     this.calculate();
+  }
+
+  /** Everything the printable quote shows; the offer only counts while the offer check is open. */
+  get quote(): MetalQuote {
+    const offer = this.offerOpen && this.offerAmount != null && this.offerPercent != null
+      ? { amount: this.offerAmount, percent: this.offerPercent }
+      : null;
+    return {
+      name: this.listName,
+      date: new Date(),
+      spotPrices: this.spotPrices,
+      manual: this.overridden,
+      gold: this.goldBreakdowns,
+      silver: this.silverBreakdowns,
+      goldTotals: this.goldTotals,
+      silverTotals: this.silverTotals,
+      grandTotals: this.grandTotals,
+      offer,
+    };
+  }
+
+  /** jsPDF is loaded on demand so it stays out of the calculator's own chunk. */
+  async downloadQuote() {
+    const { jsPDF } = await import('jspdf');
+    const quote = this.quote;
+    buildMetalQuote(jsPDF, quote).save(quoteFileName(quote));
   }
 
   toggleOffer() {

@@ -344,9 +344,15 @@
   padding: 0.3rem 0;
 }
 
+.totals-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
 .offer-toggle {
-  display: block;
-  margin: 0.4rem 0 0 auto;
   padding: 0.3rem 0.75rem;
   background: rgba(255,255,255,0.15);
   color: white;
