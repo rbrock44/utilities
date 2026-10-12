@@ -14,7 +14,6 @@ export const silverTypes: MetalType[] = [
     { name: 'Sterling Silver (92.5%)', purity: 0.925 },
     { name: 'Coin Silver (90%)', purity: 0.90 },
     { name: 'German/European (80%)', purity: 0.80 },
-    { name: 'German/European (80%)', purity: 0.80 },
 ];
 
 export const emptyMetalTotal: MetalTotals = {
