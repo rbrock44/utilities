@@ -8,6 +8,8 @@ import { TROY_OZ_IN_GRAMS } from '../../../constants/constants';
 import { SpotPriceService } from '../../../services/spot-price';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
+import { quoteFileName } from '../../../services/quote-pdf';
+import { buildCoinQuote, CoinQuote } from './coin-quote';
 
 export type Metal = 'gold' | 'silver';
 
@@ -297,6 +299,42 @@ export class CoinStackCalculatorComponent implements OnInit {
   get dealerValue(): number | null {
     const melt = this.meltValue;
     return melt === null ? null : (melt * this.dealerPercent!) / 100;
+  }
+
+  /** Everything the printable quote shows; null while the stack can't be valued. */
+  get quote(): CoinQuote | null {
+    const melt = this.meltValue;
+    const dealer = this.dealerValue;
+    if (melt === null || dealer === null) {
+      return null;
+    }
+    return {
+      name: this.stackName,
+      date: new Date(),
+      spotGold: this.spotGold,
+      spotSilver: this.spotSilver,
+      dealerPercent: this.dealerPercent!,
+      rows: this.rows.map(row => ({
+        label: row.coin.label,
+        metal: row.coin.metal,
+        quantity: this.quantity(row),
+        pureToz: this.rowToz(row),
+        melt: this.rowValue(row) ?? 0,
+        ...(row.note?.trim() ? { note: row.note.trim() } : {}),
+      })),
+      melt,
+      dealer,
+    };
+  }
+
+  /** jsPDF is loaded on demand so it stays out of the calculator's own chunk. */
+  async downloadQuote(): Promise<void> {
+    const quote = this.quote;
+    if (!quote) {
+      return;
+    }
+    const { jsPDF } = await import('jspdf');
+    buildCoinQuote(jsPDF, quote).save(quoteFileName(quote.name, quote.date, 'coin-stack'));
   }
 
   money(value: number | null): string {

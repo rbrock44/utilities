@@ -109,7 +109,10 @@
       <div class="result-row"><span>Pure silver</span><strong>{{ toz(silverToz) }}</strong></div>
     </div>
 
-    <button type="button" class="btn-secondary" (click)="clear()">Clear stack</button>
+    <div class="stack-actions">
+      <button type="button" class="btn-secondary" [disabled]="!quote" (click)="downloadQuote()">Download quote (PDF)</button>
+      <button type="button" class="btn-secondary" (click)="clear()">Clear stack</button>
+    </div>
   }
 
   <app-save-share

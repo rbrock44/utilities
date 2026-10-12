@@ -11,6 +11,8 @@ import {
   pureTozPerCoin,
 } from './coin-stack-calculator';
 import { SpotPriceService } from '../../../services/spot-price';
+import { jsPDF } from 'jspdf';
+import { buildCoinQuote } from './coin-quote';
 
 const morganId = COIN_OPTIONS.find(c => c.spec.name === 'Morgan Dollar')!.id;
 const eagleId = COIN_OPTIONS.find(c => c.spec.name === 'American Gold Eagle')!.id;
@@ -330,5 +332,69 @@ describe('CoinStackCalculatorComponent', () => {
 
       expect(component.savedStacks.lists()).toEqual([]);
     });
+  });
+
+  describe('quote', () => {
+    it('should have no quote until the stack can be valued', async () => {
+      await setup(-1, -1);
+      expect(component.quote).toBeNull();
+
+      component.addCoin(morganId);
+      expect(component.quote).toBeNull();
+    });
+
+    it('should build the quote from each row, its note, and the stack totals', async () => {
+      await setup(2000, 30);
+      component.addCoin(morganId);
+      component.addCoin(eagleId);
+      component.rows[0].quantity = 10;
+      component.rows[0].note = ' from grandpa ';
+      component.stackName = 'Jar';
+      const morganToz = pureTozPerCoin(COIN_OPTIONS.find(c => c.id === morganId)!.spec);
+
+      const quote = component.quote!;
+
+      expect(quote.name).toBe('Jar');
+      expect(quote.rows[0]).toEqual({
+        label: COIN_OPTIONS.find(c => c.id === morganId)!.label,
+        metal: 'silver',
+        quantity: 10,
+        pureToz: morganToz * 10,
+        melt: morganToz * 10 * 30,
+        note: 'from grandpa',
+      });
+      expect('note' in quote.rows[1]).toBe(false);
+      expect(quote.melt).toBe(component.meltValue);
+      expect(quote.dealer).toBe(component.dealerValue);
+    });
+  });
+});
+
+describe('coin quote pdf', () => {
+  it('should list coins by metal with quantities, notes, totals, and the dealer offer', () => {
+    const pdf = buildCoinQuote(jsPDF, {
+      name: '',
+      date: new Date('2026-10-12T15:00:00Z'),
+      spotGold: 2000,
+      spotSilver: null,
+      dealerPercent: 90,
+      rows: [
+        { label: 'Morgan Dollar · 1878-1921', metal: 'silver', quantity: 2, pureToz: 1.5469, melt: 46.41, note: '1941, from grandpa' },
+        { label: 'Peace Dollar', metal: 'silver', quantity: 0, pureToz: 0, melt: 0 },
+      ],
+      melt: 46.41,
+      dealer: 41.77,
+    }).output();
+
+    expect(pdf).toContain('(Coin Stack Quote)');
+    expect(pdf).toContain('Gold $2,000.00/oz t');
+    expect(pdf).toContain('(Morgan Dollar');
+    expect(pdf).toContain('(1941, from grandpa)');
+    expect(pdf).toContain('(2 coins)');
+    expect(pdf).toContain('($46.41)');
+    expect(pdf).toContain('(Dealer offer at 90%)');
+    expect(pdf).toContain('($41.77)');
+    expect(pdf).not.toContain('(Peace Dollar)');
+    expect(pdf).not.toContain('(Gold coins)');
   });
 });

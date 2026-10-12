@@ -195,8 +195,14 @@ tr:has(+ .note-row) td {
   color: var(--brand-soft-text);
 }
 
-.btn-secondary {
+.stack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+.btn-secondary {
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   background: var(--surface);
@@ -220,7 +226,7 @@ tr:has(+ .note-row) td {
   }
 
   .btn-secondary {
-    width: 100%;
+    flex: 1 1 100%;
   }
 
   // Stack the note pill over the remove button so the table fits a phone.
