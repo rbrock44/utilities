@@ -26,17 +26,17 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'precious-metals': {
     alias: 'pm',
     load: () => import('../components/calculators/precious-metals/precious-metals').then(m => m.PreciousMetalsComponent),
-    related: ['gold-in-coins', 'silver-in-coins', 'coin-stack-calculator', 'weight-converter']
+    related: ['gold-in-coins', 'silver-in-coins', 'weight-converter']
   },
   'silver-in-coins': {
     alias: 'sic',
     load: () => import('../components/information/silver-in-coin/silver-in-coin').then(m => m.SilverInCoinComponent),
-    related: ['gold-in-coins', 'coin-stack-calculator', 'precious-metals', 'weight-converter']
+    related: ['precious-metals', 'gold-in-coins', 'weight-converter']
   },
   'gold-in-coins': {
     alias: 'gic',
     load: () => import('../components/information/gold-in-coin/gold-in-coin').then(m => m.GoldInCoinComponent),
-    related: ['silver-in-coins', 'coin-stack-calculator', 'precious-metals', 'weight-converter']
+    related: ['precious-metals', 'silver-in-coins', 'weight-converter']
   },
   'right-angle-calculator': {
     alias: 'rac',
@@ -201,10 +201,6 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'paint-drywall-calculator': {
     load: () => import('../components/calculators/paint-drywall-calculator/paint-drywall-calculator').then(m => m.PaintDrywallCalculatorComponent),
     related: ['inch-fraction-converter', 'board-foot-calculator', 'stair-stringer-calculator']
-  },
-  'coin-stack-calculator': {
-    load: () => import('../components/information/coin-stack-calculator/coin-stack-calculator').then(m => m.CoinStackCalculatorComponent),
-    related: ['gold-in-coins', 'silver-in-coins', 'precious-metals']
   },
   'compound-interest-calculator': {
     load: () => import('../components/calculators/compound-interest-calculator/compound-interest-calculator').then(m => m.CompoundInterestCalculatorComponent),

@@ -8,15 +8,37 @@ import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, silverTypes } from '../../..
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
-import { decodeMetalList, decodeSpotPrices, encodeMetalList, encodeSpotPrices, isMetalItems, MetalListItem } from './metal-list';
+import { COIN_OPTIONS, CoinOption, findCoin } from '../../../constants/coin-options';
+import { ComboBoxComponent } from '../../combo-box/combo-box';
+import {
+  CoinListItem,
+  decodeMetalList,
+  decodeSpotPrices,
+  encodeMetalList,
+  encodeSpotPrices,
+  isCoinEntry,
+  isMetalItems,
+  MetalListEntry,
+  MetalListItem,
+} from './metal-list';
+import { migrateCoinStacks } from './coin-stack-migration';
 import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
 
 type SpotMetal = 'gold' | 'silver';
 
+export interface CoinRow {
+  coin: CoinOption;
+  quantity: number | null;
+  note?: string;
+}
+
+/** Anything with an optional note: a weighed row or a coin row. */
+type NoteRow = { note?: string };
+
 @Component({
   selector: 'app-precious-metals',
   standalone: true,
-  imports: [CommonModule, FormsModule, PreciousMetalBreakdownComponent, SaveShareComponent],
+  imports: [CommonModule, FormsModule, PreciousMetalBreakdownComponent, SaveShareComponent, ComboBoxComponent],
   templateUrl: './precious-metals.html',
   styleUrl: './precious-metals.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -66,7 +88,18 @@ export class PreciousMetalsComponent implements OnInit {
 
   readonly customPurity = CUSTOM_PURITY;
   /** Rows whose empty note box is expanded; a note with text always shows. */
-  private openNotes = new Set<MetalRow>();
+  private openNotes = new Set<NoteRow>();
+
+  coinRows: CoinRow[] = [];
+  coinPickerValue: string | null = null;
+  /** Coins with no metal in them (clad, nickel) are left out; they'd add nothing to a melt total. */
+  readonly coinOptions: ComboBoxOption[] = COIN_OPTIONS
+    .filter(coin => coin.spec.purity > 0)
+    .map(coin => ({
+      id: coin.id,
+      label: `${coin.metal === 'gold' ? 'Gold' : 'Silver'} · ${coin.label}`,
+      searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
+    }));
 
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
@@ -82,8 +115,8 @@ export class PreciousMetalsComponent implements OnInit {
   listName = '';
   /** Set when a shared link is opened, to say what was loaded from it. */
   linkNotice: string | null = null;
-  readonly savedLists = new SavedListStore<MetalListItem[]>('utilities-metal-lists', isMetalItems);
-  readonly describeList = (items: MetalListItem[]) => `${items.length} piece${items.length === 1 ? '' : 's'}`;
+  readonly savedLists = new SavedListStore<MetalListEntry[]>('utilities-metal-lists', isMetalItems);
+  readonly describeList = describeEntries;
   private readonly route = inject(ActivatedRoute, { optional: true });
 
   constructor(
@@ -93,29 +126,30 @@ export class PreciousMetalsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    migrateCoinStacks(this.savedLists);
     this.loadFromLink();
     this.loadSpotPrices();
   }
 
-  hasNote(row: MetalRow): boolean {
+  hasNote(row: NoteRow): boolean {
     return !!row.note?.trim();
   }
 
-  isNoteOpen(row: MetalRow): boolean {
+  isNoteOpen(row: NoteRow): boolean {
     return this.openNotes.has(row);
   }
 
   /** A note with text always shows; a blank one shows only while toggled open. */
-  isNoteShown(row: MetalRow): boolean {
+  isNoteShown(row: NoteRow): boolean {
     return this.hasNote(row) || this.isNoteOpen(row);
   }
 
-  noteToggleTitle(row: MetalRow): string {
+  noteToggleTitle(row: NoteRow): string {
     if (this.hasNote(row)) return 'Clear the note to hide it';
     return this.isNoteOpen(row) ? 'Hide note' : 'Add a note';
   }
 
-  toggleNote(row: MetalRow) {
+  toggleNote(row: NoteRow) {
     if (this.hasNote(row)) return;
     if (this.openNotes.has(row)) {
       this.openNotes.delete(row);
@@ -124,8 +158,60 @@ export class PreciousMetalsComponent implements OnInit {
     }
   }
 
-  /** Every row with a weight, in on-screen order: gold first, then silver. */
-  get items(): MetalListItem[] {
+  /** Picking a coin already in the list adds one more instead of a duplicate row. */
+  addCoin(id: string) {
+    const coin = findCoin(id);
+    if (!coin) return;
+
+    const existing = this.coinRows.find(row => row.coin.id === id);
+    if (existing) {
+      existing.quantity = (this.coinQuantity(existing)) + 1;
+      this.coinRows = [...this.coinRows];
+    } else {
+      this.coinRows = [...this.coinRows, { coin, quantity: 1, note: '' }];
+    }
+    this.calculate();
+    // The combo box keeps showing the picked label until its [value] input changes, so step
+    // it to the id and back to null across two change-detection passes to empty the search.
+    this.coinPickerValue = id;
+    this.cdr.markForCheck();
+    setTimeout(() => {
+      this.coinPickerValue = null;
+      this.cdr.markForCheck();
+    });
+  }
+
+  removeCoinRow(row: CoinRow) {
+    this.coinRows = this.coinRows.filter(r => r !== row);
+    this.calculate();
+  }
+
+  /** Blank, negative, or fractional counts are treated as none until fixed. */
+  coinQuantity(row: CoinRow): number {
+    return row.quantity !== null && Number.isInteger(row.quantity) && row.quantity > 0 ? row.quantity : 0;
+  }
+
+  /** Each counted coin is valued as a custom-percent row of its total weight, named after the coin. */
+  private coinMetalRows(metal: SpotMetal): MetalRow[] {
+    return this.coinRows
+      .filter(row => row.coin.metal === metal && this.coinQuantity(row) > 0)
+      .map((row, index) => ({
+        id: -(index + 1),
+        type: CUSTOM_PURITY,
+        purity: row.coin.spec.purity * 100,
+        weight: row.coin.spec.weightGrams * this.coinQuantity(row),
+        unit: 'grams' as const,
+        label: `${row.coin.label} × ${this.coinQuantity(row)}`,
+        ...(row.note?.trim() ? { note: row.note.trim() } : {}),
+      }));
+  }
+
+  private valuedRows(metal: SpotMetal): MetalRow[] {
+    return [...(metal === 'gold' ? this.goldRows : this.silverRows), ...this.coinMetalRows(metal)];
+  }
+
+  /** Every row with a weight, in on-screen order: gold first, then silver, then coins. */
+  get items(): MetalListEntry[] {
     const toItems = (metal: 'gold' | 'silver', rows: MetalRow[]) => rows
       .filter(row => Number.isFinite(row.weight) && row.weight > 0)
       .map(row => ({
@@ -136,11 +222,18 @@ export class PreciousMetalsComponent implements OnInit {
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
         ...(row.type === CUSTOM_PURITY ? { purity: row.purity } : {}),
       }));
-    return [...toItems('gold', this.goldRows), ...toItems('silver', this.silverRows)];
+    const coins: CoinListItem[] = this.coinRows
+      .filter(row => this.coinQuantity(row) > 0)
+      .map(row => ({
+        coin: row.coin.id,
+        quantity: this.coinQuantity(row),
+        ...(row.note?.trim() ? { note: row.note.trim() } : {}),
+      }));
+    return [...toItems('gold', this.goldRows), ...toItems('silver', this.silverRows), ...coins];
   }
 
-  /** Null until something is weighed, which disables Save and the share link. */
-  get itemsOrNull(): MetalListItem[] | null {
+  /** Null until something is weighed or counted, which disables Save and the share link. */
+  get itemsOrNull(): MetalListEntry[] | null {
     const items = this.items;
     return items.length > 0 ? items : null;
   }
@@ -159,8 +252,8 @@ export class PreciousMetalsComponent implements OnInit {
   /** Combined spot value of the current rows at the given prices, or null without prices. */
   spotTotalAt(prices: SpotPrices): number | null {
     if (!(prices.gold > 0 && prices.silver > 0)) return null;
-    return this.metalService.calculateGoldPrice(prices, this.goldRows).totals.spotValue +
-      this.metalService.calculateSilverPrice(prices, this.silverRows).totals.spotValue;
+    return this.metalService.calculateGoldPrice(prices, this.valuedRows('gold')).totals.spotValue +
+      this.metalService.calculateSilverPrice(prices, this.valuedRows('silver')).totals.spotValue;
   }
 
   useSharedPrices() {
@@ -195,7 +288,7 @@ export class PreciousMetalsComponent implements OnInit {
     this.loadSpotPrices();
   }
 
-  loadList(list: SavedList<MetalListItem[]>) {
+  loadList(list: SavedList<MetalListEntry[]>) {
     this.applyItems(list.items);
     this.linkNotice = null;
     this.cdr.markForCheck();
@@ -211,13 +304,14 @@ export class PreciousMetalsComponent implements OnInit {
     this.listName = params?.get('name') ?? '';
     this.sharedPrices = decodeSpotPrices(params?.get('spot'));
     this.pricePrompt = this.sharedPrices !== null;
-    const loaded = `Loaded a shared list of ${items.length} piece${items.length === 1 ? '' : 's'}.`;
+    const loaded = `Loaded a shared list of ${describeEntries(items)}.`;
     const unread = skipped === 1 ? '1 entry in the link wasn\'t' : `${skipped} entries in the link weren't`;
     this.linkNotice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
   }
 
-  /** Replaces both sections; a metal with nothing in the list keeps one empty row to type into. */
-  private applyItems(items: MetalListItem[]) {
+  /** Replaces every section; a metal with nothing in the list keeps one empty row to type into. */
+  private applyItems(entries: MetalListEntry[]) {
+    const items = entries.filter((entry): entry is MetalListItem => !isCoinEntry(entry));
     const toRows = (metal: 'gold' | 'silver', nextId: () => number, defaultType: string): MetalRow[] => {
       const rows = items
         .filter(item => item.metal === metal)
@@ -234,6 +328,10 @@ export class PreciousMetalsComponent implements OnInit {
 
     this.goldRows = toRows('gold', () => this.nextGoldId++, goldTypes[0].name);
     this.silverRows = toRows('silver', () => this.nextSilverId++, silverTypes[0].name);
+    this.coinRows = entries.filter(isCoinEntry).flatMap(entry => {
+      const coin = findCoin(entry.coin);
+      return coin ? [{ coin, quantity: entry.quantity, note: entry.note ?? '' }] : [];
+    });
     this.calculate();
   }
 
@@ -311,7 +409,7 @@ export class PreciousMetalsComponent implements OnInit {
   private calculateGold() {
     if (!this.spotPrices) return;
 
-    const goldCalc = this.metalService.calculateGoldPrice(this.spotPrices, this.goldRows)
+    const goldCalc = this.metalService.calculateGoldPrice(this.spotPrices, this.valuedRows('gold'))
 
     this.goldBreakdowns = goldCalc.breakdowns;
     this.goldTotals = goldCalc.totals
@@ -320,7 +418,7 @@ export class PreciousMetalsComponent implements OnInit {
   private calculateSilver() {
     if (!this.spotPrices) return;
 
-    const silverCalc = this.metalService.calculateSilverPrice(this.spotPrices, this.silverRows)
+    const silverCalc = this.metalService.calculateSilverPrice(this.spotPrices, this.valuedRows('silver'))
 
     this.silverBreakdowns = silverCalc.breakdowns;
     this.silverTotals = silverCalc.totals
@@ -420,4 +518,13 @@ export class PreciousMetalsComponent implements OnInit {
   private round2(value: number): number {
     return Math.round(value * 100) / 100;
   }
+}
+
+/** "2 pieces", "12 coins", or "2 pieces · 12 coins". */
+export function describeEntries(entries: MetalListEntry[]): string {
+  const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
+  const pieces = entries.filter(entry => !isCoinEntry(entry)).length;
+  const coins = entries.filter(isCoinEntry).reduce((sum, entry) => sum + entry.quantity, 0);
+  const parts = [pieces > 0 ? plural(pieces, 'piece') : '', coins > 0 ? plural(coins, 'coin') : ''].filter(Boolean);
+  return parts.join(' · ') || plural(0, 'piece');
 }

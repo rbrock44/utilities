@@ -12,6 +12,26 @@ export const redirectLegacyTile: CanActivateFn = route => {
   return param ? inject(Router).createUrlTree(['/', param]) : true;
 };
 
+/**
+ * Coin Stack Value was folded into Precious Metals. Its links still work: the stack is
+ * converted to coin rows in a Precious Metals link, keeping the stack's name.
+ */
+export const redirectCoinStack: CanActivateFn = async route => {
+  const router = inject(Router);
+  // Loaded on demand so the coin list stays out of the main bundle.
+  const [{ decodeLegacyStack }, { encodeMetalList }] = await Promise.all([
+    import('./constants/coin-options'),
+    import('./components/calculators/precious-metals/metal-list'),
+  ]);
+  const stack = decodeLegacyStack(route.queryParamMap.get('stack') ?? '').items;
+  const name = route.queryParamMap.get('name');
+  const queryParams = {
+    ...(stack.length > 0 ? { metals: encodeMetalList(stack.map(item => ({ coin: item.id, quantity: item.quantity, ...(item.note ? { note: item.note } : {}) }))) } : {}),
+    ...(name ? { name } : {}),
+  };
+  return router.createUrlTree(['/', 'precious-metals'], { queryParams });
+};
+
 function toolRoute(param: string, title: string, description: string): Routes[number] {
   const tool = TOOLS[param];
   const data: PageData = { description, tool, heading: title, noindex: !!tool.unlisted };
@@ -37,5 +57,6 @@ export const routes: Routes = [
   },
   ...listedRoutes,
   ...unlistedRoutes,
+  { path: 'coin-stack-calculator', canActivate: [redirectCoinStack], children: [] },
   { path: '**', redirectTo: '' }
 ];

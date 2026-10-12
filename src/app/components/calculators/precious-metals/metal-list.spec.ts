@@ -107,3 +107,34 @@ describe('spot prices in links', () => {
     expect(decodeSpotPrices('2000_25_soon')).toBeNull();
   });
 });
+
+describe('coins in links', () => {
+  const morgans = { coin: 'silver-morgan-dollar-1878-1921', quantity: 10, note: 'from grandpa' };
+  const eagle = { coin: 'gold-american-gold-eagle-1-oz-22k', quantity: 1 };
+
+  it('should round-trip coins next to weighed pieces', () => {
+    const encoded = encodeMetalList([ring, morgans, eagle]);
+    const raw = JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')));
+
+    expect(raw[1]).toEqual(['c', morgans.coin, 10, 'from grandpa']);
+    expect(raw[2]).toEqual(['c', eagle.coin, 1]);
+    expect(decodeMetalList(encoded)).toEqual({ items: [ring, morgans, eagle], skipped: 0 });
+  });
+
+  it('should skip unknown coins and bad counts', () => {
+    const tampered = btoa(JSON.stringify([
+      ['c', 'silver-not-a-coin', 1],
+      ['c', morgans.coin, 0],
+      ['c', morgans.coin, 1.5],
+      ['c', morgans.coin, '2'],
+      ['c', eagle.coin, 1, '  '],
+    ]));
+    expect(decodeMetalList(tampered)).toEqual({ items: [eagle], skipped: 4 });
+  });
+
+  it('should accept saved lists that mix pieces and coins', () => {
+    expect(isMetalItems([ring, morgans])).toBe(true);
+    expect(isMetalItems([{ ...morgans, coin: 'nope' }])).toBe(false);
+    expect(isMetalItems([{ ...morgans, note: 3 }])).toBe(false);
+  });
+});

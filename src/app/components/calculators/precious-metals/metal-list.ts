@@ -1,3 +1,4 @@
+import { findCoin } from '../../../constants/coin-options';
 import { CUSTOM_PURITY, goldTypes, silverTypes } from '../../../constants/constants';
 
 export type ListMetal = 'gold' | 'silver';
@@ -11,6 +12,28 @@ export interface MetalListItem {
   note?: string;
   /** Percent fine, only for a custom percent row. */
   purity?: number;
+}
+
+/** A counted coin from the coin list, valued from its standard weight and purity. */
+export interface CoinListItem {
+  coin: string;
+  quantity: number;
+  note?: string;
+}
+
+export type MetalListEntry = MetalListItem | CoinListItem;
+
+export function isCoinEntry(entry: MetalListEntry): entry is CoinListItem {
+  return 'coin' in entry;
+}
+
+export function isCoinItem(value: unknown): value is CoinListItem {
+  const item = value as CoinListItem;
+  return (
+    typeof item?.coin === 'string' && !!findCoin(item.coin) &&
+    Number.isInteger(item.quantity) && item.quantity > 0 &&
+    (item.note === undefined || typeof item.note === 'string')
+  );
 }
 
 function typesFor(metal: ListMetal): MetalType[] {
@@ -39,18 +62,21 @@ export function isMetalItem(value: unknown): value is MetalListItem {
   );
 }
 
-export function isMetalItems(value: unknown): value is MetalListItem[] {
-  return Array.isArray(value) && value.every(isMetalItem);
+export function isMetalItems(value: unknown): value is MetalListEntry[] {
+  return Array.isArray(value) && value.every(item => isMetalItem(item) || isCoinItem(item));
 }
 
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
  * `[g|s, type, weight, g|t, note?]` to keep links short; a custom percent row puts its
- * percent (a number) where the type name would be.
+ * percent (a number) where the type name would be. A coin is `[c, coin id, quantity, note?]`.
  */
-export function encodeMetalList(items: MetalListItem[]): string {
+export function encodeMetalList(items: MetalListEntry[]): string {
   const rows = items.map(item => {
+    if (isCoinEntry(item)) {
+      return item.note ? ['c', item.coin, item.quantity, item.note] : ['c', item.coin, item.quantity];
+    }
     const type = item.type === CUSTOM_PURITY ? item.purity! : item.type;
     const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, item.unit === 'toz' ? 't' : 'g'];
     if (item.note) {
@@ -66,7 +92,7 @@ export function encodeMetalList(items: MetalListItem[]): string {
 }
 
 /** Reads a shared list, keeping valid rows and counting the ones it had to skip. */
-export function decodeMetalList(text: string): { items: MetalListItem[]; skipped: number } {
+export function decodeMetalList(text: string): { items: MetalListEntry[]; skipped: number } {
   let rows: unknown;
   try {
     const base64 = text.replace(/-/g, '+').replace(/_/g, '/');
@@ -80,10 +106,24 @@ export function decodeMetalList(text: string): { items: MetalListItem[]; skipped
     return { items: [], skipped: 1 };
   }
 
-  const items: MetalListItem[] = [];
+  const items: MetalListEntry[] = [];
   let skipped = 0;
   for (const row of rows) {
     const [metal, type, weight, unit, note] = Array.isArray(row) ? row : [];
+    if (metal === 'c') {
+      const [, coin, quantity, coinNote] = row as unknown[];
+      const item: CoinListItem = {
+        coin: coin as string,
+        quantity: quantity as number,
+        ...(typeof coinNote === 'string' && coinNote.trim() ? { note: coinNote.trim() } : {}),
+      };
+      if (isCoinItem(item)) {
+        items.push(item);
+      } else {
+        skipped++;
+      }
+      continue;
+    }
     const item: MetalListItem = {
       metal: metal === 'g' ? 'gold' : 'silver',
       type: typeof type === 'number' ? CUSTOM_PURITY : type,

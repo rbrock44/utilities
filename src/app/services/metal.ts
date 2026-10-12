@@ -75,7 +75,7 @@ export class MetalService {
     if (row.type === CUSTOM_PURITY) {
       const percent = row.purity;
       return percent !== undefined && Number.isFinite(percent) && percent > 0 && percent <= 100
-        ? { name: `${label} ${percent}%`, purity: percent / 100 }
+        ? { name: row.label ?? `${label} ${percent}%`, purity: percent / 100 }
         : undefined;
     }
     return types.find(t => t.name === row.type);

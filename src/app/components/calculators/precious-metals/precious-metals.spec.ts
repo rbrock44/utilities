@@ -3,8 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
 
-import { PreciousMetalsComponent } from './precious-metals';
+import { describeEntries, PreciousMetalsComponent } from './precious-metals';
 import { goldTypes, silverTypes } from '../../../constants/constants';
+import { COIN_OPTIONS } from '../../../constants/coin-options';
 import { SpotPriceService } from '../../../services/spot-price';
 import { encodeMetalList, encodeSpotPrices, MetalListItem } from './metal-list';
 
@@ -306,7 +307,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     expect(component.silverBreakdowns[0].type).toBe('Silver 70%');
     expect(component.silverTotals.spotValue).toBeCloseTo(0.7 * 25, 4);
 
-    const item = component.items.find(i => i.metal === 'silver')!;
+    const item = component.items.find(i => 'metal' in i && i.metal === 'silver')!;
     expect(item).toEqual({ metal: 'silver', type: 'Custom %', purity: 70, weight: 31.1035, unit: 'grams' });
 
     component.loadList({ name: 'x', savedAt: '', items: [item] });
@@ -592,4 +593,98 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(savedNames()).toEqual([]);
     });
   });
+
+  describe('coins', () => {
+    const morgan = 'silver-morgan-dollar-1878-1921';
+    const eagle = 'gold-american-gold-eagle-1-oz-22k';
+    // 26.73 g × .900 Morgan and 33.931 g × .9167 Eagle.
+    const morganToz = 26.73 * 0.9 / 31.1035;
+    const eagleToz = 33.931 * 0.9167 / 31.1035;
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+
+    it('should add a coin, count up when picked again, and leave out coins with no metal', async () => {
+      await setup();
+      component.addCoin(morgan);
+      component.addCoin(morgan);
+      component.addCoin('nope');
+
+      expect(component.coinRows.map(row => [row.coin.id, row.quantity])).toEqual([[morgan, 2]]);
+      expect(component.coinOptions.length).toBeGreaterThan(0);
+      expect(component.coinOptions.every(option => findCoinPurity(option.id) > 0)).toBe(true);
+    });
+
+    it('should value coins in the matching metal breakdown, named with their count and note', async () => {
+      await setup();
+      component.addCoin(morgan);
+      component.addCoin(eagle);
+      component.coinRows[0].quantity = 10;
+      component.coinRows[0].note = 'from grandpa';
+      component.calculate();
+
+      expect(component.silverBreakdowns).toEqual([expect.objectContaining({
+        type: 'Morgan Dollar · 1878-1921 × 10',
+        note: 'from grandpa',
+      })]);
+      expect(component.silverTotals.totalPureToz).toBeCloseTo(morganToz * 10, 6);
+      expect(component.goldTotals.totalPureToz).toBeCloseTo(eagleToz, 6);
+      expect(component.grandTotals.spotValue).toBeCloseTo(morganToz * 10 * 25 + eagleToz * 2000, 4);
+      expect(component.quote.silver[0].type).toBe('Morgan Dollar · 1878-1921 × 10');
+    });
+
+    it('should ignore blank or fractional counts until fixed, and drop removed coins from the totals', async () => {
+      await setup();
+      component.addCoin(morgan);
+      component.coinRows[0].quantity = 1.5;
+      component.calculate();
+      expect(component.silverBreakdowns).toEqual([]);
+      expect(component.items).toEqual([]);
+
+      component.coinRows[0].quantity = 3;
+      component.calculate();
+      expect(component.silverTotals.totalPureToz).toBeCloseTo(morganToz * 3, 6);
+
+      component.removeCoinRow(component.coinRows[0]);
+      expect(component.coinRows).toEqual([]);
+      expect(component.silverTotals.spotValue).toBe(0);
+    });
+
+    it('should save and share coins with notes next to weighed pieces', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: '14K Gold (58.3%)', weight: 4.2, note: 'nugget ring' });
+      component.addCoin(morgan);
+      component.coinRows[0].quantity = 2;
+      component.coinRows[0].note = ' 1941 ';
+
+      expect(component.items).toEqual([ring, { coin: morgan, quantity: 2, note: '1941' }]);
+      expect(component.describeList(component.items)).toBe('1 piece · 2 coins');
+
+      component.savedLists.save('Lot', component.items);
+      component.coinRows = [];
+      component.loadList(component.savedLists.lists()[0]);
+      expect(component.coinRows.map(row => [row.coin.id, row.quantity, row.note])).toEqual([[morgan, 2, '1941']]);
+    });
+
+    it('should open a shared link with coins and show them', async () => {
+      await setup({ metals: encodeMetalList([{ coin: eagle, quantity: 1, note: 'birthday' }]) });
+      render();
+      await fixture.whenStable();
+
+      expect(component.linkNotice).toBe('Loaded a shared list of 1 coin.');
+      expect(el().querySelector('.coin-name')?.textContent).toContain('American Gold Eagle');
+      expect((el().querySelector('.coin-row .note-input') as HTMLInputElement).value).toBe('birthday');
+      expect(component.goldTotals.totalPureToz).toBeCloseTo(eagleToz, 6);
+    });
+
+    it('should describe lists by pieces and coins', () => {
+      expect(describeEntries([])).toBe('0 pieces');
+      expect(describeEntries([ring, bar])).toBe('2 pieces');
+      expect(describeEntries([{ coin: morgan, quantity: 1 }])).toBe('1 coin');
+      expect(describeEntries([bar, { coin: morgan, quantity: 3 }, { coin: eagle, quantity: 2 }])).toBe('1 piece · 5 coins');
+    });
+  });
 });
+
+function findCoinPurity(id: string): number {
+  return COIN_OPTIONS.find(coin => coin.id === id)!.spec.purity;
+}

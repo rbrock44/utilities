@@ -160,6 +160,44 @@
     </app-precious-metal-breakdown>
   </div>
 
+  <div class="metal-section">
+    <div class="section-header">
+      <h3>💰 Coins</h3>
+    </div>
+    <app-combo-box
+      [options]="coinOptions"
+      [value]="coinPickerValue"
+      placeholder="Add a coin: Morgan, Eagle, Mercury dime…"
+      ariaLabel="Add a coin"
+      (valueChange)="addCoin($event)"
+    ></app-combo-box>
+
+    @if (coinRows.length > 0) {
+    <div class="rows-container coin-rows">
+      @for (row of coinRows; track row.coin.id) {
+      <div class="row coin-row">
+        <span class="coin-name">
+          <span class="metal-tag" [class.gold]="row.coin.metal === 'gold'">{{ row.coin.metal === 'gold' ? 'Au' : 'Ag' }}</span>
+          {{ row.coin.label }}
+        </span>
+        <input type="number" class="weight-input" min="1" step="1" [(ngModel)]="row.quantity" (ngModelChange)="calculate()"
+          [attr.aria-label]="'How many ' + row.coin.spec.name">
+        <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+          {{ isNoteShown(row) ? '−' : '+' }} note
+        </button>
+        <button class="remove-btn" (click)="removeCoinRow(row)" [attr.aria-label]="'Remove ' + row.coin.spec.name">×</button>
+        @if (isNoteShown(row)) {
+        <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+          placeholder="Note, e.g. 1941, from grandpa" maxlength="80" [attr.aria-label]="'Note for ' + row.coin.spec.name">
+        }
+      </div>
+      }
+    </div>
+    <p class="coin-hint">Coins are added to the gold and silver breakdowns above.</p>
+    }
+  </div>
+
   @if (linkNotice) {
   <p class="link-notice" role="status">{{ linkNotice }}</p>
   }

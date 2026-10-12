@@ -212,6 +212,47 @@
   align-items: center;
 }
 
+// Coin rows: name, count, note toggle, remove; the name takes the room a type and unit would.
+.coin-rows {
+  margin-top: 0.4rem;
+}
+
+.row.coin-row {
+  grid-template-columns: minmax(0, 22rem) 4.5rem auto 28px;
+  justify-content: start;
+
+  .note-input {
+    grid-column: 1 / -1;
+  }
+}
+
+.coin-name {
+  min-width: 0;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.metal-tag {
+  margin-right: 0.3rem;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  background: var(--muted-soft);
+  color: var(--muted-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  &.gold {
+    background: var(--warning-soft);
+    color: var(--warning-text);
+  }
+}
+
+.coin-hint {
+  margin: 0;
+  color: var(--text-faint);
+  font-size: 0.75rem;
+}
+
 .type-cell,
 .purity-wrap {
   display: flex;

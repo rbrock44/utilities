@@ -87,6 +87,23 @@ describe('App', () => {
     expect(page.querySelector('app-tile-grid')).toBeTruthy();
   }, SLOW_TEST_MS);
 
+  it('should send a retired coin stack link to precious metals with its coins and name', async () => {
+    await render('/coin-stack-calculator?stack=silver-morgan-dollar-1878-1921~2~from%20grandpa_nope~1&name=Jar');
+
+    const url = new URL(location.path(), 'https://x.test');
+    const { decodeMetalList } = await import('./components/calculators/precious-metals/metal-list');
+    expect(url.pathname).toBe('/precious-metals');
+    expect(url.searchParams.get('name')).toBe('Jar');
+    expect(decodeMetalList(url.searchParams.get('metals')!).items).toEqual([
+      { coin: 'silver-morgan-dollar-1878-1921', quantity: 2, note: 'from grandpa' },
+    ]);
+  }, SLOW_TEST_MS);
+
+  it('should send a bare coin stack link to precious metals', async () => {
+    await render('/coin-stack-calculator');
+    expect(location.path()).toBe('/precious-metals');
+  }, SLOW_TEST_MS);
+
   it('should send unknown paths home', async () => {
     await render('/not-a-tool');
     expect(location.path()).toBe('/');
