@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
@@ -47,6 +48,15 @@ describe('stack links', () => {
     expect(encoded).toBe(`${morganId}~10_${eagleId}~1`);
     expect(encodeURIComponent(encoded)).toBe(encoded);
     expect(decodeStack(encoded)).toEqual({ items, skipped: 0 });
+  });
+
+  it('should carry notes, even ones with link separators, and still read links without them', () => {
+    const items = [{ id: morganId, quantity: 2, note: '1941 ~ from grandpa_jar & co' }, { id: eagleId, quantity: 1 }];
+    const encoded = encodeStack(items);
+
+    expect(encoded.split('_').length).toBe(2);
+    expect(decodeStack(encoded)).toEqual({ items, skipped: 0 });
+    expect(decodeStack(`${morganId}~2~%E0%A4%A`)).toEqual({ items: [{ id: morganId, quantity: 2 }], skipped: 0 });
   });
 
   it('should skip unknown coins and bad quantities but keep the rest', () => {
@@ -246,5 +256,79 @@ describe('CoinStackCalculatorComponent', () => {
 
     click('Delete Morgans');
     expect(component.savedStacks.lists()).toEqual([]);
+  });
+
+  describe('notes', () => {
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+    const toggle = () => el().querySelector('.note-toggle') as HTMLButtonElement;
+
+    it('should keep an empty note hidden until toggled, and lock open once it has text', async () => {
+      await setup(2000, 30);
+      component.addCoin(morganId);
+      render();
+
+      expect(el().querySelector('.note-input')).toBeNull();
+      expect(toggle().textContent!.trim()).toBe('+ note');
+
+      toggle().click();
+      render();
+      expect(el().querySelector('.note-input')).toBeTruthy();
+      expect(toggle().textContent!.trim()).toBe('− note');
+
+      toggle().click();
+      render();
+      expect(el().querySelector('.note-input')).toBeNull();
+
+      component.rows[0].note = 'from grandpa';
+      render();
+      expect(el().querySelector('.note-input')).toBeTruthy();
+      expect(toggle().disabled).toBe(true);
+      component.toggleNote(component.rows[0]);
+      render();
+      expect(el().querySelector('.note-input')).toBeTruthy();
+    });
+
+    it('should save and share trimmed notes and leave blank ones out', async () => {
+      await setup(2000, 30);
+      component.addCoin(morganId);
+      component.addCoin(eagleId);
+      component.rows[0].quantity = 2;
+      component.rows[0].note = '  1941, from grandpa  ';
+      component.rows[1].note = '   ';
+
+      expect(component.items).toEqual([
+        { id: morganId, quantity: 2, note: '1941, from grandpa' },
+        { id: eagleId, quantity: 1 },
+      ]);
+      expect(decodeStack(component.shareValue!).items).toEqual(component.items);
+    });
+
+    it('should show notes from a shared link and from a loaded save', async () => {
+      store['utilities-coin-stacks'] = JSON.stringify([
+        { name: 'Jar', items: [{ id: eagleId, quantity: 1, note: 'birthday' }], savedAt: '2026-10-01T00:00:00.000Z' },
+      ]);
+      await setup(2000, 30, { stack: encodeStack([{ id: morganId, quantity: 2, note: 'from grandpa' }]) });
+      await fixture.whenStable();
+
+      expect(component.rows[0].note).toBe('from grandpa');
+      expect((el().querySelector('.note-input') as HTMLInputElement).value).toBe('from grandpa');
+
+      (el().querySelector('[aria-label="Load Jar"]') as HTMLButtonElement).click();
+      render();
+      await fixture.whenStable();
+
+      expect(component.items).toEqual([{ id: eagleId, quantity: 1, note: 'birthday' }]);
+      expect((el().querySelector('.note-input') as HTMLInputElement).value).toBe('birthday');
+    });
+
+    it('should drop saved stacks whose notes are not text', async () => {
+      store['utilities-coin-stacks'] = JSON.stringify([
+        { name: 'Bad', items: [{ id: morganId, quantity: 1, note: 5 }], savedAt: '2026-10-01T00:00:00.000Z' },
+      ]);
+      await setup(2000, 30);
+
+      expect(component.savedStacks.lists()).toEqual([]);
+    });
   });
 });

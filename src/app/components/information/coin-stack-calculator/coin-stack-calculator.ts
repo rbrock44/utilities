@@ -14,11 +14,13 @@ export type Metal = 'gold' | 'silver';
 export interface StackItem {
   id: string;
   quantity: number;
+  note?: string;
 }
 
 function isStackItems(value: unknown): value is StackItem[] {
   return Array.isArray(value) && value.every(
-    item => typeof item?.id === 'string' && Number.isInteger(item.quantity)
+    item => typeof item?.id === 'string' && Number.isInteger(item.quantity) &&
+      (item.note === undefined || typeof item.note === 'string')
   );
 }
 
@@ -32,6 +34,7 @@ export interface CoinOption {
 export interface StackRow {
   coin: CoinOption;
   quantity: number | null;
+  note?: string;
 }
 
 /**
@@ -64,9 +67,30 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-/** `id~quantity` pairs joined by `_`: characters that never need escaping in a URL. */
+/**
+ * `id~quantity` pairs joined by `_`: characters that never need escaping in a URL. A note
+ * rides along as a third `~` part, percent-encoded with `_` and `~` escaped too so it can't
+ * split a pair.
+ */
 export function encodeStack(items: StackItem[]): string {
-  return items.map(item => `${item.id}~${item.quantity}`).join('_');
+  return items
+    .map(item => {
+      const pair = `${item.id}~${item.quantity}`;
+      return item.note ? `${pair}~${encodeNote(item.note)}` : pair;
+    })
+    .join('_');
+}
+
+function encodeNote(note: string): string {
+  return encodeURIComponent(note).replace(/_/g, '%5F').replace(/~/g, '%7E');
+}
+
+function decodeNote(text: string | undefined): string {
+  try {
+    return decodeURIComponent(text ?? '').trim();
+  } catch {
+    return '';
+  }
 }
 
 /** Reads a shared stack, keeping recognizable coins and counting the ones it had to skip. */
@@ -75,10 +99,11 @@ export function decodeStack(text: string): { items: StackItem[]; skipped: number
   let skipped = 0;
 
   for (const pair of text.split('_').filter(Boolean)) {
-    const [id, count] = pair.split('~');
+    const [id, count, encodedNote] = pair.split('~');
     const quantity = Number(count);
+    const note = decodeNote(encodedNote);
     if (COIN_OPTIONS.some(coin => coin.id === id) && Number.isInteger(quantity) && quantity > 0) {
-      items.push({ id, quantity });
+      items.push(note ? { id, quantity, note } : { id, quantity });
     } else {
       skipped++;
     }
@@ -109,6 +134,9 @@ export class CoinStackCalculatorComponent implements OnInit {
   stackName = '';
   /** Set when a shared link is opened, to say what was loaded from it. */
   linkNotice: string | null = null;
+
+  /** Rows whose empty note box is expanded; a note with text always shows. */
+  private openNotes = new Set<StackRow>();
 
   readonly savedStacks = new SavedListStore<StackItem[]>('utilities-coin-stacks', isStackItems);
   readonly describeStack = (items: StackItem[]) =>
@@ -168,7 +196,33 @@ export class CoinStackCalculatorComponent implements OnInit {
   get items(): StackItem[] {
     return this.rows
       .filter(row => this.isWholeOrZero(row.quantity) && row.quantity! > 0)
-      .map(row => ({ id: row.coin.id, quantity: row.quantity! }));
+      .map(row => {
+        const note = row.note?.trim();
+        return note ? { id: row.coin.id, quantity: row.quantity!, note } : { id: row.coin.id, quantity: row.quantity! };
+      });
+  }
+
+  hasNote(row: StackRow): boolean {
+    return !!row.note?.trim();
+  }
+
+  /** A note with text always shows; a blank one shows only while toggled open. */
+  isNoteShown(row: StackRow): boolean {
+    return this.hasNote(row) || this.openNotes.has(row);
+  }
+
+  noteToggleTitle(row: StackRow): string {
+    if (this.hasNote(row)) return 'Clear the note to hide it';
+    return this.openNotes.has(row) ? 'Hide note' : 'Add a note';
+  }
+
+  toggleNote(row: StackRow): void {
+    if (this.hasNote(row)) return;
+    if (this.openNotes.has(row)) {
+      this.openNotes.delete(row);
+    } else {
+      this.openNotes.add(row);
+    }
   }
 
   /** Null until there's at least one coin, which disables Save and the share link. */
@@ -271,7 +325,7 @@ export class CoinStackCalculatorComponent implements OnInit {
   private applyItems(items: StackItem[]): void {
     this.rows = items.flatMap(item => {
       const coin = COIN_OPTIONS.find(option => option.id === item.id);
-      return coin ? [{ coin, quantity: item.quantity }] : [];
+      return coin ? [{ coin, quantity: item.quantity, note: item.note ?? '' }] : [];
     });
   }
 

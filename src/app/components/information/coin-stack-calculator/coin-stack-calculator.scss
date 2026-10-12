@@ -100,6 +100,47 @@ th {
   color: var(--warning-text);
 }
 
+.row-actions {
+  white-space: nowrap;
+}
+
+.note-toggle {
+  margin-right: 0.35rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.note-toggle:hover:not(:disabled),
+.note-toggle.open {
+  border-color: var(--brand-border);
+  color: var(--brand);
+}
+
+.note-toggle:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+// The note row hangs under its coin, so the coin row above loses its divider.
+tr:has(+ .note-row) td {
+  border-bottom: none;
+}
+
+.note-row td {
+  padding-top: 0;
+}
+
+.note-input {
+  padding: 0.3rem 0.5rem;
+  border-style: dashed;
+  font-size: 0.85rem;
+}
+
 .remove {
   border: none;
   background: transparent;
@@ -180,5 +221,17 @@ th {
 
   .btn-secondary {
     width: 100%;
+  }
+
+  // Stack the note pill over the remove button so the table fits a phone.
+  .row-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+  }
+
+  .note-toggle {
+    margin-right: 0;
   }
 }

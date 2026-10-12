@@ -73,10 +73,22 @@
               </td>
               <td>{{ toz(rowToz(row)) }}</td>
               <td>{{ money(rowValue(row)) }}</td>
-              <td>
+              <td class="row-actions">
+                <button type="button" class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)"
+                  [disabled]="hasNote(row)" [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+                  {{ isNoteShown(row) ? '−' : '+' }} note
+                </button>
                 <button type="button" class="remove" [attr.aria-label]="'Remove ' + row.coin.spec.name" (click)="removeRow(row)">✕</button>
               </td>
             </tr>
+            @if (isNoteShown(row)) {
+              <tr class="note-row">
+                <td colspan="5">
+                  <input type="text" class="note-input" [(ngModel)]="row.note" maxlength="80"
+                    placeholder="Note, e.g. from grandpa's jar" [attr.aria-label]="'Note for ' + row.coin.spec.name" />
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
