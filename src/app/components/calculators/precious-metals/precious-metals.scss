@@ -199,6 +199,7 @@
   flex-direction: column;
   gap: 0.35rem;
   margin-bottom: 0.4rem;
+  container-type: inline-size;
 }
 
 // Columns sized to what they hold: type names top out around 18 characters and weights
@@ -423,6 +424,18 @@
   padding-bottom: 0.4rem;
   font-size: 1.1rem;
   opacity: 0.85;
+}
+
+// With room to spare the note sits beside the row instead of on its own line under it.
+@container (min-width: 46rem) {
+  .row {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 7rem) auto auto 28px minmax(8rem, 1fr);
+    justify-content: stretch;
+  }
+
+  .note-input {
+    grid-column: 6;
+  }
 }
 
 @media (max-width: 768px) {
