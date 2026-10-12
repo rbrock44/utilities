@@ -428,4 +428,168 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     expect(component.goldTotals.spotValue).toBeCloseTo(0.625 * 2000, 4);
     expect(component.items[0]).toEqual({ metal: 'gold', type: 'Custom %', purity: 62.5, weight: 31.1035, unit: 'grams' });
   });
+
+  describe('saved lists', () => {
+    const KEY = 'utilities-metal-lists';
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+    const saveButton = () => el().querySelector('.save-share .btn-primary') as HTMLButtonElement;
+    const savedNames = () => [...el().querySelectorAll('.save-share .list-name')].map(n => n.textContent);
+    const saved = () => JSON.parse(store[KEY] ?? '[]') as { name: string; items: MetalListItem[]; savedAt: string }[];
+    const button = (label: string) => el().querySelector(`[aria-label="${label}"]`) as HTMLButtonElement;
+
+    const typeName = (name: string) => {
+      const input = el().querySelector('#saveShareName') as HTMLInputElement;
+      input.value = name;
+      input.dispatchEvent(new Event('input'));
+      render();
+    };
+    const weigh = (rows: MetalRow[], ...pieces: Partial<MetalRow>[]) => {
+      pieces.forEach((piece, index) => {
+        if (index > 0) rows === component.goldRows ? component.addGoldRow() : component.addSilverRow();
+        const target = rows === component.goldRows ? component.goldRows : component.silverRows;
+        Object.assign(target[target.length - 1], piece);
+      });
+      component.calculate();
+      render();
+    };
+    const saveAs = (name: string) => {
+      typeName(name);
+      saveButton().click();
+      render();
+    };
+    const reload = async () => {
+      TestBed.resetTestingModule();
+      await setup();
+    };
+
+    it('should only save once a piece is weighed and the list has a name', async () => {
+      await setup();
+      expect(saveButton().disabled).toBe(true);
+
+      weigh(component.goldRows, { type: '14K Gold (58.3%)', weight: 4.2, note: 'nugget ring' });
+      expect(saveButton().disabled).toBe(true);
+
+      typeName('   ');
+      expect(saveButton().disabled).toBe(true);
+
+      saveAs('Smith estate');
+
+      expect(saved()).toEqual([{ name: 'Smith estate', items: [ring], savedAt: expect.any(String) }]);
+      expect(savedNames()).toEqual(['Smith estate']);
+      expect(el().querySelector('.save-share .meta')?.textContent).toBe('1 piece');
+      expect(el().querySelector('.save-share .notice')?.textContent).toContain('Saved “Smith estate” in this browser.');
+    });
+
+    it('should keep a list across a reload and restore every row, unit, note, and custom percent', async () => {
+      await setup();
+      weigh(component.goldRows,
+        { type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: 'nugget ring' },
+        { type: 'Custom %', purity: 62.5, weight: 1, unit: 'toz' });
+      weigh(component.silverRows,
+        { type: 'Fine Silver (99.9%)', weight: 1, unit: 'toz' },
+        { type: 'Custom %', purity: 70, weight: 31.1035, unit: 'grams', note: 'old bracelet' },
+        { weight: 0 });
+      const expected = component.items;
+      saveAs('Estate');
+
+      expect(expected.length).toBe(4);
+      expect(saved()[0].items).toEqual(expected);
+      expect(el().querySelector('.save-share .meta')?.textContent).toBe('4 pieces');
+
+      await reload();
+      expect(component.items).toEqual([]);
+      expect(savedNames()).toEqual(['Estate']);
+
+      button('Load Estate').click();
+      render();
+      // ngModel writes values into inputs a tick after they render.
+      await fixture.whenStable();
+
+      expect(component.items).toEqual(expected);
+      expect(component.listName).toBe('Estate');
+      expect(component.goldRows.map(row => row.purity)).toEqual([undefined, 62.5]);
+      expect(component.silverRows.map(row => row.unit)).toEqual(['toz', 'grams']);
+      expect([...el().querySelectorAll('.note-input')].map(input => (input as HTMLInputElement).value))
+        .toEqual(['nugget ring', 'old bracelet']);
+      // 4.2 g of 14K, 1 oz t at 62.5%, 1 oz t of .999 silver, 1 oz t at 70% silver.
+      const gold = (4.2 * 0.583 / 31.1035 + 0.625) * 2000;
+      const silver = (0.999 + 0.7) * 25;
+      expect(component.grandTotals.spotValue).toBeCloseTo(gold + silver, 2);
+    });
+
+    it('should replace a list saved again under the same name, ignoring case, and keep the newest first', async () => {
+      await setup();
+      weigh(component.goldRows, { type: '14K Gold (58.3%)', weight: 4.2 });
+      saveAs('Alpha');
+      saveAs('Beta');
+
+      component.addSilverRow();
+      weigh(component.silverRows, { type: 'Fine Silver (99.9%)', weight: 1, unit: 'toz' });
+      saveAs('alpha');
+
+      expect(savedNames()).toEqual(['alpha', 'Beta']);
+      expect(saved().map(list => list.items.length)).toEqual([2, 1]);
+    });
+
+    it('should delete a saved list from the panel and from storage', async () => {
+      await setup();
+      weigh(component.goldRows, { type: '14K Gold (58.3%)', weight: 4.2 });
+      saveAs('Keep');
+      saveAs('Drop');
+
+      button('Delete Drop').click();
+      render();
+
+      expect(savedNames()).toEqual(['Keep']);
+      expect(saved().map(list => list.name)).toEqual(['Keep']);
+      expect(component.items.length).toBe(1);
+    });
+
+    it('should replace what is on screen when loading, leaving an empty row for a metal the list lacks', async () => {
+      store[KEY] = JSON.stringify([{ name: 'Rings', items: [ring], savedAt: '2026-10-01T00:00:00.000Z' }]);
+      await setup({ metals: encodeMetalList([bar]) });
+      expect(component.linkNotice).not.toBeNull();
+
+      button('Load Rings').click();
+      render();
+
+      expect(component.items).toEqual([ring]);
+      expect(component.silverRows).toEqual([expect.objectContaining({ type: silverTypes[0].name, weight: 0 })]);
+      expect(component.silverTotals.spotValue).toBe(0);
+      expect(component.linkNotice).toBeNull();
+      expect(el().querySelector('.link-notice')).toBeNull();
+    });
+
+    it('should drop saved entries it can no longer read and keep the rest', async () => {
+      const savedAt = '2026-10-01T00:00:00.000Z';
+      store[KEY] = JSON.stringify([
+        { name: 'Good', items: [ring, { metal: 'gold', type: 'Custom %', purity: 62.5, weight: 1, unit: 'toz' }], savedAt },
+        { name: 'Unknown type', items: [{ ...ring, type: '13K Gold' }], savedAt },
+        { name: 'Bad percent', items: [{ metal: 'gold', type: 'Custom %', purity: 150, weight: 1, unit: 'toz' }], savedAt },
+        { name: 'Bad unit', items: [{ ...bar, unit: 'lb' }], savedAt },
+        { name: 'No date', items: [bar] },
+        'not a list',
+      ]);
+      await setup();
+
+      expect(savedNames()).toEqual(['Good']);
+      expect(el().querySelector('.save-share .meta')?.textContent).toBe('2 pieces');
+    });
+
+    it('should still work, without remembering, when storage is blocked', async () => {
+      vi.stubGlobal('localStorage', {
+        getItem: () => { throw new Error('blocked'); },
+        setItem: () => { throw new Error('blocked'); },
+      });
+      await setup();
+      weigh(component.goldRows, { type: '14K Gold (58.3%)', weight: 4.2 });
+
+      saveAs('Session only');
+      expect(savedNames()).toEqual(['Session only']);
+
+      await reload();
+      expect(savedNames()).toEqual([]);
+    });
+  });
 });
