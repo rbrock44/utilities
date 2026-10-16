@@ -141,6 +141,53 @@
   background: var(--surface);
 }
 
+.spot-price-card {
+  cursor: pointer;
+}
+
+.breakdown-toggle {
+  padding: 0 0.2rem;
+  background: none;
+  border: none;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.breakdown-toggle.open {
+  transform: rotate(180deg);
+}
+
+.type-prices {
+  flex-basis: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0 1.5rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.type-prices ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.type-prices li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--text-soft);
+}
+
+.type-prices strong {
+  color: var(--brand);
+}
+
 .timestamp {
   margin-left: auto;
   font-size: 0.75rem;

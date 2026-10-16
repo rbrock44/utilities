@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
-import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
@@ -59,6 +59,8 @@ export class PreciousMetalsComponent implements OnInit {
   editingMetal: SpotMetal | null = null;
   editPrice: number | null = null;
   overridden: Record<SpotMetal, boolean> = { gold: false, silver: false };
+  /** Whether the per-type price lists are dropped down; gold and silver open together. */
+  typePricesOpen = false;
 
   @ViewChild('priceInput') set priceInput(input: ElementRef<HTMLInputElement> | undefined) {
     input?.nativeElement.focus();
@@ -453,6 +455,26 @@ export class PreciousMetalsComponent implements OnInit {
 
   cancelPriceEdit() {
     this.editingMetal = null;
+  }
+
+  /** A click on a card opens the per-type prices, unless it landed on the price, its input or a button. */
+  onSpotCardClick(event: MouseEvent) {
+    if ((event.target as HTMLElement).closest('button, input')) return;
+    this.toggleTypePrices();
+  }
+
+  toggleTypePrices() {
+    this.typePricesOpen = !this.typePricesOpen;
+  }
+
+  /** What a gram of each fineness is worth at the current spot price, named without the metal ("14K (58.3%)"). */
+  typePrices(metal: SpotMetal): { name: string; perGram: number }[] {
+    const types = metal === 'gold' ? goldTypes : silverTypes;
+    const perGramPure = this.spotPrices[metal] / TROY_OZ_IN_GRAMS;
+    return types.map(type => ({
+      name: type.name.replace(/\s*(Gold|Silver)\b/, '').replace('German/European', 'European'),
+      perGram: perGramPure * type.purity,
+    }));
   }
 
   resetPrice(metal: SpotMetal) {

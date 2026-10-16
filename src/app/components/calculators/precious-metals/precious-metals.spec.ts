@@ -149,6 +149,30 @@ describe('PreciousMetalsComponent', () => {
       expect(component.overridden.gold).toBe(false);
       expect(component.goldTotals.spotValue).toBeCloseTo(1998);
     });
+
+    it('prices a gram of each type at spot', () => {
+      const prices = component.typePrices('gold');
+      const fourteen = prices.find(p => p.name === '14K (58.3%)')!;
+
+      expect(prices.length).toBe(goldTypes.length);
+      expect(fourteen.perGram).toBeCloseTo(2000 / 31.1035 * 0.583, 2);
+      expect(component.typePrices('silver').map(p => p.name)).toEqual(
+        ['Fine (99.9%)', 'Sterling (92.5%)', 'Coin (90%)', 'European (80%)']);
+    });
+
+    it('drops down type prices on a card click but not on the price', () => {
+      const card = { closest: () => null } as unknown as HTMLElement;
+      const price = { closest: () => ({}) } as unknown as HTMLElement;
+
+      component.onSpotCardClick({ target: price } as unknown as MouseEvent);
+      expect(component.typePricesOpen).toBe(false);
+
+      component.onSpotCardClick({ target: card } as unknown as MouseEvent);
+      expect(component.typePricesOpen).toBe(true);
+
+      component.toggleTypePrices();
+      expect(component.typePricesOpen).toBe(false);
+    });
   });
 });
 

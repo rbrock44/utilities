@@ -9,7 +9,7 @@
   @if (spotPrices) {
   <div class="spot-prices">
     @for (metal of spotMetals; track metal.key) {
-    <div class="spot-price-card">
+    <div class="spot-price-card" (click)="onSpotCardClick($event)">
       <span class="metal-name">{{ metal.label }}</span>
       @if (editingMetal === metal.key) {
       <span class="price-edit">
@@ -28,11 +28,24 @@
         [title]="'Reset to live $' + livePrices[metal.key].toFixed(2)"
         [attr.aria-label]="'Reset ' + metal.label.toLowerCase() + ' to live price'">↺</button>
       }
+      <button class="breakdown-toggle" [class.open]="typePricesOpen" (click)="toggleTypePrices()"
+        [attr.aria-expanded]="typePricesOpen" aria-label="Show price per gram by type">▾</button>
     </div>
     }
     <div class="timestamp">
       Updated: {{ spotPrices.timestamp | date:'short' }}
     </div>
+    @if (typePricesOpen) {
+    <div class="type-prices">
+      @for (metal of spotMetals; track metal.key) {
+      <ul [attr.aria-label]="metal.label + ' price per gram by type'">
+        @for (type of typePrices(metal.key); track type.name) {
+        <li><span>{{ type.name }}</span><strong>{{ type.perGram > 0 ? '$' + type.perGram.toFixed(2) + '/g' : '—' }}</strong></li>
+        }
+      </ul>
+      }
+    </div>
+    }
   </div>
   }
 
