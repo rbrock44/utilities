@@ -8,6 +8,8 @@ export interface CoinOption {
   label: string;
   metal: CoinMetal;
   spec: CoinSpec;
+  /** Years struck, read from the description; an open end (`Pre-1965`, `2016+`) is left out. */
+  years?: { from?: number; to?: number };
 }
 
 /**
@@ -27,13 +29,40 @@ function buildOptions(): CoinOption[] {
     }
     taken.add(id);
     const label = spec.description ? `${spec.name} · ${spec.description}` : spec.name;
-    return { id, label, metal, spec };
+    const years = yearsFrom(spec.description);
+    return { id, label, metal, spec, ...(years ? { years } : {}) };
   };
 
   return [
     ...GOLD_COIN_DATABASE.map(spec => toOption(spec, 'gold')),
     ...SILVER_COIN_DATABASE.map(spec => toOption(spec, 'silver')),
   ];
+}
+
+function yearsFrom(description: string | undefined): CoinOption['years'] {
+  const text = description ?? '';
+  const before = text.match(/^Pre-(\d{4})$/i);
+  if (before) {
+    return { to: Number(before[1]) - 1 };
+  }
+  const since = text.match(/\((\d{4})\+\)/);
+  if (since) {
+    return { from: Number(since[1]) };
+  }
+  // Only a leading date, so `1000 toz` isn't read as the year 1000.
+  const range = text.match(/^(\d{4})(?:-(\d{4}))?(?:$| \()/);
+  if (range) {
+    return { from: Number(range[1]), to: Number(range[2] ?? range[1]) };
+  }
+  return undefined;
+}
+
+/** True when a dated coin was struck in `year`; undated coins never match a year. */
+export function coinStruckIn(coin: CoinOption, year: number): boolean {
+  if (!coin.years) {
+    return false;
+  }
+  return (coin.years.from ?? -Infinity) <= year && year <= (coin.years.to ?? Infinity);
 }
 
 function slugify(text: string): string {

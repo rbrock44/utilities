@@ -26,6 +26,9 @@ export class ComboBoxComponent implements OnChanges {
   @Input() value: string | null = null;
   @Input() placeholder = 'Search…';
   @Input() ariaLabel = 'Select an option';
+  /** Decides whether one typed word fits an option; every word has to fit, in any order. */
+  @Input() matchesWord: (option: ComboBoxOption, word: string) => boolean =
+    (option, word) => option.searchText.includes(word);
   @Output() valueChange = new EventEmitter<string>();
 
   query = '';
@@ -48,8 +51,8 @@ export class ComboBoxComponent implements OnChanges {
     if (!this.hasTyped || this.query.trim() === '') {
       return this.options;
     }
-    const term = this.query.trim().toLowerCase();
-    return this.options.filter(option => option.searchText.includes(term));
+    const words = this.query.trim().toLowerCase().split(/\s+/);
+    return this.options.filter(option => words.every(word => this.matchesWord(option, word)));
   }
 
   onFocus(event: FocusEvent): void {

@@ -1,4 +1,4 @@
-import { COIN_OPTIONS, decodeLegacyStack, findCoin, pureTozPerCoin } from './coin-options';
+import { COIN_OPTIONS, coinStruckIn, decodeLegacyStack, findCoin, pureTozPerCoin } from './coin-options';
 
 const morganId = 'silver-morgan-dollar-1878-1921';
 const eagleId = 'gold-american-gold-eagle-1-oz-22k';
@@ -20,6 +20,25 @@ describe('COIN_OPTIONS', () => {
   it('should tell the two Kennedy halves apart by year', () => {
     const kennedys = COIN_OPTIONS.filter(c => c.spec.name === 'Kennedy Half Dollar').map(c => c.label);
     expect(kennedys).toEqual(['Kennedy Half Dollar · 1965-1970', 'Kennedy Half Dollar · 1964']);
+  });
+
+  it('should read the years struck from each description', () => {
+    const years = (name: string) => COIN_OPTIONS.find(c => c.spec.name === name)!.years;
+    expect(years('Mercury Dime')).toEqual({ from: 1916, to: 1945 });
+    expect(years('Roosevelt Dime')).toEqual({ to: 1964 });
+    expect(COIN_OPTIONS.find(c => c.spec.description === '30g (2016+)')!.years).toEqual({ from: 2016 });
+    expect(findCoin(morganId)!.years).toEqual({ from: 1878, to: 1921 });
+    expect(findCoin(eagleId)!.years).toBeUndefined();
+    expect(COIN_OPTIONS.filter(c => c.spec.description === '1000 toz').every(c => !c.years)).toBe(true);
+  });
+
+  it('should match a year inside a coin\'s range, including open ends', () => {
+    const morgan = findCoin(morganId)!;
+    expect(coinStruckIn(morgan, 1878)).toBe(true);
+    expect(coinStruckIn(morgan, 1921)).toBe(true);
+    expect(coinStruckIn(morgan, 1922)).toBe(false);
+    expect(coinStruckIn(COIN_OPTIONS.find(c => c.spec.name === 'Roosevelt Dime')!, 1950)).toBe(true);
+    expect(coinStruckIn(findCoin(eagleId)!, 2000)).toBe(false);
   });
 
   it('should compute pure troy ounces from weight and purity', () => {

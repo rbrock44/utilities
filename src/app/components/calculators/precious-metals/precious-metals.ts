@@ -8,7 +8,7 @@ import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS, silverTypes, TR
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
-import { COIN_OPTIONS, CoinOption, findCoin } from '../../../constants/coin-options';
+import { COIN_OPTIONS, CoinOption, coinStruckIn, findCoin } from '../../../constants/coin-options';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
 import {
   CoinListItem,
@@ -102,6 +102,15 @@ export class PreciousMetalsComponent implements OnInit {
       label: `${coin.metal === 'gold' ? 'Gold' : 'Silver'} · ${coin.label}`,
       searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
     }));
+
+  /** A typed year like `1944` finds coins struck that year, not just ones whose label has it. */
+  readonly coinMatchesWord = (option: ComboBoxOption, word: string): boolean => {
+    const coin = findCoin(option.id);
+    if (/^\d{4}$/.test(word) && coin?.years) {
+      return coinStruckIn(coin, Number(word));
+    }
+    return option.searchText.includes(word);
+  };
 
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;

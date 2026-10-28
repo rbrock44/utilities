@@ -638,6 +638,24 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(component.coinOptions.every(option => findCoinPurity(option.id) > 0)).toBe(true);
     });
 
+    it('should find coins by a year and words in any order', async () => {
+      await setup();
+      const input = el().querySelector<HTMLInputElement>('input[aria-label="Add a coin"]')!;
+      const search = (text: string) => {
+        input.dispatchEvent(new Event('focus'));
+        input.value = text;
+        input.dispatchEvent(new Event('input'));
+        render();
+        return Array.from(el().querySelectorAll('.combo-option'), li => li.textContent!.trim());
+      };
+
+      expect(search('1944 dime')).toEqual([
+        'Silver · Mercury Dime · 1916-1945', 'Silver · Roosevelt Dime · Pre-1965', 'Silver · Canadian Dime · 1920-1967',
+      ]);
+      expect(search('dime mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
+      expect(search('1925 morgan')).toEqual([]);
+    });
+
     it('should value coins in the matching metal breakdown, named with their count and note', async () => {
       await setup();
       component.addCoin(morgan);
