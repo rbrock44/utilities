@@ -425,14 +425,23 @@ export class PreciousMetalsComponent implements OnInit {
     const shared = params?.get('metals');
     if (!shared) return;
 
-    const { items, skipped } = decodeMetalList(shared);
+    const decoded = decodeMetalList(shared);
+    // A coin with no metal in it can't be picked, so one in a link gets the picker's hint, not a $0 row.
+    const noMetal = (entry: MetalListEntry) => isCoinEntry(entry) && findCoin(entry.coin)?.spec.purity === 0;
+    const items = decoded.items.filter(entry => !noMetal(entry));
+    const leftOut = decoded.items.filter(isCoinEntry).filter(noMetal).map(entry => findCoin(entry.coin)!.label);
+    const skipped = decoded.skipped;
     this.applyItems(items);
     this.listName = params?.get('name') ?? '';
     this.sharedPrices = decodeSpotPrices(params?.get('spot'));
     this.pricePrompt = this.sharedPrices !== null;
     const loaded = `Loaded a shared list of ${describeEntries(items)}.`;
     const unread = skipped === 1 ? '1 entry in the link wasn\'t' : `${skipped} entries in the link weren't`;
-    this.linkNotice = skipped > 0 ? `${loaded} ${unread} recognized.` : loaded;
+    this.linkNotice = [
+      loaded,
+      ...(skipped > 0 ? [`${unread} recognized.`] : []),
+      ...(leftOut.length > 0 ? [`Left out ${leftOut.join(', ')}: no silver.`] : []),
+    ].join(' ');
   }
 
   /** Replaces every section; a metal with nothing in the list keeps one empty row to type into. */

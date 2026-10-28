@@ -892,6 +892,15 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(component.goldTotals.totalPureToz).toBeCloseTo(eagleToz, 6);
     });
 
+    it('should leave a no-silver coin in a shared link out, with the same hint as the picker', async () => {
+      const ike = 'silver-eisenhower-dollar-1971-1978-p-d-copper-nickel';
+      await setup({ metals: encodeMetalList([{ coin: eagle, quantity: 1 }, { coin: ike, quantity: 3 }]) });
+
+      expect(component.coinRows.map(row => row.coin.id)).toEqual([eagle]);
+      expect(component.linkNotice)
+        .toBe('Loaded a shared list of 1 coin. Left out Eisenhower Dollar · 1971-1978 P/D (copper-nickel): no silver.');
+    });
+
     it('should describe lists by pieces and coins', () => {
       expect(describeEntries([])).toBe('0 pieces');
       expect(describeEntries([ring, bar])).toBe('2 pieces');
