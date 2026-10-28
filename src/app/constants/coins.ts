@@ -32,7 +32,7 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     { name: 'Canadian Gold Maple Leaf (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1982 } },
     { name: 'Canadian Gold Maple Leaf (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1982 } },
     { name: 'Canadian Gold Maple Leaf (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)', years: { from: 1993 } },
-    { name: 'Canadian Gold Maple Leaf (1/25 toz)', weightGrams: 1.244, purity: 0.9999, description: '1/25 toz (24K)' },
+    { name: 'Canadian Gold Maple Leaf (1/25 toz)', weightGrams: 1.244, purity: 0.9999, description: '1/25 toz (24K)', years: { from: 2004 } },
     
     // British Gold Coins - Sovereign
     { name: 'British Sovereign', weightGrams: 7.988, purity: 0.9167, description: 'Modern (22K)', years: { from: 1957 } },
@@ -46,7 +46,7 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     { name: 'British Britannia (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1987 } },
     { name: 'British Britannia (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1987 } },
     { name: 'British Britannia (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1987 } },
-    { name: 'British Britannia (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
+    { name: 'British Britannia (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)', years: { from: 2013 } },
     
     // South African Gold Coins - Krugerrand
     { name: 'Krugerrand', weightGrams: 33.930, purity: 0.9167, description: '1 oz (22K)', years: { from: 1967 } },
@@ -78,9 +78,9 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     
     // Australian Gold Coins - Kangaroo/Nugget
     { name: 'Australian Kangaroo/Nugget', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1986 } },
-    { name: 'Australian Kangaroo (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'Australian Kangaroo (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'Australian Kangaroo (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
+    { name: 'Australian Kangaroo (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1986 } },
+    { name: 'Australian Kangaroo (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1986 } },
+    { name: 'Australian Kangaroo (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1986 } },
     { name: 'Australian Kangaroo (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
     
     // Australian Gold Coins - Lunar Series
@@ -100,10 +100,10 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     
     // Mexican Gold Coins - Libertad
     { name: 'Mexican Libertad', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1981 } },
-    { name: 'Mexican Libertad (1/2 toz)', weightGrams: 15.552, purity: 0.999, description: '1/2 toz' },
-    { name: 'Mexican Libertad (1/4 toz)', weightGrams: 7.776, purity: 0.999, description: '1/4 toz' },
-    { name: 'Mexican Libertad (1/10 toz)', weightGrams: 3.110, purity: 0.999, description: '1/10 toz' },
-    { name: 'Mexican Libertad (1/20 toz)', weightGrams: 1.555, purity: 0.999, description: '1/20 toz' },
+    { name: 'Mexican Libertad (1/2 toz)', weightGrams: 15.552, purity: 0.999, description: '1/2 toz', years: { from: 1981 } },
+    { name: 'Mexican Libertad (1/4 toz)', weightGrams: 7.776, purity: 0.999, description: '1/4 toz', years: { from: 1981 } },
+    { name: 'Mexican Libertad (1/10 toz)', weightGrams: 3.110, purity: 0.999, description: '1/10 toz', years: { from: 1991 } },
+    { name: 'Mexican Libertad (1/20 toz)', weightGrams: 1.555, purity: 0.999, description: '1/20 toz', years: { from: 1991 } },
     
     // Swiss Gold Coins
     { name: 'Swiss 20 Franc (Helvetia/Vreneli)', weightGrams: 6.451, purity: 0.900, description: '0.1867 toz AGW' },

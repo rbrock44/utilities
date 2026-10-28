@@ -52,6 +52,16 @@ describe('COIN_OPTIONS', () => {
     expect(coinStruckIn(findCoin('silver-generic-silver-round-1-toz')!, 2000)).toBe(false);
   });
 
+  it('should date the fractional gold coins from the year each size was first struck', () => {
+    const gold = (name: string) => COIN_OPTIONS.find(c => c.metal === 'gold' && c.spec.name === name)!;
+    expect(coinStruckIn(gold('Mexican Libertad (1/20 toz)'), 1991)).toBe(true);
+    expect(coinStruckIn(gold('Mexican Libertad (1/20 toz)'), 1990)).toBe(false);
+    expect(coinStruckIn(gold('Mexican Libertad (1/4 toz)'), 1981)).toBe(true);
+    expect(coinStruckIn(gold('British Britannia (1/20 toz)'), 2012)).toBe(false);
+    expect(coinStruckIn(gold('Canadian Gold Maple Leaf (1/25 toz)'), 2004)).toBe(true);
+    expect(coinStruckIn(gold('Australian Kangaroo (1/10 toz)'), 1986)).toBe(true);
+  });
+
   it('should limit a coin to the mints that struck it in silver', () => {
     const ike = findCoin('silver-eisenhower-dollar-1971-1976-s-40-silver')!;
     expect(coinStruckAt(ike, 's')).toBe(true);
