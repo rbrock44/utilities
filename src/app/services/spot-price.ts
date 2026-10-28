@@ -18,7 +18,8 @@ export class SpotPriceService {
         silver: response.silver,
         platinum: response.platinum ?? -1,
         palladium: response.palladium ?? -1,
-        timestamp: new Date(response.timestamp || Date.now())
+        // The API sends `timeStamp`, the time it scraped the prices.
+        timestamp: new Date(response.timeStamp || Date.now())
       })),
       catchError(error => {
         console.error('Error fetching spot prices:', error);
