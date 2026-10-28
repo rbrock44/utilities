@@ -49,16 +49,22 @@ export class ComboBoxComponent implements OnChanges {
 
   get filteredOptions(): ComboBoxOption[] {
     if (!this.hasTyped || this.query.trim() === '') {
-      return this.options;
+      return this.options.filter(option => !option.disabled);
     }
     const words = this.query.trim().toLowerCase().split(/\s+/);
-    return this.options.filter(option => words.every(word => this.matchesWord(option, word)));
+    const matches = this.options.filter(option => words.every(word => this.matchesWord(option, word)));
+    return [...matches.filter(option => !option.disabled), ...matches.filter(option => option.disabled)];
+  }
+
+  /** Hints sit after every real match, so arrowing stops at the last one that can be picked. */
+  private get lastSelectableIndex(): number {
+    return this.filteredOptions.filter(option => !option.disabled).length - 1;
   }
 
   onFocus(event: FocusEvent): void {
     this.isOpen = true;
     this.hasTyped = false;
-    this.highlightedIndex = Math.max(0, this.options.findIndex(option => option.id === this.value));
+    this.highlightedIndex = Math.max(0, this.filteredOptions.findIndex(option => option.id === this.value));
     (event.target as HTMLInputElement).select();
   }
 
@@ -79,7 +85,7 @@ export class ComboBoxComponent implements OnChanges {
     const options = this.filteredOptions;
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      this.highlightedIndex = Math.min(this.highlightedIndex + 1, options.length - 1);
+      this.highlightedIndex = Math.max(0, Math.min(this.highlightedIndex + 1, this.lastSelectableIndex));
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       this.highlightedIndex = Math.max(this.highlightedIndex - 1, 0);
@@ -96,6 +102,9 @@ export class ComboBoxComponent implements OnChanges {
   }
 
   selectOption(option: ComboBoxOption): void {
+    if (option.disabled) {
+      return;
+    }
     this.value = option.id;
     this.isOpen = false;
     this.syncQueryToSelectedValue();

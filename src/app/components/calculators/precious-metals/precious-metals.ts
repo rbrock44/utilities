@@ -94,14 +94,22 @@ export class PreciousMetalsComponent implements OnInit {
 
   coinRows: CoinRow[] = [];
   coinPickerValue: string | null = null;
-  /** Coins with no metal in them (clad, nickel) are left out; they'd add nothing to a melt total. */
-  readonly coinOptions: ComboBoxOption[] = COIN_OPTIONS
-    .filter(coin => coin.spec.purity > 0)
-    .map(coin => ({
+  /**
+   * Coins with no metal in them (clad, nickel) add nothing to a melt total, so they can't be picked;
+   * they show as a hint instead, so a search for a 1976-D Ike says why it isn't silver.
+   */
+  readonly coinOptions: ComboBoxOption[] = COIN_OPTIONS.map(coin => coin.spec.purity > 0
+    ? {
       id: coin.id,
       label: `${coin.metal === 'gold' ? 'Gold' : 'Silver'} · ${coin.label}`,
       searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
-    }));
+    }
+    : {
+      id: coin.id,
+      label: `${coin.label} · no silver`,
+      searchText: coin.label.toLowerCase(),
+      disabled: true,
+    });
 
   /**
    * A typed year like `1944` finds coins struck that year, not just ones whose label has it, and a
@@ -180,7 +188,7 @@ export class PreciousMetalsComponent implements OnInit {
   /** Picking a coin already in the list adds one more instead of a duplicate row. */
   addCoin(id: string) {
     const coin = findCoin(id);
-    if (!coin) return;
+    if (!coin || coin.spec.purity === 0) return;
 
     const existing = this.coinRows.find(row => row.coin.id === id);
     if (existing) {

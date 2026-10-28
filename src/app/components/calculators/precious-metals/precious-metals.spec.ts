@@ -635,7 +635,9 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(component.coinRows.map(row => [row.coin.id, row.quantity])).toEqual([[morgan, 2]]);
       expect(component.coinOptions.length).toBeGreaterThan(0);
-      expect(component.coinOptions.every(option => findCoinPurity(option.id) > 0)).toBe(true);
+      expect(component.coinOptions.every(option => !!option.disabled === (findCoinPurity(option.id) === 0))).toBe(true);
+      component.addCoin('silver-eisenhower-dollar-1971-1978-p-d-copper-nickel');
+      expect(component.coinRows.length).toBe(1);
     });
 
     it('should find coins by a year and words in any order', async () => {
@@ -651,10 +653,21 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(search('1944 dime')).toEqual(['Silver · Mercury Dime · 1916-1945', 'Silver · Canadian Dime · 1920-1967']);
       expect(search('dime mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
+      input.dispatchEvent(new Event('focus'));
+      input.value = '';
+      render();
+      expect(el().querySelector('.combo-option.disabled')).toBeNull();
       expect(search('1925 morgan')).toEqual([]);
-      expect(search('1976 eisenhower')).toEqual(['Silver · Eisenhower Dollar · 1971-1976 S (40% silver)']);
+      expect(search('1976 eisenhower')).toEqual([
+        'Silver · Eisenhower Dollar · 1971-1976 S (40% silver)',
+        'Eisenhower Dollar · 1971-1978 P/D (copper-nickel) · no silver',
+      ]);
       expect(search('1976 s eisenhower')).toEqual(['Silver · Eisenhower Dollar · 1971-1976 S (40% silver)']);
-      expect(search('1976 d eisenhower')).toEqual([]);
+      expect(search('1976 d eisenhower')).toEqual(['Eisenhower Dollar · 1971-1978 P/D (copper-nickel) · no silver']);
+      el().querySelector<HTMLElement>('.combo-option.disabled')!.click();
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      expect(component.coinRows).toEqual([]);
+      expect(search('1980 dime')).toEqual(['Roosevelt Dime · 1965+ P/D (copper-nickel) · no silver']);
       expect(search('1976-s quarter')).toEqual(['Silver · Washington Quarter · 1976 S (40% silver)']);
       expect(search('2021s dime')).toEqual(['Silver · Roosevelt Dime · 2019+ S (silver proof)']);
       expect(search('1885 cc morgan')).toEqual(['Silver · Morgan Dollar · 1878-1921']);

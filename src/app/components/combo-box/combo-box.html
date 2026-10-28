@@ -20,7 +20,9 @@
       @for (option of filteredOptions; track option.id; let i = $index) {
         <li
           class="combo-option"
-          [class.highlighted]="i === highlightedIndex"
+          [class.highlighted]="i === highlightedIndex && !option.disabled"
+          [class.disabled]="option.disabled"
+          [attr.aria-disabled]="option.disabled || null"
           [class.selected]="option.id === value"
           role="option"
           [attr.aria-selected]="option.id === value"

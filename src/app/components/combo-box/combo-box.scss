@@ -50,6 +50,13 @@
   background: var(--brand-soft);
 }
 
+.combo-option.disabled {
+  cursor: default;
+  color: var(--text-soft);
+  font-style: italic;
+  background: none;
+}
+
 .combo-option.selected {
   font-weight: 700;
   color: var(--brand-deep);

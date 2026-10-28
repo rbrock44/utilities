@@ -187,17 +187,20 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'Kennedy Half Dollar', weightGrams: 11.50, purity: 0.400, description: '1976 S (40% silver)', mints: ['S'] },
     { name: 'Kennedy Half Dollar', weightGrams: 12.50, purity: 0.900, description: '1992-2018 S (silver proof)', mints: ['S'] },
     { name: 'Kennedy Half Dollar', weightGrams: 12.685, purity: 0.999, description: '2019+ S (silver proof)', mints: ['S'] },
+    { name: 'Kennedy Half Dollar', weightGrams: 11.34, purity: 0, description: '1971+ P/D (copper-nickel)', mints: ['P', 'D'] },
     { name: 'Walking Liberty Half', weightGrams: 12.50, purity: 0.900, description: '1916-1947' },
     { name: 'Franklin Half Dollar', weightGrams: 12.50, purity: 0.900, description: '1948-1963' },
     { name: 'Washington Quarter', weightGrams: 6.25, purity: 0.900, description: '1932-1964' },
     { name: 'Washington Quarter', weightGrams: 5.75, purity: 0.400, description: '1976 S (40% silver)', mints: ['S'] },
     { name: 'Washington Quarter', weightGrams: 6.25, purity: 0.900, description: '1992-2018 S (silver proof)', mints: ['S'] },
     { name: 'Washington Quarter', weightGrams: 6.343, purity: 0.999, description: '2019+ S (silver proof)', mints: ['S'] },
+    { name: 'Washington Quarter', weightGrams: 5.67, purity: 0, description: '1965+ P/D (copper-nickel)', mints: ['P', 'D'] },
     { name: 'Standing Liberty Quarter', weightGrams: 6.25, purity: 0.900, description: '1916-1930' },
     { name: 'Mercury Dime', weightGrams: 2.50, purity: 0.900, description: '1916-1945' },
     { name: 'Roosevelt Dime', weightGrams: 2.50, purity: 0.900, description: '1946-1964' },
     { name: 'Roosevelt Dime', weightGrams: 2.50, purity: 0.900, description: '1992-2018 S (silver proof)', mints: ['S'] },
     { name: 'Roosevelt Dime', weightGrams: 2.537, purity: 0.999, description: '2019+ S (silver proof)', mints: ['S'] },
+    { name: 'Roosevelt Dime', weightGrams: 2.268, purity: 0, description: '1965+ P/D (copper-nickel)', mints: ['P', 'D'] },
     { name: 'Barber Dime', weightGrams: 2.50, purity: 0.900, description: '1892-1916' },
     { name: 'Barber Quarter', weightGrams: 6.25, purity: 0.900, description: '1892-1916' },
     { name: 'Barber Half Dollar', weightGrams: 12.50, purity: 0.900, description: '1892-1915' },
@@ -208,6 +211,7 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'Jefferson Nickel (War Nickel)', weightGrams: 5.00, purity: 0.350, description: '1942-1945 (35% silver)' },
     // Circulating P and D Ikes are copper-nickel; only the S collector strikes carry silver.
     { name: 'Eisenhower Dollar', weightGrams: 24.59, purity: 0.400, description: '1971-1976 S (40% silver)', mints: ['S'] },
+    { name: 'Eisenhower Dollar', weightGrams: 22.68, purity: 0, description: '1971-1978 P/D (copper-nickel)', mints: ['P', 'D'] },
     { name: 'Trade Dollar', weightGrams: 27.22, purity: 0.900, description: '1873-1885' },
     
     // Canadian Coins

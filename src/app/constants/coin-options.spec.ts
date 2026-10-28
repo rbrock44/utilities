@@ -25,6 +25,7 @@ describe('COIN_OPTIONS', () => {
       'Kennedy Half Dollar · 1976 S (40% silver)',
       'Kennedy Half Dollar · 1992-2018 S (silver proof)',
       'Kennedy Half Dollar · 2019+ S (silver proof)',
+      'Kennedy Half Dollar · 1971+ P/D (copper-nickel)',
     ]);
   });
 
