@@ -22,6 +22,7 @@
           class="combo-option"
           [class.highlighted]="i === highlightedIndex && !option.disabled"
           [class.disabled]="option.disabled"
+          [class.warning]="option.warning"
           [attr.aria-disabled]="option.disabled || null"
           [class.selected]="option.id === value"
           role="option"

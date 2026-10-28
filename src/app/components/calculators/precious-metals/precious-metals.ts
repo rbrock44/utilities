@@ -9,6 +9,7 @@ import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
 import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin } from '../../../constants/coin-options';
+import { KEY_DATES, KeyDate, keyDateLabel, keyDateMatches } from '../../../constants/key-dates';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
 import {
   CoinListItem,
@@ -94,28 +95,52 @@ export class PreciousMetalsComponent implements OnInit {
 
   coinRows: CoinRow[] = [];
   coinPickerValue: string | null = null;
+  /** Key date warnings by option id, so the matcher can tell them from coins. */
+  private readonly keyDateOptions = new Map<string, KeyDate>(
+    KEY_DATES.map(key => [`key-${key.coin}-${key.year}-${key.mint.toLowerCase()}`, key]));
+
   /**
    * Coins with no metal in them (clad, nickel) add nothing to a melt total, so they can't be picked;
-   * they show as a hint instead, so a search for a 1976-D Ike says why it isn't silver.
+   * they show as a hint instead, so a search for a 1976-D Ike says why it isn't silver. Key date
+   * warnings are hints too, listed first so they sit right under the coin they're about.
    */
-  readonly coinOptions: ComboBoxOption[] = COIN_OPTIONS.map(coin => coin.spec.purity > 0
-    ? {
-      id: coin.id,
-      label: `${coin.metal === 'gold' ? 'Gold' : 'Silver'} · ${coin.label}`,
-      searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
-    }
-    : {
-      id: coin.id,
-      label: `${coin.label} · no silver`,
-      searchText: coin.label.toLowerCase(),
-      disabled: true,
-    });
+  readonly coinOptions: ComboBoxOption[] = [
+    ...[...this.keyDateOptions].map(([id, key]) => {
+      const coin = findCoin(key.coin)!;
+      return {
+        id,
+        label: `⚠ ${keyDateLabel(key)} ${coin.spec.name} is a key date · often worth far more than melt, check before selling`,
+        searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
+        disabled: true,
+        warning: true,
+      };
+    }),
+    ...COIN_OPTIONS.map(coin => coin.spec.purity > 0
+      ? {
+        id: coin.id,
+        label: `${coin.metal === 'gold' ? 'Gold' : 'Silver'} · ${coin.label}`,
+        searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
+      }
+      : {
+        id: coin.id,
+        label: `${coin.label} · no silver`,
+        searchText: coin.label.toLowerCase(),
+        disabled: true,
+      }),
+  ];
+
+  readonly coinMatches = (option: ComboBoxOption, words: string[]): boolean => {
+    const key = this.keyDateOptions.get(option.id);
+    return key
+      ? keyDateMatches(key, option.searchText, words)
+      : words.every(word => this.coinMatchesWord(option, word));
+  };
 
   /**
    * A typed year like `1944` finds coins struck that year, not just ones whose label has it, and a
    * mint mark (`1976 s`, `1976-s`, `1976s`) narrows to coins that mint struck in silver or gold.
    */
-  readonly coinMatchesWord = (option: ComboBoxOption, word: string): boolean => {
+  private coinMatchesWord(option: ComboBoxOption, word: string): boolean {
     const coin = findCoin(option.id);
     const dated = word.match(/^(\d{4})-?(p|d|s|o|w|cc)?$/);
     if (coin && dated && coin.years) {
@@ -125,7 +150,7 @@ export class PreciousMetalsComponent implements OnInit {
       return coinStruckAt(coin, word);
     }
     return option.searchText.includes(word);
-  };
+  }
 
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;

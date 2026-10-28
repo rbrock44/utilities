@@ -26,9 +26,9 @@ export class ComboBoxComponent implements OnChanges {
   @Input() value: string | null = null;
   @Input() placeholder = 'Search…';
   @Input() ariaLabel = 'Select an option';
-  /** Decides whether one typed word fits an option; every word has to fit, in any order. */
-  @Input() matchesWord: (option: ComboBoxOption, word: string) => boolean =
-    (option, word) => option.searchText.includes(word);
+  /** Decides whether an option fits the typed words; by default each word has to be in its text, in any order. */
+  @Input() matches: (option: ComboBoxOption, words: string[]) => boolean =
+    (option, words) => words.every(word => option.searchText.includes(word));
   @Output() valueChange = new EventEmitter<string>();
 
   query = '';
@@ -52,7 +52,7 @@ export class ComboBoxComponent implements OnChanges {
       return this.options.filter(option => !option.disabled);
     }
     const words = this.query.trim().toLowerCase().split(/\s+/);
-    const matches = this.options.filter(option => words.every(word => this.matchesWord(option, word)));
+    const matches = this.options.filter(option => this.matches(option, words));
     return [...matches.filter(option => !option.disabled), ...matches.filter(option => option.disabled)];
   }
 

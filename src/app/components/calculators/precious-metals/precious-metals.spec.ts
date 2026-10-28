@@ -637,7 +637,8 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(component.coinRows.map(row => [row.coin.id, row.quantity])).toEqual([[morgan, 2]]);
       expect(component.coinOptions.length).toBeGreaterThan(0);
-      expect(component.coinOptions.every(option => !!option.disabled === (findCoinPurity(option.id) === 0))).toBe(true);
+      const coins = component.coinOptions.filter(option => !option.warning);
+      expect(coins.every(option => !!option.disabled === (findCoinPurity(option.id) === 0))).toBe(true);
       component.addCoin('silver-eisenhower-dollar-1971-1978-p-d-copper-nickel');
       expect(component.coinRows.length).toBe(1);
     });
@@ -655,6 +656,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(search('1944 dime')).toEqual(['Silver · Mercury Dime · 1916-1945', 'Silver · Canadian Dime · 1920-1967']);
       expect(search('dime mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
+      expect(search('mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
       input.dispatchEvent(new Event('focus'));
       input.value = '';
       render();
@@ -684,6 +686,14 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(search('1985 silver eagle')).toEqual([]);
       expect(search('2010 silver panda')).toEqual(['Silver · Chinese Silver Panda · 1 toz (current)']);
       expect(search('2020 silver panda')).toEqual(['Silver · Chinese Silver Panda · 30g (2016+)']);
+      const keyDime = '⚠ 1916-D Mercury Dime is a key date · often worth far more than melt, check before selling';
+      expect(search('1916 d mercury')).toEqual(['Silver · Mercury Dime · 1916-1945', keyDime]);
+      expect(search('1916-d mercury')).toEqual(['Silver · Mercury Dime · 1916-1945', keyDime]);
+      expect(search('1916 mercury')).toEqual(['Silver · Mercury Dime · 1916-1945', keyDime]);
+      expect(search('1916 s mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
+      expect(search('1917 mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
+      expect(search('1895 morgan')).toContain('⚠ 1895 (no mint mark) Morgan Dollar is a key date · often worth far more than melt, check before selling');
+      expect(el().querySelector('.combo-option.warning')).not.toBeNull();
     });
 
     it('should value coins in the matching metal breakdown, named with their count and note', async () => {

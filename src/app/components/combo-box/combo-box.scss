@@ -57,6 +57,12 @@
   background: none;
 }
 
+.combo-option.warning {
+  color: var(--warning-text);
+  background: var(--warning-soft);
+  font-style: normal;
+}
+
 .combo-option.selected {
   font-weight: 700;
   color: var(--brand-deep);
