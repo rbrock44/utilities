@@ -61,6 +61,26 @@ describe('PreciousMetalBreakdownComponent', () => {
     expect(row.textContent).toContain('$1049.40');
   });
 
+  it('should show weights and value per unit in the picked unit, and report the pick', async () => {
+    const element = await render({ breakdowns: [breakdown], totals, unit: 'dwt' });
+    const row = element.querySelectorAll('.breakdown-table-row')[0];
+
+    expect(element.querySelector('.breakdown-table-header')?.textContent).toContain('$/dwt');
+    expect(row.textContent).toContain('20.00 dwt');
+    expect(row.textContent).toContain('$58.30');
+
+    const picked: MetalUnitId[] = [];
+    fixture.componentInstance.unitChange.subscribe(unit => picked.push(unit));
+    const select = element.querySelector<HTMLSelectElement>('select')!;
+    expect(select.value).toBe('dwt');
+    select.value = 'grams';
+    select.dispatchEvent(new Event('change'));
+    await render({});
+
+    expect(picked).toEqual(['grams']);
+    expect(element.querySelectorAll('.breakdown-table-row')[0].textContent).toContain('31.10 g');
+  });
+
   it('should render the totals row with its title and class', async () => {
     const element = await render({
       breakdowns: [breakdown],

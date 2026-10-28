@@ -145,7 +145,7 @@
         </div>
       </div>
 
-      <app-precious-metal-breakdown [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
+      <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
         totalsTitle="Gold Totals" totalsClass="gold-totals">
       </app-precious-metal-breakdown>
     </div>
@@ -228,7 +228,7 @@
         </div>
       </div>
 
-      <app-precious-metal-breakdown [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
+      <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
         totalsTitle="Silver Totals" totalsClass="silver-totals">
       </app-precious-metal-breakdown>
     </div>
@@ -343,7 +343,7 @@
           }
         </div>
 
-        <app-precious-metal-breakdown [title]="metal.label + ' Breakdown'" [breakdowns]="pgmBreakdowns[metal.key]"
+        <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="metal.label + ' Breakdown'" [breakdowns]="pgmBreakdowns[metal.key]"
           [totals]="pgmTotals[metal.key]" [totalsTitle]="metal.label + ' Totals'" totalsClass="silver-totals">
         </app-precious-metal-breakdown>
       </div>

@@ -1,11 +1,22 @@
 @if (breakdowns && breakdowns.length > 0) {
 <div class="breakdowns">
-  <h4>{{ title }}</h4>
+  <div class="breakdowns-header">
+    <h4>{{ title }}</h4>
+    <label class="unit-pick">
+      Show in
+      <select (change)="pickUnit($any($event.target).value)" aria-label="Breakdown weight unit">
+        @for (option of units; track option.id) {
+        <option [value]="option.id" [selected]="option.id === unit">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
   <div class="breakdown-table">
     <div class="breakdown-table-header">
       <span>Type</span>
       <span>Total Wt</span>
       <span>Pure Wt</span>
+      <span>$/{{ unitLabel }}</span>
       <span class="highlight-col">Spot</span>
       <span>90%</span>
       <span>80%</span>
@@ -21,8 +32,9 @@
           <span class="row-note">less {{ item.stoneCarats }} ct stone</span>
         }
       </span>
-      <span>{{ item.weightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
-      <span>{{ item.pureWeightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span>{{ weight(item.weightGrams) }}<span class="unit"> {{ unitLabel }}</span></span>
+      <span>{{ weight(item.pureWeightGrams) }}<span class="unit"> {{ unitLabel }}</span></span>
+      <span>${{ perUnit(item.spotValue, item.weightGrams) }}</span>
       <span class="highlight-col">${{ item.spotValue.toFixed(2) }}</span>
       <span>${{ item.value90.toFixed(2) }}</span>
       <span>${{ item.value80.toFixed(2) }}</span>
@@ -30,8 +42,9 @@
 
     <div class="breakdown-table-row totals-row" [ngClass]="totalsClass">
       <span class="row-label">{{ totalsTitle }}</span>
-      <span>{{ totals.totalWeightToz.toFixed(3) }}<span class="unit"> oz t</span></span>
-      <span>{{ totals.totalPureToz.toFixed(3) }}<span class="unit"> oz t</span></span>
+      <span>{{ weight(totals.totalWeightGrams) }}<span class="unit"> {{ unitLabel }}</span></span>
+      <span>{{ weight(totals.totalPureGrams) }}<span class="unit"> {{ unitLabel }}</span></span>
+      <span>${{ perUnit(totals.spotValue, totals.totalWeightGrams) }}</span>
       <span class="highlight-col">${{ totals.spotValue.toFixed(2) }}</span>
       <span>${{ totals.value90.toFixed(2) }}</span>
       <span>${{ totals.value80.toFixed(2) }}</span>

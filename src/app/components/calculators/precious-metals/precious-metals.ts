@@ -179,6 +179,8 @@ export class PreciousMetalsComponent implements OnInit {
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
   readonly metalUnits = METAL_UNITS;
+  /** One weight unit for every breakdown, oz t until picked. */
+  breakdownUnit: MetalUnitId = 'toz';
 
   private nextGoldId = 2;
   private nextSilverId = 2;
