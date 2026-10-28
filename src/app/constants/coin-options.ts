@@ -74,6 +74,8 @@ const RENAMED_COIN_IDS: Record<string, string> = {
   'silver-eisenhower-dollar-1971-1976-40-silver': 'silver-eisenhower-dollar-1971-1976-s-40-silver',
   'silver-roosevelt-dime-pre-1965': 'silver-roosevelt-dime-1946-1964',
   'silver-washington-quarter-pre-1965': 'silver-washington-quarter-1932-1964',
+  'silver-jefferson-nickel-war-nickel-1942-1945-35-silver':
+    'silver-jefferson-nickel-war-nickel-1942-1945-35-silver-large-mint-mark-above-dome',
 };
 
 export function findCoin(id: string): CoinOption | undefined {

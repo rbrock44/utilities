@@ -208,17 +208,24 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'Seated Liberty Quarter', weightGrams: 6.25, purity: 0.900, description: '1838-1891' },
     { name: 'Seated Liberty Half Dollar', weightGrams: 12.50, purity: 0.900, description: '1839-1891' },
     { name: 'Seated Liberty Dollar', weightGrams: 26.73, purity: 0.900, description: '1840-1873' },
-    { name: 'Jefferson Nickel (War Nickel)', weightGrams: 5.00, purity: 0.350, description: '1942-1945 (35% silver)' },
+    // War nickels carry a large P, D, or S above Monticello's dome; 1942-D and early 1942 are regular nickels.
+    { name: 'Jefferson Nickel (War Nickel)', weightGrams: 5.00, purity: 0.350, description: '1942-1945 (35% silver, large mint mark above dome)', mints: ['P', 'D', 'S'] },
+    { name: 'Jefferson Nickel', weightGrams: 5.00, purity: 0, description: '1938-1942 (copper-nickel, incl. 1942-D)' },
+    { name: 'Jefferson Nickel', weightGrams: 5.00, purity: 0, description: '1946+ (copper-nickel)' },
     // Circulating P and D Ikes are copper-nickel; only the S collector strikes carry silver.
     { name: 'Eisenhower Dollar', weightGrams: 24.59, purity: 0.400, description: '1971-1976 S (40% silver)', mints: ['S'] },
     { name: 'Eisenhower Dollar', weightGrams: 22.68, purity: 0, description: '1971-1978 P/D (copper-nickel)', mints: ['P', 'D'] },
     { name: 'Trade Dollar', weightGrams: 27.22, purity: 0.900, description: '1873-1885' },
+    { name: 'Susan B. Anthony Dollar', weightGrams: 8.10, purity: 0, description: '1979-1999 (copper-nickel)' },
+    { name: 'Sacagawea / Native American Dollar', weightGrams: 8.10, purity: 0, description: '2000+ (manganese brass)' },
     
     // Canadian Coins
     { name: 'Canadian Silver Dollar', weightGrams: 23.33, purity: 0.800, description: '1935-1967' },
     { name: 'Canadian Half Dollar', weightGrams: 11.66, purity: 0.800, description: '1920-1967' },
     { name: 'Canadian Quarter', weightGrams: 5.83, purity: 0.800, description: '1920-1967' },
+    { name: 'Canadian Quarter', weightGrams: 5.83, purity: 0.500, description: '1967-1968 (50% silver)' },
     { name: 'Canadian Dime', weightGrams: 2.33, purity: 0.800, description: '1920-1967' },
+    { name: 'Canadian Dime', weightGrams: 2.33, purity: 0.500, description: '1967-1968 (50% silver)' },
     { name: 'Canadian Silver Nickel', weightGrams: 4.60, purity: 0.800, description: '1920-1921' },
     
     // US Bullion - American Silver Eagle

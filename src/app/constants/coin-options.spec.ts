@@ -62,6 +62,7 @@ describe('COIN_OPTIONS', () => {
     expect(findCoin('silver-eisenhower-dollar-1971-1976-40-silver')?.id).toBe('silver-eisenhower-dollar-1971-1976-s-40-silver');
     expect(findCoin('silver-roosevelt-dime-pre-1965')?.id).toBe('silver-roosevelt-dime-1946-1964');
     expect(findCoin('silver-washington-quarter-pre-1965')?.id).toBe('silver-washington-quarter-1932-1964');
+    expect(findCoin('silver-jefferson-nickel-war-nickel-1942-1945-35-silver')?.spec.mints).toEqual(['P', 'D', 'S']);
   });
 
   it('should compute pure troy ounces from weight and purity', () => {

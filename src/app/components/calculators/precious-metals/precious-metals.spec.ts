@@ -671,6 +671,13 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       expect(search('1976-s quarter')).toEqual(['Silver · Washington Quarter · 1976 S (40% silver)']);
       expect(search('2021s dime')).toEqual(['Silver · Roosevelt Dime · 2019+ S (silver proof)']);
       expect(search('1885 cc morgan')).toEqual(['Silver · Morgan Dollar · 1878-1921']);
+      expect(search('1943 nickel')).toEqual(['Silver · Jefferson Nickel (War Nickel) · 1942-1945 (35% silver, large mint mark above dome)']);
+      expect(search('1942 d nickel')).toEqual([
+        'Silver · Jefferson Nickel (War Nickel) · 1942-1945 (35% silver, large mint mark above dome)',
+        'Jefferson Nickel · 1938-1942 (copper-nickel, incl. 1942-D) · no silver',
+      ]);
+      expect(search('1979 anthony')).toEqual(['Susan B. Anthony Dollar · 1979-1999 (copper-nickel) · no silver']);
+      expect(search('1968 canadian dime')).toEqual(['Silver · Canadian Dime · 1967-1968 (50% silver)']);
     });
 
     it('should value coins in the matching metal breakdown, named with their count and note', async () => {
