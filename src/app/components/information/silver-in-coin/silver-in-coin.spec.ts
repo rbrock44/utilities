@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 import { SilverInCoinComponent } from './silver-in-coin';
+import { SpotPriceService } from '../../../services/spot-price';
 
 describe('SilverInCoinComponent', () => {
   let component: SilverInCoinComponent;
@@ -8,7 +10,8 @@ describe('SilverInCoinComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SilverInCoinComponent]
+      imports: [SilverInCoinComponent],
+      providers: [{ provide: SpotPriceService, useValue: { getSpotPrices: () => of({ gold: 2000, silver: 25, timestamp: new Date() }) } }],
     })
     .compileComponents();
 

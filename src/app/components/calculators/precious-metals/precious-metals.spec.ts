@@ -15,7 +15,9 @@ describe('PreciousMetalsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PreciousMetalsComponent]
+      imports: [PreciousMetalsComponent],
+      // Without a stub the real spot price API is called and whenStable waits on it.
+      providers: [{ provide: SpotPriceService, useValue: { getSpotPrices: () => of({ gold: 2000, silver: 25, timestamp: new Date() }) } }],
     })
     .compileComponents();
 
