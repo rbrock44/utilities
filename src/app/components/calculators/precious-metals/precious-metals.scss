@@ -241,12 +241,12 @@
   box-shadow: var(--shadow-sm);
 }
 
-.pgm-heading {
-  margin: 0;
-  font-size: 1.1rem;
+.section-heading {
+  flex: 1;
+  min-width: 0;
 }
 
-.pgm-toggle {
+.section-toggle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -261,7 +261,7 @@
   cursor: pointer;
 }
 
-.pgm-caret {
+.section-caret {
   display: inline-block;
   transition: transform 0.15s;
 
@@ -270,7 +270,7 @@
   }
 }
 
-.pgm-summary {
+.section-summary {
   margin-left: auto;
   font-size: 0.85rem;
   font-weight: 600;

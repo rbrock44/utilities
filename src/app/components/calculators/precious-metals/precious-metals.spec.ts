@@ -467,11 +467,54 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     expect(component.items[0]).toEqual({ metal: 'gold', type: 'Custom %', purity: 62.5, weight: 31.1035, unit: 'grams' });
   });
 
+  describe('collapsing gold and silver', () => {
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+    const toggle = (section: string) => el().querySelector<HTMLButtonElement>(`[aria-controls="${section}Panel"]`)!;
+
+    it('should start open and fold away on a header click, keeping a summary and the totals', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: goldTypes[0].name, weight: 1, unit: 'toz' });
+      component.addCoin('gold-american-gold-eagle-1-oz-22k');
+      component.calculate();
+      render();
+
+      expect(toggle('gold').getAttribute('aria-expanded')).toBe('true');
+      expect(toggle('silver').getAttribute('aria-expanded')).toBe('true');
+      expect(el().querySelector('select[aria-label="Gold type"]')).not.toBeNull();
+
+      toggle('gold').click();
+      render();
+
+      expect(toggle('gold').getAttribute('aria-expanded')).toBe('false');
+      expect(el().querySelector('select[aria-label="Gold type"]')).toBeNull();
+      expect(el().querySelector('#goldPanel')).toBeNull();
+      expect(toggle('gold').querySelector('.section-summary')?.textContent)
+        .toBe(`1 piece · 1 coin · $${component.goldTotals.spotValue.toFixed(2)}`);
+      expect(component.grandTotals.spotValue).toBeCloseTo(component.goldTotals.spotValue, 2);
+      expect(el().querySelector('select[aria-label="Silver type"]')).not.toBeNull();
+
+      toggle('gold').click();
+      render();
+
+      expect(el().querySelector('select[aria-label="Gold type"]')).not.toBeNull();
+    });
+
+    it('should show no summary on a closed section with nothing in it', async () => {
+      await setup();
+      toggle('silver').click();
+      render();
+
+      expect(toggle('silver').querySelector('.section-summary')).toBeNull();
+      expect(component.sectionSummary('silver')).toBeNull();
+    });
+  });
+
   describe('platinum and palladium', () => {
     const el = () => fixture.nativeElement as HTMLElement;
     const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
     const withPlatinum = () => of({ gold: 2000, silver: 25, platinum: 1000, palladium: -1, timestamp: new Date() });
-    const toggle = () => el().querySelector<HTMLButtonElement>('.pgm-toggle')!;
+    const toggle = () => el().querySelector<HTMLButtonElement>('[aria-controls="pgmPanel"]')!;
 
     it('should stay closed until its header is clicked', async () => {
       await setup({}, withPlatinum);
@@ -498,14 +541,14 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(component.pgmTotals.platinum.spotValue).toBeCloseTo(950, 2);
       expect(component.grandTotals.spotValue).toBeCloseTo(950, 2);
-      expect(el().querySelector('.pgm-summary')?.textContent).toBe('1 piece · $950.00');
+      expect(toggle().querySelector('.section-summary')?.textContent).toBe('1 piece · $950.00');
       expect(component.items).toEqual([{ metal: 'platinum', type: 'Platinum (95%)', weight: 1, unit: 'toz' }]);
       expect(component.quote.others?.map(other => other.title)).toEqual(['Platinum']);
     });
 
     it('should ask for a palladium price, then keep a typed one through a refresh', async () => {
       await setup({}, withPlatinum);
-      component.togglePgm();
+      component.toggleSection('pgm');
       Object.assign(component.pgmRows.palladium[0], { type: 'Palladium (95%)', weight: 1, unit: 'toz' });
       component.calculate();
       render();
@@ -536,7 +579,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       }, withPlatinum);
       render();
 
-      expect(component.pgmOpen).toBe(false);
+      expect(component.open.pgm).toBe(false);
       expect(component.pgmRows.platinum.map(row => row.type)).toEqual(['Platinum (95%)']);
       expect(el().querySelector('.shared-choice')?.textContent).toContain('Platinum $800.00');
 

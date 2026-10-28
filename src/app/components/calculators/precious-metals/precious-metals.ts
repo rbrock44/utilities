@@ -31,6 +31,8 @@ import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
 type SpotMetal = ListMetal;
 /** Platinum and palladium live in their own section, closed until asked for. */
 type PgmMetal = 'platinum' | 'palladium';
+/** Each metal section folds away behind its header. */
+type Section = 'gold' | 'silver' | 'pgm';
 
 export interface CoinRow {
   coin: CoinOption;
@@ -88,7 +90,8 @@ export class PreciousMetalsComponent implements OnInit {
   goldTotals: MetalTotals = emptyMetalTotal;
   silverTotals: MetalTotals = emptyMetalTotal;
 
-  pgmOpen = false;
+  /** Gold and silver start open; platinum and palladium stay closed until asked for. */
+  open: Record<Section, boolean> = { gold: true, silver: true, pgm: false };
   pgmRows: Record<PgmMetal, MetalRow[]> = {
     platinum: [{ id: 1, type: typesFor('platinum')[0].name, weight: 0, unit: 'grams' }],
     palladium: [{ id: 2, type: typesFor('palladium')[0].name, weight: 0, unit: 'grams' }],
@@ -527,8 +530,8 @@ export class PreciousMetalsComponent implements OnInit {
     this.calculate();
   }
 
-  togglePgm() {
-    this.pgmOpen = !this.pgmOpen;
+  toggleSection(section: Section) {
+    this.open = { ...this.open, [section]: !this.open[section] };
   }
 
   addPgmRow(metal: PgmMetal) {
@@ -545,12 +548,27 @@ export class PreciousMetalsComponent implements OnInit {
     this.calculate();
   }
 
-  /** Shown on the closed section so pieces counted in the totals are never out of sight: "2 pieces · $1,234.56". */
-  get pgmSummary(): string | null {
-    const pieces = this.pgmMetals.reduce((sum, { key }) => sum + this.pgmBreakdowns[key].length, 0);
-    if (pieces === 0) return null;
-    const value = this.pgmTotals.platinum.spotValue + this.pgmTotals.palladium.spotValue;
-    return `${pieces} piece${pieces === 1 ? '' : 's'} · $${value.toFixed(2)}`;
+  /**
+   * Shown on a closed section so what it adds to the totals is never out of sight:
+   * "2 pieces · 5 coins · $1234.56". Gold and silver count their coins too.
+   */
+  sectionSummary(section: Section): string | null {
+    const rows = section === 'gold' ? this.goldRows
+      : section === 'silver' ? this.silverRows
+      : [...this.pgmRows.platinum, ...this.pgmRows.palladium];
+    const pieces = rows.filter(row => row.weight > 0).length;
+    const coins = section === 'pgm' ? 0 : this.coinRows
+      .filter(row => row.coin.metal === section)
+      .reduce((sum, row) => sum + this.coinQuantity(row), 0);
+    if (pieces + coins === 0) return null;
+
+    const value = section === 'gold' ? this.goldTotals.spotValue
+      : section === 'silver' ? this.silverTotals.spotValue
+      : this.pgmTotals.platinum.spotValue + this.pgmTotals.palladium.spotValue;
+    const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
+    return [pieces > 0 ? plural(pieces, 'piece') : '', coins > 0 ? plural(coins, 'coin') : '', `$${value.toFixed(2)}`]
+      .filter(Boolean)
+      .join(' · ');
   }
 
   calculate() {

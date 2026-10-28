@@ -72,118 +72,151 @@
   <!-- GOLD SECTION -->
   <div class="metal-section">
     <div class="section-header">
-      <h3>🥇 Gold</h3>
-      <button class="add-btn" (click)="addGoldRow()">+ Add Row</button>
-    </div>
-
-    <div class="rows-container">
-      <div class="row" *ngFor="let row of goldRows">
-        <span class="type-cell">
-          <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Gold type">
-            <option *ngFor="let type of goldMetalTypes" [value]="type.name">
-              {{ type.name }} · {{ type.stamp }}
-            </option>
-            <option [value]="customPurity">Custom %…</option>
-          </select>
-          @if (row.type === customPurity) {
-          <span class="purity-wrap">
-            <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
-              min="1" max="100" step="0.1" placeholder="58" aria-label="Gold percent">%
-          </span>
+      <h3 class="section-heading">
+        <button class="section-toggle" (click)="toggleSection('gold')" [attr.aria-expanded]="open.gold"
+          aria-controls="goldPanel">
+          <span class="section-caret" [class.open]="open.gold" aria-hidden="true">▸</span>
+          🥇 Gold
+          @if (!open.gold && sectionSummary('gold')) {
+          <span class="section-summary">{{ sectionSummary('gold') }}</span>
           }
-        </span>
-
-        <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
-
-        <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
-          <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
-        </select>
-
-        <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-          {{ isNoteShown(row) ? '−' : '+' }} note
         </button>
-
-        <button class="remove-btn" (click)="removeGoldRow(row.id)" aria-label="Remove row">
-          ×
-        </button>
-
-        @if (isNoteShown(row)) {
-        <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
-          placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
-        }
-      </div>
+      </h3>
+      @if (open.gold) {
+      <button class="add-btn" (click)="addGoldRow()">+ Add Row</button>
+      }
     </div>
 
-    <app-precious-metal-breakdown [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
-      totalsTitle="Gold Totals" totalsClass="gold-totals">
-    </app-precious-metal-breakdown>
+    @if (open.gold) {
+    <div id="goldPanel">
+      <div class="rows-container">
+        <div class="row" *ngFor="let row of goldRows">
+          <span class="type-cell">
+            <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Gold type">
+              <option *ngFor="let type of goldMetalTypes" [value]="type.name">
+                {{ type.name }} · {{ type.stamp }}
+              </option>
+              <option [value]="customPurity">Custom %…</option>
+            </select>
+            @if (row.type === customPurity) {
+            <span class="purity-wrap">
+              <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
+                min="1" max="100" step="0.1" placeholder="58" aria-label="Gold percent">%
+            </span>
+            }
+          </span>
+
+          <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
+
+          <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
+            <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
+          </select>
+
+          <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+            [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+            {{ isNoteShown(row) ? '−' : '+' }} note
+          </button>
+
+          <button class="remove-btn" (click)="removeGoldRow(row.id)" aria-label="Remove row">
+            ×
+          </button>
+
+          @if (isNoteShown(row)) {
+          <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+            placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          }
+        </div>
+      </div>
+
+      <app-precious-metal-breakdown [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
+        totalsTitle="Gold Totals" totalsClass="gold-totals">
+      </app-precious-metal-breakdown>
+    </div>
+    }
   </div>
 
   <!-- SILVER SECTION -->
   <div class="metal-section">
     <div class="section-header">
-      <h3>⚪ Silver</h3>
-      <button class="add-btn" (click)="addSilverRow()">+ Add Row</button>
-    </div>
-
-    <div class="rows-container">
-      <div class="row" *ngFor="let row of silverRows">
-        <span class="type-cell">
-          <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Silver type">
-            <option *ngFor="let type of silverMetalTypes" [value]="type.name">
-              {{ type.name }} · {{ type.stamp }}
-            </option>
-            <option [value]="customPurity">Custom %…</option>
-          </select>
-          @if (row.type === customPurity) {
-          <span class="purity-wrap">
-            <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
-              min="1" max="100" step="0.1" placeholder="70" aria-label="Silver percent">%
-          </span>
+      <h3 class="section-heading">
+        <button class="section-toggle" (click)="toggleSection('silver')" [attr.aria-expanded]="open.silver"
+          aria-controls="silverPanel">
+          <span class="section-caret" [class.open]="open.silver" aria-hidden="true">▸</span>
+          ⚪ Silver
+          @if (!open.silver && sectionSummary('silver')) {
+          <span class="section-summary">{{ sectionSummary('silver') }}</span>
           }
-        </span>
-
-        <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
-
-        <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
-          <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
-        </select>
-
-        <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-          {{ isNoteShown(row) ? '−' : '+' }} note
         </button>
-
-        <button class="remove-btn" (click)="removeSilverRow(row.id)" aria-label="Remove row">
-          ×
-        </button>
-
-        @if (isNoteShown(row)) {
-        <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
-          placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
-        }
-      </div>
+      </h3>
+      @if (open.silver) {
+      <button class="add-btn" (click)="addSilverRow()">+ Add Row</button>
+      }
     </div>
 
-    <app-precious-metal-breakdown [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
-      totalsTitle="Silver Totals" totalsClass="silver-totals">
-    </app-precious-metal-breakdown>
+    @if (open.silver) {
+    <div id="silverPanel">
+      <div class="rows-container">
+        <div class="row" *ngFor="let row of silverRows">
+          <span class="type-cell">
+            <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Silver type">
+              <option *ngFor="let type of silverMetalTypes" [value]="type.name">
+                {{ type.name }} · {{ type.stamp }}
+              </option>
+              <option [value]="customPurity">Custom %…</option>
+            </select>
+            @if (row.type === customPurity) {
+            <span class="purity-wrap">
+              <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
+                min="1" max="100" step="0.1" placeholder="70" aria-label="Silver percent">%
+            </span>
+            }
+          </span>
+
+          <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
+
+          <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
+            <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
+          </select>
+
+          <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+            [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+            {{ isNoteShown(row) ? '−' : '+' }} note
+          </button>
+
+          <button class="remove-btn" (click)="removeSilverRow(row.id)" aria-label="Remove row">
+            ×
+          </button>
+
+          @if (isNoteShown(row)) {
+          <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+            placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          }
+        </div>
+      </div>
+
+      <app-precious-metal-breakdown [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
+        totalsTitle="Silver Totals" totalsClass="silver-totals">
+      </app-precious-metal-breakdown>
+    </div>
+    }
   </div>
 
   <!-- PLATINUM & PALLADIUM SECTION: closed until asked for -->
   <div class="metal-section pgm-section">
-    <h3 class="pgm-heading">
-      <button class="pgm-toggle" (click)="togglePgm()" [attr.aria-expanded]="pgmOpen" aria-controls="pgmPanel">
-        <span class="pgm-caret" [class.open]="pgmOpen" aria-hidden="true">▸</span>
-        💍 Platinum &amp; Palladium
-        @if (!pgmOpen && pgmSummary) {
-        <span class="pgm-summary">{{ pgmSummary }}</span>
-        }
-      </button>
-    </h3>
+    <div class="section-header">
+      <h3 class="section-heading">
+        <button class="section-toggle" (click)="toggleSection('pgm')" [attr.aria-expanded]="open.pgm"
+          aria-controls="pgmPanel">
+          <span class="section-caret" [class.open]="open.pgm" aria-hidden="true">▸</span>
+          💍 Platinum &amp; Palladium
+          @if (!open.pgm && sectionSummary('pgm')) {
+          <span class="section-summary">{{ sectionSummary('pgm') }}</span>
+          }
+        </button>
+      </h3>
+    </div>
 
-    @if (pgmOpen) {
+    @if (open.pgm) {
     <div id="pgmPanel" class="pgm-panel">
       @for (metal of pgmMetals; track metal.key) {
       <div class="pgm-metal">
