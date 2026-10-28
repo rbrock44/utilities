@@ -27,6 +27,8 @@ export interface MetalListItem {
   note?: string;
   /** Percent fine, only for a custom percent row. */
   purity?: number;
+  /** Carats of stone to take off the weight. */
+  stone?: number;
 }
 
 /** A counted coin from the coin list, valued from its standard weight and purity. */
@@ -73,7 +75,8 @@ export function isMetalItem(value: unknown): value is MetalListItem {
     hasValidType(item) &&
     typeof item.weight === 'number' && Number.isFinite(item.weight) && item.weight > 0 &&
     !!findMetalUnit(item.unit) &&
-    (item.note === undefined || typeof item.note === 'string')
+    (item.note === undefined || typeof item.note === 'string') &&
+    (item.stone === undefined || (typeof item.stone === 'number' && Number.isFinite(item.stone) && item.stone > 0))
   );
 }
 
@@ -84,7 +87,8 @@ export function isMetalItems(value: unknown): value is MetalListEntry[] {
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
- * `[g|s|p|d, type, weight, unit code, note?]` to keep links short; a custom percent row puts its
+ * `[g|s|p|d, type, weight, unit code, note?, stone carats?]` to keep links short (a stone with no
+ * note leaves the note blank); a custom percent row puts its
  * percent (a number) where the type name would be. A coin is `[c, coin id, quantity, note?]`.
  */
 export function encodeMetalList(items: MetalListEntry[]): string {
@@ -94,8 +98,11 @@ export function encodeMetalList(items: MetalListEntry[]): string {
     }
     const type = item.type === CUSTOM_PURITY ? item.purity! : item.type;
     const row: (string | number)[] = [METAL_CODES[item.metal], type, item.weight, findMetalUnit(item.unit)!.code];
-    if (item.note) {
-      row.push(item.note);
+    if (item.note || item.stone) {
+      row.push(item.note ?? '');
+    }
+    if (item.stone) {
+      row.push(item.stone);
     }
     return row;
   });
@@ -124,7 +131,7 @@ export function decodeMetalList(text: string): { items: MetalListEntry[]; skippe
   const items: MetalListEntry[] = [];
   let skipped = 0;
   for (const row of rows) {
-    const [metal, type, weight, unit, note] = Array.isArray(row) ? row : [];
+    const [metal, type, weight, unit, note, stone] = Array.isArray(row) ? row : [];
     if (metal === 'c') {
       const [, coin, quantity, coinNote] = row as unknown[];
       const item: CoinListItem = {
@@ -147,6 +154,7 @@ export function decodeMetalList(text: string): { items: MetalListEntry[]; skippe
       weight,
       unit: METAL_UNITS.find(known => known.code === unit)?.id as MetalUnitId,
       ...(typeof note === 'string' && note.trim() ? { note: note.trim() } : {}),
+      ...(stone !== undefined ? { stone } : {}),
     };
     if (listMetal && isMetalItem(item)) {
       items.push(item);

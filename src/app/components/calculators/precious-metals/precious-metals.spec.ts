@@ -510,6 +510,43 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     });
   });
 
+  describe('stone weight', () => {
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+
+    it('should take a stone off the gold, show it in the breakdown, and carry it in the list', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: goldTypes[0].name, weight: 5, unit: 'grams' });
+      component.calculate();
+      render();
+      const fullValue = component.goldTotals.spotValue;
+
+      expect(el().querySelector('.stone-input')).toBeNull();
+      component.toggleStone(component.goldRows[0]);
+      render();
+      expect(el().querySelector('.stone-input')).not.toBeNull();
+
+      component.goldRows[0].stone = 2.5;
+      component.calculate();
+      render();
+
+      expect(component.goldTotals.totalWeightGrams).toBeCloseTo(4.5, 6);
+      expect(component.goldTotals.spotValue).toBeCloseTo(fullValue * 0.9, 2);
+      expect(el().textContent).toContain('less 2.5 ct stone');
+      expect(component.items[0]).toMatchObject({ metal: 'gold', weight: 5, stone: 2.5 });
+    });
+
+    it('should warn when the stone weighs as much as the piece', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: goldTypes[0].name, weight: 1, unit: 'grams', stone: 5 });
+      component.calculate();
+      render();
+
+      expect(el().querySelector('.stone-warning')).not.toBeNull();
+      expect(component.goldBreakdowns.length).toBe(0);
+    });
+  });
+
   describe('platinum and palladium', () => {
     const el = () => fixture.nativeElement as HTMLElement;
     const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };

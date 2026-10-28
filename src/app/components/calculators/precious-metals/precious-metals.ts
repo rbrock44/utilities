@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
-import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS, silverTypes, TROY_OZ_IN_GRAMS } from '../../../constants/constants';
-import { MetalService } from '../../../services/metal';
+import { CARAT_IN_GRAMS, CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS, silverTypes, TROY_OZ_IN_GRAMS } from '../../../constants/constants';
+import { MetalService, validStone } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
 import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin } from '../../../constants/coin-options';
@@ -115,6 +115,7 @@ export class PreciousMetalsComponent implements OnInit {
   readonly customPurity = CUSTOM_PURITY;
   /** Rows whose empty note box is expanded; a note with text always shows. */
   private openNotes = new Set<NoteRow>();
+  private openStones = new Set<MetalRow>();
 
   coinRows: CoinRow[] = [];
   coinPickerValue: string | null = null;
@@ -233,6 +234,35 @@ export class PreciousMetalsComponent implements OnInit {
     }
   }
 
+  hasStone(row: MetalRow): boolean {
+    return validStone(row.stone) > 0;
+  }
+
+  /** Like a note, a stone with a weight always shows; an empty one shows only while toggled open. */
+  isStoneShown(row: MetalRow): boolean {
+    return this.hasStone(row) || this.openStones.has(row);
+  }
+
+  stoneToggleTitle(row: MetalRow): string {
+    if (this.hasStone(row)) return 'Clear the stone weight to hide it';
+    return this.openStones.has(row) ? 'Hide stone' : 'Take a stone\'s weight off';
+  }
+
+  toggleStone(row: MetalRow) {
+    if (this.hasStone(row)) return;
+    if (this.openStones.has(row)) {
+      this.openStones.delete(row);
+    } else {
+      this.openStones.add(row);
+    }
+  }
+
+  /** A stone as heavy as the piece leaves no metal to value, so the row says so. */
+  isStoneTooHeavy(row: MetalRow): boolean {
+    const unit = METAL_UNITS.find(known => known.id === row.unit);
+    return !!unit && row.weight > 0 && validStone(row.stone) * CARAT_IN_GRAMS >= row.weight * unit.grams;
+  }
+
   /** Picking a coin already in the list adds one more instead of a duplicate row. */
   addCoin(id: string) {
     const coin = findCoin(id);
@@ -299,6 +329,7 @@ export class PreciousMetalsComponent implements OnInit {
         unit: row.unit,
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
         ...(row.type === CUSTOM_PURITY ? { purity: row.purity } : {}),
+        ...(this.hasStone(row) ? { stone: row.stone! } : {}),
       }));
     const coins: CoinListItem[] = this.coinRows
       .filter(row => this.coinQuantity(row) > 0)
@@ -457,6 +488,7 @@ export class PreciousMetalsComponent implements OnInit {
           unit: item.unit,
           note: item.note ?? '',
           ...(item.purity !== undefined ? { purity: item.purity } : {}),
+          ...(item.stone !== undefined ? { stone: item.stone } : {}),
         }));
       return rows.length > 0 ? rows : [{ id: nextId(), type: defaultType, weight: 0, unit: 'grams' }];
     };

@@ -112,10 +112,16 @@
             <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
           </select>
 
-          <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-            [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-            {{ isNoteShown(row) ? '−' : '+' }} note
-          </button>
+          <span class="row-toggles">
+            <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+              {{ isNoteShown(row) ? '−' : '+' }} note
+            </button>
+            <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
+              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
+              {{ isStoneShown(row) ? '−' : '+' }} stone
+            </button>
+          </span>
 
           <button class="remove-btn" (click)="removeGoldRow(row.id)" aria-label="Remove row">
             ×
@@ -124,6 +130,17 @@
           @if (isNoteShown(row)) {
           <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
             placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          }
+          @if (isStoneShown(row)) {
+          <span class="stone-wrap">
+            less
+            <input type="number" [(ngModel)]="row.stone" (ngModelChange)="calculate()" class="stone-input"
+              min="0" step="0.01" placeholder="0.5" aria-label="Stone weight in carats">
+            ct stone
+            @if (isStoneTooHeavy(row)) {
+            <span class="stone-warning">· weighs as much as the piece</span>
+            }
+          </span>
           }
         </div>
       </div>
@@ -178,10 +195,16 @@
             <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
           </select>
 
-          <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-            [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-            {{ isNoteShown(row) ? '−' : '+' }} note
-          </button>
+          <span class="row-toggles">
+            <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+              {{ isNoteShown(row) ? '−' : '+' }} note
+            </button>
+            <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
+              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
+              {{ isStoneShown(row) ? '−' : '+' }} stone
+            </button>
+          </span>
 
           <button class="remove-btn" (click)="removeSilverRow(row.id)" aria-label="Remove row">
             ×
@@ -190,6 +213,17 @@
           @if (isNoteShown(row)) {
           <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
             placeholder="Note, e.g. nugget ring" maxlength="80" aria-label="Note for this piece">
+          }
+          @if (isStoneShown(row)) {
+          <span class="stone-wrap">
+            less
+            <input type="number" [(ngModel)]="row.stone" (ngModelChange)="calculate()" class="stone-input"
+              min="0" step="0.01" placeholder="0.5" aria-label="Stone weight in carats">
+            ct stone
+            @if (isStoneTooHeavy(row)) {
+            <span class="stone-warning">· weighs as much as the piece</span>
+            }
+          </span>
           }
         </div>
       </div>
@@ -275,10 +309,16 @@
               }
             </select>
 
-            <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-              {{ isNoteShown(row) ? '−' : '+' }} note
-            </button>
+            <span class="row-toggles">
+              <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+                [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+                {{ isNoteShown(row) ? '−' : '+' }} note
+              </button>
+              <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
+                [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
+                {{ isStoneShown(row) ? '−' : '+' }} stone
+              </button>
+            </span>
 
             <button class="remove-btn" (click)="removePgmRow(metal.key, row.id)" aria-label="Remove row">
               ×
@@ -287,6 +327,17 @@
             @if (isNoteShown(row)) {
             <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
               placeholder="Note, e.g. 950 band" maxlength="80" aria-label="Note for this piece">
+            }
+            @if (isStoneShown(row)) {
+            <span class="stone-wrap">
+              less
+              <input type="number" [(ngModel)]="row.stone" (ngModelChange)="calculate()" class="stone-input"
+                min="0" step="0.01" placeholder="0.5" aria-label="Stone weight in carats">
+              ct stone
+              @if (isStoneTooHeavy(row)) {
+              <span class="stone-warning">· weighs as much as the piece</span>
+              }
+            </span>
             }
           </div>
           }

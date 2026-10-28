@@ -31,6 +31,29 @@ describe('MetalService', () => {
     expect(result.totals.spotValue).toBeCloseTo(0.999 * 2000, 5);
   });
 
+  it('should take a stone\'s carats off the weight before valuing the piece', () => {
+    const rows: MetalRow[] = [{ id: 1, type: '24K Gold (99.9%)', weight: 5, unit: 'grams', stone: 2.5 }];
+
+    const result = service.calculateGoldPrice(spotPrices, rows);
+
+    expect(result.breakdowns[0].stoneCarats).toBe(2.5);
+    expect(result.breakdowns[0].weightGrams).toBeCloseTo(4.5, 6);
+    expect(result.totals.totalPureGrams).toBeCloseTo(4.5 * 0.999, 6);
+  });
+
+  it('should ignore a blank stone and skip a piece the stone outweighs', () => {
+    const rows: MetalRow[] = [
+      { id: 1, type: '24K Gold (99.9%)', weight: 1, unit: 'grams', stone: null },
+      { id: 2, type: '24K Gold (99.9%)', weight: 1, unit: 'grams', stone: 5 },
+    ];
+
+    const result = service.calculateGoldPrice(spotPrices, rows);
+
+    expect(result.breakdowns.length).toBe(1);
+    expect(result.breakdowns[0].stoneCarats).toBeUndefined();
+    expect(result.totals.totalWeightGrams).toBeCloseTo(1, 6);
+  });
+
   it('should carry a trimmed note into the breakdown and leave blank notes out', () => {
     const rows: MetalRow[] = [
       { id: 1, type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: '  nugget ring ' },

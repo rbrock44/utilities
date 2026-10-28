@@ -48,6 +48,8 @@ export const emptyMetalTotal: MetalTotals = {
 export const ASC: 'asc' = 'asc';
 export const DESC: 'desc' = 'desc';
 export const TROY_OZ_IN_GRAMS: number = 31.1035;
+/** A metric carat, the unit stones are weighed in. */
+export const CARAT_IN_GRAMS: number = 0.2;
 /** Troy units are what dealers quote; the rest are what a kitchen or postal scale might read. */
 export const METAL_UNITS: MetalUnit[] = [
     { id: 'grams', label: 'g', grams: 1, code: 'g' },

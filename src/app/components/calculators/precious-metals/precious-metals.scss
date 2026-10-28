@@ -370,7 +370,8 @@
 .weight-input,
 .unit-select,
 .purity-input,
-.note-input {
+.note-input,
+.stone-input {
   padding: 0.3rem 0.4rem;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -403,7 +404,32 @@
   background: transparent;
 }
 
-.note-toggle {
+.row-toggles {
+  display: flex;
+  gap: 0.25rem;
+}
+
+// The stone sits on its own line under the row, like a narrow-screen note.
+.stone-wrap {
+  grid-column: 1 / 4;
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+
+.stone-input {
+  width: 4.5rem;
+  border-style: dashed;
+}
+
+.stone-warning {
+  color: var(--warning-text);
+}
+
+.note-toggle,
+.stone-toggle {
   height: 28px;
   padding: 0 0.35rem;
   border: 1px solid var(--border);
@@ -416,13 +442,16 @@
 }
 
 .note-toggle:hover:not(:disabled),
+.stone-toggle:hover:not(:disabled),
 .note-toggle.open,
+.stone-toggle.open,
 .choice:hover:not(:disabled) {
   border-color: var(--brand-border);
   color: var(--brand);
 }
 
 .note-toggle:disabled,
+.stone-toggle:disabled,
 .choice:disabled {
   opacity: 0.55;
   cursor: default;
@@ -600,7 +629,8 @@
   }
 
   .type-cell,
-  .note-input {
+  .note-input,
+  .stone-wrap {
     grid-column: 1 / -1;
   }
 

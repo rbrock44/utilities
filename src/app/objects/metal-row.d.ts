@@ -6,6 +6,8 @@ interface MetalRow {
   note?: string;
   /** Percent fine, used only when `type` is the custom percent option. */
   purity?: number;
+  /** Carats of stone set in the piece, taken off the weight before it's valued. */
+  stone?: number | null;
   /** Shown in place of the type name, e.g. a coin and how many of it. */
   label?: string;
 }

@@ -11,6 +11,17 @@ describe('metal list links', () => {
     expect(decodeMetalList(encoded)).toEqual({ items: [ring, chain, bar], skipped: 0 });
   });
 
+  it('should round-trip a stone, with or without a note', () => {
+    const set: MetalListItem = { ...ring, stone: 0.75 };
+    const bare: MetalListItem = { ...chain, stone: 1 };
+    expect(decodeMetalList(encodeMetalList([set, bare]))).toEqual({ items: [set, bare], skipped: 0 });
+  });
+
+  it('should skip a row with a bad stone weight', () => {
+    const tampered = btoa(JSON.stringify([['g', '14K Gold (58.3%)', 4.2, 'g', '', -1], ['g', '14K Gold (58.3%)', 4.2, 'g', '', 'x']]));
+    expect(decodeMetalList(tampered)).toEqual({ items: [], skipped: 2 });
+  });
+
   it('should round-trip every weight unit', () => {
     const items: MetalListItem[] = METAL_UNITS.map(unit => ({ ...chain, unit: unit.id }));
     expect(decodeMetalList(encodeMetalList(items))).toEqual({ items, skipped: 0 });

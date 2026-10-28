@@ -1,5 +1,10 @@
 import { Injectable } from "@angular/core";
-import { CUSTOM_PURITY, findMetalUnit, goldTypes, palladiumTypes, platinumTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+import { CARAT_IN_GRAMS, CUSTOM_PURITY, findMetalUnit, goldTypes, palladiumTypes, platinumTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+
+/** Blank, negative, or not-a-number stone weights count as no stone. */
+export function validStone(stone: number | null | undefined): number {
+  return typeof stone === 'number' && Number.isFinite(stone) && stone > 0 ? stone : 0;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +41,10 @@ export class MetalService {
       const unit = findMetalUnit(row.unit);
       if (!unit) return;
 
-      const weightGrams = row.weight * unit.grams;
+      // A stone weighs nothing as metal, so it comes off before the piece is valued.
+      const stoneCarats = validStone(row.stone);
+      const weightGrams = row.weight * unit.grams - stoneCarats * CARAT_IN_GRAMS;
+      if (weightGrams <= 0) return;
       const weightToz = weightGrams / TROY_OZ_IN_GRAMS;
       const pureWeightGrams = weightGrams * metalType.purity;
       const pureWeightToz = pureWeightGrams / TROY_OZ_IN_GRAMS;
@@ -49,6 +57,7 @@ export class MetalService {
       breakdowns.push({
         type: metalType.name,
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
+        ...(stoneCarats > 0 ? { stoneCarats } : {}),
         weightGrams,
         weightToz,
         pureWeightGrams,

@@ -37,7 +37,8 @@ export function buildMetalQuote(PDF: typeof jsPDF, quote: MetalQuote): jsPDF {
     columns: ['Weight', 'Pure oz t', 'Spot value'],
     rows: rows.map(row => ({
       label: row.type,
-      note: row.note,
+      note: [row.note, row.stoneCarats ? `less ${row.stoneCarats} ct stone` : undefined]
+        .filter(Boolean).join(' · ') || undefined,
       cells: [`${row.weightGrams.toFixed(2)} g`, row.pureWeightToz.toFixed(4), money.format(row.spotValue)],
     })),
     total: {
