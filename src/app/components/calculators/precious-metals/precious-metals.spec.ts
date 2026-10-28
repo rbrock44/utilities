@@ -649,11 +649,15 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
         return Array.from(el().querySelectorAll('.combo-option'), li => li.textContent!.trim());
       };
 
-      expect(search('1944 dime')).toEqual([
-        'Silver · Mercury Dime · 1916-1945', 'Silver · Roosevelt Dime · Pre-1965', 'Silver · Canadian Dime · 1920-1967',
-      ]);
+      expect(search('1944 dime')).toEqual(['Silver · Mercury Dime · 1916-1945', 'Silver · Canadian Dime · 1920-1967']);
       expect(search('dime mercury')).toEqual(['Silver · Mercury Dime · 1916-1945']);
       expect(search('1925 morgan')).toEqual([]);
+      expect(search('1976 eisenhower')).toEqual(['Silver · Eisenhower Dollar · 1971-1976 S (40% silver)']);
+      expect(search('1976 s eisenhower')).toEqual(['Silver · Eisenhower Dollar · 1971-1976 S (40% silver)']);
+      expect(search('1976 d eisenhower')).toEqual([]);
+      expect(search('1976-s quarter')).toEqual(['Silver · Washington Quarter · 1976 S (40% silver)']);
+      expect(search('2021s dime')).toEqual(['Silver · Roosevelt Dime · 2019+ S (silver proof)']);
+      expect(search('1885 cc morgan')).toEqual(['Silver · Morgan Dollar · 1878-1921']);
     });
 
     it('should value coins in the matching metal breakdown, named with their count and note', async () => {

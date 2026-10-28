@@ -8,7 +8,7 @@ import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS, silverTypes, TR
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
-import { COIN_OPTIONS, CoinOption, coinStruckIn, findCoin } from '../../../constants/coin-options';
+import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin } from '../../../constants/coin-options';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
 import {
   CoinListItem,
@@ -103,11 +103,18 @@ export class PreciousMetalsComponent implements OnInit {
       searchText: `${coin.metal} ${coin.label}`.toLowerCase(),
     }));
 
-  /** A typed year like `1944` finds coins struck that year, not just ones whose label has it. */
+  /**
+   * A typed year like `1944` finds coins struck that year, not just ones whose label has it, and a
+   * mint mark (`1976 s`, `1976-s`, `1976s`) narrows to coins that mint struck in silver or gold.
+   */
   readonly coinMatchesWord = (option: ComboBoxOption, word: string): boolean => {
     const coin = findCoin(option.id);
-    if (/^\d{4}$/.test(word) && coin?.years) {
-      return coinStruckIn(coin, Number(word));
+    const dated = word.match(/^(\d{4})-?(p|d|s|o|w|cc)?$/);
+    if (coin && dated && coin.years) {
+      return coinStruckIn(coin, Number(dated[1])) && (!dated[2] || coinStruckAt(coin, dated[2]));
+    }
+    if (coin && /^(p|d|s|o|w|cc)$/.test(word)) {
+      return coinStruckAt(coin, word);
     }
     return option.searchText.includes(word);
   };

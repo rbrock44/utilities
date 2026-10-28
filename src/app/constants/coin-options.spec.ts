@@ -1,4 +1,4 @@
-import { COIN_OPTIONS, coinStruckIn, decodeLegacyStack, findCoin, pureTozPerCoin } from './coin-options';
+import { COIN_OPTIONS, coinStruckAt, coinStruckIn, decodeLegacyStack, findCoin, pureTozPerCoin } from './coin-options';
 
 const morganId = 'silver-morgan-dollar-1878-1921';
 const eagleId = 'gold-american-gold-eagle-1-oz-22k';
@@ -17,15 +17,24 @@ describe('COIN_OPTIONS', () => {
     expect(COIN_OPTIONS.every(c => /^(gold|silver)-[a-z0-9-]+$/.test(c.id))).toBe(true);
   });
 
-  it('should tell the two Kennedy halves apart by year', () => {
+  it('should tell the Kennedy halves apart by year and mint', () => {
     const kennedys = COIN_OPTIONS.filter(c => c.spec.name === 'Kennedy Half Dollar').map(c => c.label);
-    expect(kennedys).toEqual(['Kennedy Half Dollar · 1965-1970', 'Kennedy Half Dollar · 1964']);
+    expect(kennedys).toEqual([
+      'Kennedy Half Dollar · 1965-1970',
+      'Kennedy Half Dollar · 1964',
+      'Kennedy Half Dollar · 1976 S (40% silver)',
+      'Kennedy Half Dollar · 1992-2018 S (silver proof)',
+      'Kennedy Half Dollar · 2019+ S (silver proof)',
+    ]);
   });
 
   it('should read the years struck from each description', () => {
     const years = (name: string) => COIN_OPTIONS.find(c => c.spec.name === name)!.years;
     expect(years('Mercury Dime')).toEqual({ from: 1916, to: 1945 });
-    expect(years('Roosevelt Dime')).toEqual({ to: 1964 });
+    expect(years('Roosevelt Dime')).toEqual({ from: 1946, to: 1964 });
+    expect(years('British Crown')).toEqual({ to: 1946 });
+    expect(findCoin('silver-roosevelt-dime-2019-s-silver-proof')!.years).toEqual({ from: 2019 });
+    expect(findCoin('silver-eisenhower-dollar-1971-1976-s-40-silver')!.years).toEqual({ from: 1971, to: 1976 });
     expect(COIN_OPTIONS.find(c => c.spec.description === '30g (2016+)')!.years).toEqual({ from: 2016 });
     expect(findCoin(morganId)!.years).toEqual({ from: 1878, to: 1921 });
     expect(findCoin(eagleId)!.years).toBeUndefined();
@@ -39,6 +48,19 @@ describe('COIN_OPTIONS', () => {
     expect(coinStruckIn(morgan, 1922)).toBe(false);
     expect(coinStruckIn(COIN_OPTIONS.find(c => c.spec.name === 'Roosevelt Dime')!, 1950)).toBe(true);
     expect(coinStruckIn(findCoin(eagleId)!, 2000)).toBe(false);
+  });
+
+  it('should limit a coin to the mints that struck it in silver', () => {
+    const ike = findCoin('silver-eisenhower-dollar-1971-1976-s-40-silver')!;
+    expect(coinStruckAt(ike, 's')).toBe(true);
+    expect(coinStruckAt(ike, 'd')).toBe(false);
+    expect(coinStruckAt(findCoin(morganId)!, 'cc')).toBe(true);
+  });
+
+  it('should still find coins saved under their old, less specific ids', () => {
+    expect(findCoin('silver-eisenhower-dollar-1971-1976-40-silver')?.id).toBe('silver-eisenhower-dollar-1971-1976-s-40-silver');
+    expect(findCoin('silver-roosevelt-dime-pre-1965')?.id).toBe('silver-roosevelt-dime-1946-1964');
+    expect(findCoin('silver-washington-quarter-pre-1965')?.id).toBe('silver-washington-quarter-1932-1964');
   });
 
   it('should compute pure troy ounces from weight and purity', () => {
