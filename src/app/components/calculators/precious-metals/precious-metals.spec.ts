@@ -159,7 +159,18 @@ describe('PreciousMetalsComponent', () => {
       expect(prices.length).toBe(goldTypes.length);
       expect(fourteen.perGram).toBeCloseTo(2000 / 31.1035 * 0.583, 2);
       expect(component.typePrices('silver').map(p => p.name)).toEqual(
-        ['Fine (99.9%)', 'Sterling (92.5%)', 'Coin (90%)', 'European (80%)']);
+        ['Fine (99.9%)', 'Britannia (95.8%)', 'Mexican/French (95%)', 'Sterling (92.5%)', 'Coin (90%)',
+          'Continental (83.5%)', 'Scandinavian (83%)', 'European (80%)']);
+    });
+
+    it('lists each fineness with the stamp found on the piece', async () => {
+      await fixture.whenStable();
+      const options = (select: string) => Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll(`select[aria-label="${select}"] option`), o => o.textContent!.trim());
+      expect(options('Gold type')).toContain('9K Gold (37.5%) · 375');
+      expect(options('Gold type')).toContain('14K Gold (58.3%) · 585');
+      expect(options('Silver type')).toContain('Sterling Silver (92.5%) · 925');
+      expect(options('Silver type')).toContain('Mexican/French Silver (95%) · 950');
     });
 
     it('drops down type prices on a card click but not on the price', () => {

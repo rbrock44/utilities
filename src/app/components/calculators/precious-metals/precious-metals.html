@@ -81,7 +81,7 @@
         <span class="type-cell">
           <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Gold type">
             <option *ngFor="let type of goldMetalTypes" [value]="type.name">
-              {{ type.name }}
+              {{ type.name }} · {{ type.stamp }}
             </option>
             <option [value]="customPurity">Custom %…</option>
           </select>
@@ -132,7 +132,7 @@
         <span class="type-cell">
           <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Silver type">
             <option *ngFor="let type of silverMetalTypes" [value]="type.name">
-              {{ type.name }}
+              {{ type.name }} · {{ type.stamp }}
             </option>
             <option [value]="customPurity">Custom %…</option>
           </select>
