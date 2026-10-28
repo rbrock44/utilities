@@ -1,15 +1,15 @@
 export const GOLD_COIN_DATABASE: CoinSpec[] = [
     // US Gold Coins - Eagles
-    { name: 'American Gold Eagle', weightGrams: 33.931, purity: 0.9167, description: '1 oz (22K)' },
-    { name: 'American Gold Eagle (1/2 oz)', weightGrams: 16.966, purity: 0.9167, description: '1/2 oz (22K)' },
-    { name: 'American Gold Eagle (1/4 oz)', weightGrams: 8.483, purity: 0.9167, description: '1/4 oz (22K)' },
-    { name: 'American Gold Eagle (1/10 oz)', weightGrams: 3.393, purity: 0.9167, description: '1/10 oz (22K)' },
+    { name: 'American Gold Eagle', weightGrams: 33.931, purity: 0.9167, description: '1 oz (22K)', years: { from: 1986 } },
+    { name: 'American Gold Eagle (1/2 oz)', weightGrams: 16.966, purity: 0.9167, description: '1/2 oz (22K)', years: { from: 1986 } },
+    { name: 'American Gold Eagle (1/4 oz)', weightGrams: 8.483, purity: 0.9167, description: '1/4 oz (22K)', years: { from: 1986 } },
+    { name: 'American Gold Eagle (1/10 oz)', weightGrams: 3.393, purity: 0.9167, description: '1/10 oz (22K)', years: { from: 1986 } },
     
     // US Gold Coins - Buffalo
-    { name: 'American Gold Buffalo', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
-    { name: 'American Gold Buffalo (1/2 oz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'American Gold Buffalo (1/4 oz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'American Gold Buffalo (1/10 oz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
+    { name: 'American Gold Buffalo', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 2006 } },
+    { name: 'American Gold Buffalo (1/2 oz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 2008, to: 2008 } },
+    { name: 'American Gold Buffalo (1/4 oz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 2008, to: 2008 } },
+    { name: 'American Gold Buffalo (1/10 oz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 2008, to: 2008 } },
     
     // US Historic Gold Coins
     { name: 'Double Eagle ($20)', weightGrams: 33.436, purity: 0.900, description: '1849-1933' },
@@ -27,39 +27,39 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     { name: '$3 Gold Piece', weightGrams: 5.015, purity: 0.900, description: '1854-1889' },
     
     // Canadian Gold Coins - Maple Leaf
-    { name: 'Canadian Gold Maple Leaf', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
-    { name: 'Canadian Gold Maple Leaf (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'Canadian Gold Maple Leaf (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'Canadian Gold Maple Leaf (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
-    { name: 'Canadian Gold Maple Leaf (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
+    { name: 'Canadian Gold Maple Leaf', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1979 } },
+    { name: 'Canadian Gold Maple Leaf (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1986 } },
+    { name: 'Canadian Gold Maple Leaf (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1982 } },
+    { name: 'Canadian Gold Maple Leaf (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1982 } },
+    { name: 'Canadian Gold Maple Leaf (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)', years: { from: 1993 } },
     { name: 'Canadian Gold Maple Leaf (1/25 toz)', weightGrams: 1.244, purity: 0.9999, description: '1/25 toz (24K)' },
     
     // British Gold Coins - Sovereign
-    { name: 'British Sovereign', weightGrams: 7.988, purity: 0.9167, description: 'Modern (22K)' },
-    { name: 'British Half Sovereign', weightGrams: 3.994, purity: 0.9167, description: 'Modern (22K)' },
-    { name: 'British Quarter Sovereign', weightGrams: 1.997, purity: 0.9167, description: 'Modern (22K)' },
-    { name: 'British Double Sovereign', weightGrams: 15.976, purity: 0.9167, description: 'Modern (22K)' },
-    { name: 'British Five Sovereign', weightGrams: 39.940, purity: 0.9167, description: 'Modern (22K)' },
+    { name: 'British Sovereign', weightGrams: 7.988, purity: 0.9167, description: 'Modern (22K)', years: { from: 1957 } },
+    { name: 'British Half Sovereign', weightGrams: 3.994, purity: 0.9167, description: 'Modern (22K)', years: { from: 1980 } },
+    { name: 'British Quarter Sovereign', weightGrams: 1.997, purity: 0.9167, description: 'Modern (22K)', years: { from: 2009 } },
+    { name: 'British Double Sovereign', weightGrams: 15.976, purity: 0.9167, description: 'Modern (22K)', years: { from: 1980 } },
+    { name: 'British Five Sovereign', weightGrams: 39.940, purity: 0.9167, description: 'Modern (22K)', years: { from: 1980 } },
     
     // British Gold Coins - Britannia
-    { name: 'British Britannia', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
-    { name: 'British Britannia (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'British Britannia (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'British Britannia (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
+    { name: 'British Britannia', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1987 } },
+    { name: 'British Britannia (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1987 } },
+    { name: 'British Britannia (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1987 } },
+    { name: 'British Britannia (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1987 } },
     { name: 'British Britannia (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
     
     // South African Gold Coins - Krugerrand
-    { name: 'Krugerrand', weightGrams: 33.930, purity: 0.9167, description: '1 oz (22K)' },
-    { name: 'Krugerrand (1/2 oz)', weightGrams: 16.965, purity: 0.9167, description: '1/2 oz (22K)' },
-    { name: 'Krugerrand (1/4 oz)', weightGrams: 8.482, purity: 0.9167, description: '1/4 oz (22K)' },
-    { name: 'Krugerrand (1/10 oz)', weightGrams: 3.393, purity: 0.9167, description: '1/10 oz (22K)' },
+    { name: 'Krugerrand', weightGrams: 33.930, purity: 0.9167, description: '1 oz (22K)', years: { from: 1967 } },
+    { name: 'Krugerrand (1/2 oz)', weightGrams: 16.965, purity: 0.9167, description: '1/2 oz (22K)', years: { from: 1980 } },
+    { name: 'Krugerrand (1/4 oz)', weightGrams: 8.482, purity: 0.9167, description: '1/4 oz (22K)', years: { from: 1980 } },
+    { name: 'Krugerrand (1/10 oz)', weightGrams: 3.393, purity: 0.9167, description: '1/10 oz (22K)', years: { from: 1980 } },
     
     // Austrian Gold Coins - Philharmonic
-    { name: 'Austrian Philharmonic', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
-    { name: 'Austrian Philharmonic (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'Austrian Philharmonic (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'Austrian Philharmonic (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
-    { name: 'Austrian Philharmonic (1/25 toz)', weightGrams: 1.244, purity: 0.9999, description: '1/25 toz (24K)' },
+    { name: 'Austrian Philharmonic', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1989 } },
+    { name: 'Austrian Philharmonic (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1994 } },
+    { name: 'Austrian Philharmonic (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1989 } },
+    { name: 'Austrian Philharmonic (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1989 } },
+    { name: 'Austrian Philharmonic (1/25 toz)', weightGrams: 1.244, purity: 0.9999, description: '1/25 toz (24K)', years: { from: 2014 } },
     
     // Austrian Historic Gold Coins
     { name: 'Austrian 100 Corona', weightGrams: 33.875, purity: 0.900, description: 'Re-strike' },
@@ -69,26 +69,26 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     { name: 'Austrian Ducat', weightGrams: 3.491, purity: 0.9860, description: 'Re-strike' },
     
     // Chinese Gold Coins - Panda
-    { name: 'Chinese Gold Panda', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
-    { name: 'Chinese Gold Panda (30g)', weightGrams: 30.000, purity: 0.999, description: '30 grams' },
-    { name: 'Chinese Gold Panda (15g)', weightGrams: 15.000, purity: 0.999, description: '15 grams' },
-    { name: 'Chinese Gold Panda (8g)', weightGrams: 8.000, purity: 0.999, description: '8 grams' },
-    { name: 'Chinese Gold Panda (3g)', weightGrams: 3.000, purity: 0.999, description: '3 grams' },
-    { name: 'Chinese Gold Panda (1g)', weightGrams: 1.000, purity: 0.999, description: '1 gram' },
+    { name: 'Chinese Gold Panda', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1982, to: 2015 } },
+    { name: 'Chinese Gold Panda (30g)', weightGrams: 30.000, purity: 0.999, description: '30 grams', years: { from: 2016 } },
+    { name: 'Chinese Gold Panda (15g)', weightGrams: 15.000, purity: 0.999, description: '15 grams', years: { from: 2016 } },
+    { name: 'Chinese Gold Panda (8g)', weightGrams: 8.000, purity: 0.999, description: '8 grams', years: { from: 2016 } },
+    { name: 'Chinese Gold Panda (3g)', weightGrams: 3.000, purity: 0.999, description: '3 grams', years: { from: 2016 } },
+    { name: 'Chinese Gold Panda (1g)', weightGrams: 1.000, purity: 0.999, description: '1 gram', years: { from: 2016 } },
     
     // Australian Gold Coins - Kangaroo/Nugget
-    { name: 'Australian Kangaroo/Nugget', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
+    { name: 'Australian Kangaroo/Nugget', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1986 } },
     { name: 'Australian Kangaroo (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
     { name: 'Australian Kangaroo (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
     { name: 'Australian Kangaroo (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
     { name: 'Australian Kangaroo (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
     
     // Australian Gold Coins - Lunar Series
-    { name: 'Australian Lunar Series', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)' },
-    { name: 'Australian Lunar Series (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)' },
-    { name: 'Australian Lunar Series (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)' },
-    { name: 'Australian Lunar Series (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)' },
-    { name: 'Australian Lunar Series (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)' },
+    { name: 'Australian Lunar Series', weightGrams: 31.103, purity: 0.9999, description: '1 toz (24K)', years: { from: 1996 } },
+    { name: 'Australian Lunar Series (1/2 toz)', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz (24K)', years: { from: 1996 } },
+    { name: 'Australian Lunar Series (1/4 toz)', weightGrams: 7.776, purity: 0.9999, description: '1/4 toz (24K)', years: { from: 1996 } },
+    { name: 'Australian Lunar Series (1/10 toz)', weightGrams: 3.110, purity: 0.9999, description: '1/10 toz (24K)', years: { from: 1996 } },
+    { name: 'Australian Lunar Series (1/20 toz)', weightGrams: 1.555, purity: 0.9999, description: '1/20 toz (24K)', years: { from: 1996 } },
     
     // Mexican Gold Coins - Centenario/Peso
     { name: 'Mexican 50 Peso', weightGrams: 41.666, purity: 0.900, description: '1.2057 toz AGW (Centenario)' },
@@ -99,7 +99,7 @@ export const GOLD_COIN_DATABASE: CoinSpec[] = [
     { name: 'Mexican 2 Peso', weightGrams: 1.666, purity: 0.900, description: '0.0482 toz AGW' },
     
     // Mexican Gold Coins - Libertad
-    { name: 'Mexican Libertad', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'Mexican Libertad', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1981 } },
     { name: 'Mexican Libertad (1/2 toz)', weightGrams: 15.552, purity: 0.999, description: '1/2 toz' },
     { name: 'Mexican Libertad (1/4 toz)', weightGrams: 7.776, purity: 0.999, description: '1/4 toz' },
     { name: 'Mexican Libertad (1/10 toz)', weightGrams: 3.110, purity: 0.999, description: '1/10 toz' },
@@ -229,21 +229,21 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'Canadian Silver Nickel', weightGrams: 4.60, purity: 0.800, description: '1920-1921' },
     
     // US Bullion - American Silver Eagle
-    { name: 'American Silver Eagle', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'American Silver Eagle', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1986 } },
     
     // Canadian Bullion - Maple Leaf
-    { name: 'Canadian Maple Leaf', weightGrams: 31.103, purity: 0.9999, description: '1 toz' },
+    { name: 'Canadian Maple Leaf', weightGrams: 31.103, purity: 0.9999, description: '1 toz', years: { from: 1988 } },
     { name: 'Canadian Maple Leaf', weightGrams: 15.552, purity: 0.9999, description: '1/2 toz' },
     { name: 'Canadian Maple Leaf', weightGrams: 311.030, purity: 0.9999, description: '10 toz' },
     
     // Austrian Bullion - Philharmonic
-    { name: 'Austrian Philharmonic', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'Austrian Philharmonic', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 2008 } },
     { name: 'Austrian Philharmonic', weightGrams: 15.552, purity: 0.999, description: '1/2 toz' },
     
     // Mexican Bullion - Libertad (all denominations)
     { name: 'Mexican Libertad', weightGrams: 155.515, purity: 0.999, description: '5 toz' },
     { name: 'Mexican Libertad', weightGrams: 62.206, purity: 0.999, description: '2 toz' },
-    { name: 'Mexican Libertad', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'Mexican Libertad', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1982 } },
     { name: 'Mexican Libertad', weightGrams: 15.552, purity: 0.999, description: '1/2 toz' },
     { name: 'Mexican Libertad', weightGrams: 7.776, purity: 0.999, description: '1/4 toz' },
     { name: 'Mexican Libertad', weightGrams: 3.110, purity: 0.999, description: '1/10 toz' },
@@ -251,25 +251,25 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     { name: 'Mexican Libertad Kilo', weightGrams: 1000.0, purity: 0.999, description: '1 kilogram' },
     
     // Chinese Bullion - Panda
-    { name: 'Chinese Silver Panda', weightGrams: 31.103, purity: 0.999, description: '1 toz (current)' },
+    { name: 'Chinese Silver Panda', weightGrams: 31.103, purity: 0.999, description: '1 toz (current)', years: { from: 1989, to: 2015 } },
     { name: 'Chinese Silver Panda', weightGrams: 30.0, purity: 0.999, description: '30g (2016+)' },
     
     // Australian Bullion - Kookaburra
-    { name: 'Australian Kookaburra', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'Australian Kookaburra', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1990 } },
     { name: 'Australian Kookaburra Kilo', weightGrams: 1000.0, purity: 0.999, description: '1 kilogram' },
     
     // Australian Bullion - Kangaroo/Nugget
-    { name: 'Australian Kangaroo', weightGrams: 31.103, purity: 0.9999, description: '1 toz' },
+    { name: 'Australian Kangaroo', weightGrams: 31.103, purity: 0.9999, description: '1 toz', years: { from: 2016 } },
     
     // Australian Bullion - Lunar Series
-    { name: 'Australian Lunar Series', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'Australian Lunar Series', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1999 } },
     { name: 'Australian Lunar Series Kilo', weightGrams: 1000.0, purity: 0.999, description: '1 kilogram' },
     
     // British Bullion - Britannia
-    { name: 'British Britannia', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'British Britannia', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 1997 } },
     
     // South African Bullion - Krugerrand
-    { name: 'South African Silver Krugerrand', weightGrams: 31.103, purity: 0.999, description: '1 toz' },
+    { name: 'South African Silver Krugerrand', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 2017 } },
     
     // British Pre-Decimal Coins
     { name: 'British Crown', weightGrams: 28.28, purity: 0.925, description: 'Pre-1947' },

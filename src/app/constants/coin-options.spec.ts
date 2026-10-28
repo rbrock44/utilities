@@ -38,7 +38,8 @@ describe('COIN_OPTIONS', () => {
     expect(findCoin('silver-eisenhower-dollar-1971-1976-s-40-silver')!.years).toEqual({ from: 1971, to: 1976 });
     expect(COIN_OPTIONS.find(c => c.spec.description === '30g (2016+)')!.years).toEqual({ from: 2016 });
     expect(findCoin(morganId)!.years).toEqual({ from: 1878, to: 1921 });
-    expect(findCoin(eagleId)!.years).toBeUndefined();
+    expect(findCoin(eagleId)!.years).toEqual({ from: 1986 });
+    expect(findCoin('silver-generic-silver-round-1-toz')!.years).toBeUndefined();
     expect(COIN_OPTIONS.filter(c => c.spec.description === '1000 toz').every(c => !c.years)).toBe(true);
   });
 
@@ -48,7 +49,7 @@ describe('COIN_OPTIONS', () => {
     expect(coinStruckIn(morgan, 1921)).toBe(true);
     expect(coinStruckIn(morgan, 1922)).toBe(false);
     expect(coinStruckIn(COIN_OPTIONS.find(c => c.spec.name === 'Roosevelt Dime')!, 1950)).toBe(true);
-    expect(coinStruckIn(findCoin(eagleId)!, 2000)).toBe(false);
+    expect(coinStruckIn(findCoin('silver-generic-silver-round-1-toz')!, 2000)).toBe(false);
   });
 
   it('should limit a coin to the mints that struck it in silver', () => {

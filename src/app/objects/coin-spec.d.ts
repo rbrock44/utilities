@@ -5,4 +5,6 @@ interface CoinSpec {
   description?: string;
   /** Mint marks struck in this metal (`S` for a silver-only proof); left out when every mint was. */
   mints?: string[];
+  /** Years struck, for coins whose description is a size (`1 toz`) rather than a date. */
+  years?: { from?: number; to?: number };
 }

@@ -8,7 +8,7 @@ export interface CoinOption {
   label: string;
   metal: CoinMetal;
   spec: CoinSpec;
-  /** Years struck, read from the description; an open end (`Pre-1965`, `2016+`) is left out. */
+  /** Years struck, from the spec or read from the description; an open end (`Pre-1965`, `2016+`) is left out. */
   years?: { from?: number; to?: number };
 }
 
@@ -29,7 +29,7 @@ function buildOptions(): CoinOption[] {
     }
     taken.add(id);
     const label = spec.description ? `${spec.name} · ${spec.description}` : spec.name;
-    const years = yearsFrom(spec.description);
+    const years = spec.years ?? yearsFrom(spec.description);
     return { id, label, metal, spec, ...(years ? { years } : {}) };
   };
 

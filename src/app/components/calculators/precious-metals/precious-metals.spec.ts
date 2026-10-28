@@ -680,6 +680,10 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       ]);
       expect(search('1979 anthony')).toEqual(['Susan B. Anthony Dollar · 1979-1999 (copper-nickel) · no silver']);
       expect(search('1968 canadian dime')).toEqual(['Silver · Canadian Dime · 1967-1968 (50% silver)']);
+      expect(search('2021 silver eagle')).toEqual(['Silver · American Silver Eagle · 1 toz']);
+      expect(search('1985 silver eagle')).toEqual([]);
+      expect(search('2010 silver panda')).toEqual(['Silver · Chinese Silver Panda · 1 toz (current)']);
+      expect(search('2020 silver panda')).toEqual(['Silver · Chinese Silver Panda · 30g (2016+)']);
     });
 
     it('should value coins in the matching metal breakdown, named with their count and note', async () => {
