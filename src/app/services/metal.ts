@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CUSTOM_PURITY, findMetalUnit, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+import { CUSTOM_PURITY, findMetalUnit, goldTypes, palladiumTypes, platinumTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +11,15 @@ export class MetalService {
 
   calculateSilverPrice(spotPrices: SpotPrices, rows: MetalRow[]) {
     return this.calculateMetal(spotPrices.silver, rows, silverTypes, 'Silver');
+  }
+
+  /** Without a price, platinum and palladium pieces are still weighed but valued at nothing. */
+  calculatePlatinumPrice(spotPrices: SpotPrices, rows: MetalRow[]): MetalCalculation {
+    return this.calculateMetal(Math.max(0, spotPrices.platinum ?? 0), rows, platinumTypes, 'Platinum');
+  }
+
+  calculatePalladiumPrice(spotPrices: SpotPrices, rows: MetalRow[]): MetalCalculation {
+    return this.calculateMetal(Math.max(0, spotPrices.palladium ?? 0), rows, palladiumTypes, 'Palladium');
   }
 
   private calculateMetal(spotPriceForMetal: number, rows: MetalRow[], types: MetalType[], label: string): MetalCalculation {

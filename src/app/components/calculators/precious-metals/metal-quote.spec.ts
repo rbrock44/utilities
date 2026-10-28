@@ -65,6 +65,21 @@ describe('metal quote', () => {
     expect(pdf).not.toContain('(Offer)');
   });
 
+  it('should add platinum and palladium sections and prices only when present', () => {
+    const band = { ...ring, type: 'Platinum (95%)', note: '950 band' };
+    const pdf = source(quote({
+      spotPrices: { gold: 2000, silver: 25, platinum: 1000, palladium: -1, timestamp: new Date() },
+      manual: { gold: false, silver: false, platinum: true },
+      others: [{ title: 'Platinum', breakdowns: [band], totals: totals(374.88, 10, 0.1874) }],
+    }));
+
+    expect(pdf).toContain('Platinum $1,000.00/oz t \\(set by hand\\)');
+    expect(pdf).not.toContain('Palladium');
+    expect(pdf).toContain('(Platinum)');
+    expect(pdf).toContain('(950 band)');
+    expect(source(quote())).not.toContain('Platinum');
+  });
+
   it('should fall back to a generic title and include an offer when given', () => {
     const pdf = source(quote({ name: '', offer: { amount: 300, percent: 80.02 } }));
 

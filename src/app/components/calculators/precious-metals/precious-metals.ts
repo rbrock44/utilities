@@ -19,13 +19,18 @@ import {
   encodeSpotPrices,
   isCoinEntry,
   isMetalItems,
+  ListMetal,
   MetalListEntry,
   MetalListItem,
+  priceOf,
+  typesFor,
 } from './metal-list';
 import { migrateCoinStacks } from './coin-stack-migration';
 import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
 
-type SpotMetal = 'gold' | 'silver';
+type SpotMetal = ListMetal;
+/** Platinum and palladium live in their own section, closed until asked for. */
+type PgmMetal = 'platinum' | 'palladium';
 
 export interface CoinRow {
   coin: CoinOption;
@@ -48,18 +53,24 @@ export class PreciousMetalsComponent implements OnInit {
   spotPrices: SpotPrices = {
     gold: -1.00,
     silver: -1.00,
+    platinum: -1.00,
+    palladium: -1.00,
     timestamp: new Date()
   };
   livePrices: SpotPrices = this.spotPrices;
   loading = true;
 
-  readonly spotMetals: { key: SpotMetal; label: string }[] = [
+  readonly spotMetals: { key: 'gold' | 'silver'; label: string }[] = [
     { key: 'gold', label: 'Gold' },
     { key: 'silver', label: 'Silver' }
   ];
+  readonly pgmMetals: { key: PgmMetal; label: string; types: MetalType[] }[] = [
+    { key: 'platinum', label: 'Platinum', types: typesFor('platinum') },
+    { key: 'palladium', label: 'Palladium', types: typesFor('palladium') },
+  ];
   editingMetal: SpotMetal | null = null;
   editPrice: number | null = null;
-  overridden: Record<SpotMetal, boolean> = { gold: false, silver: false };
+  overridden: Record<SpotMetal, boolean> = { gold: false, silver: false, platinum: false, palladium: false };
   /** Whether the per-type price lists are dropped down; gold and silver open together. */
   typePricesOpen = false;
 
@@ -76,6 +87,15 @@ export class PreciousMetalsComponent implements OnInit {
 
   goldTotals: MetalTotals = emptyMetalTotal;
   silverTotals: MetalTotals = emptyMetalTotal;
+
+  pgmOpen = false;
+  pgmRows: Record<PgmMetal, MetalRow[]> = {
+    platinum: [{ id: 1, type: typesFor('platinum')[0].name, weight: 0, unit: 'grams' }],
+    palladium: [{ id: 2, type: typesFor('palladium')[0].name, weight: 0, unit: 'grams' }],
+  };
+  pgmBreakdowns: Record<PgmMetal, PreciousMetalBreakdown[]> = { platinum: [], palladium: [] };
+  pgmTotals: Record<PgmMetal, MetalTotals> = { platinum: emptyMetalTotal, palladium: emptyMetalTotal };
+  private nextPgmId = 3;
 
   grandTotals = {
     spotValue: 0,
@@ -259,12 +279,15 @@ export class PreciousMetalsComponent implements OnInit {
   }
 
   private valuedRows(metal: SpotMetal): MetalRow[] {
+    if (metal === 'platinum' || metal === 'palladium') {
+      return this.pgmRows[metal];
+    }
     return [...(metal === 'gold' ? this.goldRows : this.silverRows), ...this.coinMetalRows(metal)];
   }
 
-  /** Every row with a weight, in on-screen order: gold first, then silver, then coins. */
+  /** Every row with a weight, in on-screen order: gold, silver, platinum, palladium, then coins. */
   get items(): MetalListEntry[] {
-    const toItems = (metal: 'gold' | 'silver', rows: MetalRow[]) => rows
+    const toItems = (metal: ListMetal, rows: MetalRow[]) => rows
       .filter(row => Number.isFinite(row.weight) && row.weight > 0)
       .map(row => ({
         metal,
@@ -281,7 +304,13 @@ export class PreciousMetalsComponent implements OnInit {
         quantity: this.coinQuantity(row),
         ...(row.note?.trim() ? { note: row.note.trim() } : {}),
       }));
-    return [...toItems('gold', this.goldRows), ...toItems('silver', this.silverRows), ...coins];
+    return [
+      ...toItems('gold', this.goldRows),
+      ...toItems('silver', this.silverRows),
+      ...toItems('platinum', this.pgmRows.platinum),
+      ...toItems('palladium', this.pgmRows.palladium),
+      ...coins,
+    ];
   }
 
   /** Null until something is weighed or counted, which disables Save and the share link. */
@@ -305,7 +334,25 @@ export class PreciousMetalsComponent implements OnInit {
   spotTotalAt(prices: SpotPrices): number | null {
     if (!(prices.gold > 0 && prices.silver > 0)) return null;
     return this.metalService.calculateGoldPrice(prices, this.valuedRows('gold')).totals.spotValue +
-      this.metalService.calculateSilverPrice(prices, this.valuedRows('silver')).totals.spotValue;
+      this.metalService.calculateSilverPrice(prices, this.valuedRows('silver')).totals.spotValue +
+      this.metalService.calculatePlatinumPrice(prices, this.valuedRows('platinum')).totals.spotValue +
+      this.metalService.calculatePalladiumPrice(prices, this.valuedRows('palladium')).totals.spotValue;
+  }
+
+  /** "Gold $4,000.00 · Silver $50.00", plus platinum and palladium when they're known. */
+  priceSummary(prices: SpotPrices): string {
+    return [...this.spotMetals, ...this.pgmMetals]
+      .filter(metal => priceOf(prices, metal.key) > 0)
+      .map(metal => `${metal.label} $${priceOf(prices, metal.key).toFixed(2)}`)
+      .join(' · ');
+  }
+
+  price(metal: SpotMetal): number {
+    return priceOf(this.spotPrices, metal);
+  }
+
+  livePrice(metal: SpotMetal): number {
+    return priceOf(this.livePrices, metal);
   }
 
   useSharedPrices() {
@@ -317,20 +364,44 @@ export class PreciousMetalsComponent implements OnInit {
   useTodaysPrices() {
     this.pricePrompt = false;
     this.usingSharedPrices = false;
+    const kept = this.spotPrices;
     if (this.livePrices.gold > 0) {
       this.spotPrices = { ...this.livePrices };
     }
-    this.overridden = { gold: false, silver: false };
+    this.overridden = { gold: false, silver: false, platinum: false, palladium: false };
+    this.keepTypedPrices(kept);
     this.calculate();
+  }
+
+  /** Live prices replace typed ones, except where the feed has none (palladium), so a typed price survives. */
+  private keepTypedPrices(kept: SpotPrices) {
+    for (const { key } of this.pgmMetals) {
+      if (this.livePrice(key) <= 0 && priceOf(kept, key) > 0) {
+        this.spotPrices = { ...this.spotPrices, [key]: kept[key] };
+        this.overridden = { ...this.overridden, [key]: true };
+      }
+    }
   }
 
   /** The shared prices count as set by hand, so the reset button goes back to live once live prices arrive. */
   private applySharedPrices() {
     const shared = this.sharedPrices;
     if (!shared) return;
-    const differs = (metal: SpotMetal) => this.livePrices[metal] > 0 && shared[metal] !== this.livePrices[metal];
-    this.spotPrices = { ...shared };
-    this.overridden = { gold: differs('gold'), silver: differs('silver') };
+    const kept = this.spotPrices;
+    const differs = (metal: SpotMetal) => this.livePrice(metal) > 0 && priceOf(shared, metal) > 0 &&
+      priceOf(shared, metal) !== this.livePrice(metal);
+    // A link without platinum or palladium prices keeps whatever this page already has for them.
+    this.spotPrices = {
+      ...shared,
+      platinum: priceOf(shared, 'platinum') > 0 ? shared.platinum : kept.platinum,
+      palladium: priceOf(shared, 'palladium') > 0 ? shared.palladium : kept.palladium,
+    };
+    this.overridden = {
+      gold: differs('gold'),
+      silver: differs('silver'),
+      platinum: differs('platinum'),
+      palladium: differs('palladium') || (this.livePrice('palladium') <= 0 && this.price('palladium') > 0),
+    };
     this.calculate();
   }
 
@@ -364,7 +435,7 @@ export class PreciousMetalsComponent implements OnInit {
   /** Replaces every section; a metal with nothing in the list keeps one empty row to type into. */
   private applyItems(entries: MetalListEntry[]) {
     const items = entries.filter((entry): entry is MetalListItem => !isCoinEntry(entry));
-    const toRows = (metal: 'gold' | 'silver', nextId: () => number, defaultType: string): MetalRow[] => {
+    const toRows = (metal: ListMetal, nextId: () => number, defaultType: string): MetalRow[] => {
       const rows = items
         .filter(item => item.metal === metal)
         .map(item => ({
@@ -380,6 +451,10 @@ export class PreciousMetalsComponent implements OnInit {
 
     this.goldRows = toRows('gold', () => this.nextGoldId++, goldTypes[0].name);
     this.silverRows = toRows('silver', () => this.nextSilverId++, silverTypes[0].name);
+    this.pgmRows = {
+      platinum: toRows('platinum', () => this.nextPgmId++, typesFor('platinum')[0].name),
+      palladium: toRows('palladium', () => this.nextPgmId++, typesFor('palladium')[0].name),
+    };
     this.coinRows = entries.filter(isCoinEntry).flatMap(entry => {
       const coin = findCoin(entry.coin);
       return coin ? [{ coin, quantity: entry.quantity, note: entry.note ?? '' }] : [];
@@ -396,8 +471,10 @@ export class PreciousMetalsComponent implements OnInit {
         if (this.usingSharedPrices) {
           this.applySharedPrices();
         } else {
+          const kept = this.spotPrices;
           this.spotPrices = { ...prices };
-          this.overridden = { gold: false, silver: false };
+          this.overridden = { gold: false, silver: false, platinum: false, palladium: false };
+          this.keepTypedPrices(kept);
           this.calculate();
         }
         this.cdr.markForCheck();
@@ -450,12 +527,46 @@ export class PreciousMetalsComponent implements OnInit {
     this.calculate();
   }
 
+  togglePgm() {
+    this.pgmOpen = !this.pgmOpen;
+  }
+
+  addPgmRow(metal: PgmMetal) {
+    this.pgmRows[metal].push({ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: 'grams' });
+    this.calculate();
+  }
+
+  /** Removes the row, or resets it to defaults when it is the only one left. */
+  removePgmRow(metal: PgmMetal, id: number) {
+    const rows = this.pgmRows[metal];
+    this.pgmRows[metal] = rows.length > 1
+      ? rows.filter(row => row.id !== id)
+      : [{ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: 'grams' }];
+    this.calculate();
+  }
+
+  /** Shown on the closed section so pieces counted in the totals are never out of sight: "2 pieces · $1,234.56". */
+  get pgmSummary(): string | null {
+    const pieces = this.pgmMetals.reduce((sum, { key }) => sum + this.pgmBreakdowns[key].length, 0);
+    if (pieces === 0) return null;
+    const value = this.pgmTotals.platinum.spotValue + this.pgmTotals.palladium.spotValue;
+    return `${pieces} piece${pieces === 1 ? '' : 's'} · $${value.toFixed(2)}`;
+  }
+
   calculate() {
     if (!this.spotPrices) return;
 
     this.calculateGold();
     this.calculateSilver();
+    this.calculatePgm();
     this.calculateGrandTotals();
+  }
+
+  private calculatePgm() {
+    const platinum = this.metalService.calculatePlatinumPrice(this.spotPrices, this.pgmRows.platinum);
+    const palladium = this.metalService.calculatePalladiumPrice(this.spotPrices, this.pgmRows.palladium);
+    this.pgmBreakdowns = { platinum: platinum.breakdowns, palladium: palladium.breakdowns };
+    this.pgmTotals = { platinum: platinum.totals, palladium: palladium.totals };
   }
 
   private calculateGold() {
@@ -477,18 +588,20 @@ export class PreciousMetalsComponent implements OnInit {
   }
 
   private calculateGrandTotals() {
+    const all = [this.goldTotals, this.silverTotals, this.pgmTotals.platinum, this.pgmTotals.palladium];
+    const sum = (field: 'spotValue' | 'value90' | 'value80' | 'value70') => all.reduce((total, t) => total + t[field], 0);
     this.grandTotals = {
-      spotValue: this.goldTotals.spotValue + this.silverTotals.spotValue,
-      value90: this.goldTotals.value90 + this.silverTotals.value90,
-      value80: this.goldTotals.value80 + this.silverTotals.value80,
-      value70: this.goldTotals.value70 + this.silverTotals.value70
+      spotValue: sum('spotValue'),
+      value90: sum('value90'),
+      value80: sum('value80'),
+      value70: sum('value70')
     };
     this.syncOffer();
   }
 
   startPriceEdit(metal: SpotMetal) {
     this.editingMetal = metal;
-    this.editPrice = this.spotPrices[metal] > 0 ? this.spotPrices[metal] : null;
+    this.editPrice = this.price(metal) > 0 ? this.price(metal) : null;
   }
 
   /** Applies the typed price; blank or non-positive input leaves the price unchanged. */
@@ -519,9 +632,8 @@ export class PreciousMetalsComponent implements OnInit {
 
   /** What a gram of each fineness is worth at the current spot price, named without the metal ("14K (58.3%)"). */
   typePrices(metal: SpotMetal): { name: string; perGram: number }[] {
-    const types = metal === 'gold' ? goldTypes : silverTypes;
-    const perGramPure = this.spotPrices[metal] / TROY_OZ_IN_GRAMS;
-    return types.map(type => ({
+    const perGramPure = this.price(metal) / TROY_OZ_IN_GRAMS;
+    return typesFor(metal).map(type => ({
       name: type.name.replace(/\s*(Gold|Silver)\b/, '').replace('German/European', 'European'),
       perGram: perGramPure * type.purity,
     }));
@@ -547,6 +659,9 @@ export class PreciousMetalsComponent implements OnInit {
       silver: this.silverBreakdowns,
       goldTotals: this.goldTotals,
       silverTotals: this.silverTotals,
+      others: this.pgmMetals
+        .filter(({ key }) => this.pgmBreakdowns[key].length > 0)
+        .map(({ key, label }) => ({ title: label as 'Platinum' | 'Palladium', breakdowns: this.pgmBreakdowns[key], totals: this.pgmTotals[key] })),
       grandTotals: this.grandTotals,
       offer,
     };

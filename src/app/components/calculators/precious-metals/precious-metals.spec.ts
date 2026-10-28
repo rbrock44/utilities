@@ -413,7 +413,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(el().querySelector('.price-choice')).toBeNull();
       expect(component.spotPrices).toEqual({ gold: 1000, silver: 10, timestamp: sharedAt });
-      expect(component.overridden).toEqual({ gold: true, silver: true });
+      expect(component.overridden).toMatchObject({ gold: true, silver: true });
       expect(component.grandTotals.spotValue).toBeCloseTo(1008.99, 2);
     });
 
@@ -424,7 +424,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(component.pricePrompt).toBe(false);
       expect(component.spotPrices.gold).toBe(2000);
-      expect(component.overridden).toEqual({ gold: false, silver: false });
+      expect(component.overridden).toMatchObject({ gold: false, silver: false });
       expect(component.grandTotals.spotValue).toBeCloseTo(2022.975, 3);
     });
 
@@ -440,7 +440,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(component.spotPrices.gold).toBe(1000);
       expect(component.livePrices.gold).toBe(2000);
-      expect(component.overridden).toEqual({ gold: true, silver: true });
+      expect(component.overridden).toMatchObject({ gold: true, silver: true });
     });
 
     it('should go back to live prices on refresh', async () => {
@@ -450,7 +450,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
       component.refreshPrices();
 
       expect(component.spotPrices.gold).toBe(2000);
-      expect(component.overridden).toEqual({ gold: false, silver: false });
+      expect(component.overridden).toMatchObject({ gold: false, silver: false });
     });
   });
 
@@ -465,6 +465,86 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     expect(component.goldBreakdowns[0].type).toBe('Gold 62.5%');
     expect(component.goldTotals.spotValue).toBeCloseTo(0.625 * 2000, 4);
     expect(component.items[0]).toEqual({ metal: 'gold', type: 'Custom %', purity: 62.5, weight: 31.1035, unit: 'grams' });
+  });
+
+  describe('platinum and palladium', () => {
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+    const withPlatinum = () => of({ gold: 2000, silver: 25, platinum: 1000, palladium: -1, timestamp: new Date() });
+    const toggle = () => el().querySelector<HTMLButtonElement>('.pgm-toggle')!;
+
+    it('should stay closed until its header is clicked', async () => {
+      await setup({}, withPlatinum);
+      render();
+
+      expect(toggle().getAttribute('aria-expanded')).toBe('false');
+      expect(el().querySelector('#pgmPanel')).toBeNull();
+      expect(el().querySelector('select[aria-label="Platinum type"]')).toBeNull();
+
+      toggle().click();
+      render();
+
+      expect(toggle().getAttribute('aria-expanded')).toBe('true');
+      expect(el().querySelector('select[aria-label="Platinum type"]')).not.toBeNull();
+      expect(el().querySelector('select[aria-label="Palladium type"]')).not.toBeNull();
+      expect(el().textContent).toContain('$1000.00/oz');
+    });
+
+    it('should value platinum at the live price, count it in the totals, and show it on the closed header', async () => {
+      await setup({}, withPlatinum);
+      Object.assign(component.pgmRows.platinum[0], { type: 'Platinum (95%)', weight: 1, unit: 'toz' });
+      component.calculate();
+      render();
+
+      expect(component.pgmTotals.platinum.spotValue).toBeCloseTo(950, 2);
+      expect(component.grandTotals.spotValue).toBeCloseTo(950, 2);
+      expect(el().querySelector('.pgm-summary')?.textContent).toBe('1 piece · $950.00');
+      expect(component.items).toEqual([{ metal: 'platinum', type: 'Platinum (95%)', weight: 1, unit: 'toz' }]);
+      expect(component.quote.others?.map(other => other.title)).toEqual(['Platinum']);
+    });
+
+    it('should ask for a palladium price, then keep a typed one through a refresh', async () => {
+      await setup({}, withPlatinum);
+      component.togglePgm();
+      Object.assign(component.pgmRows.palladium[0], { type: 'Palladium (95%)', weight: 1, unit: 'toz' });
+      component.calculate();
+      render();
+
+      expect(el().querySelector('.pgm-no-price')?.textContent).toContain('No live palladium price');
+      expect(component.pgmTotals.palladium.spotValue).toBe(0);
+
+      component.startPriceEdit('palladium');
+      component.editPrice = 1200;
+      component.commitPriceEdit();
+      render();
+
+      expect(component.pgmTotals.palladium.spotValue).toBeCloseTo(1140, 2);
+      expect(el().querySelector('.pgm-no-price')).toBeNull();
+
+      component.refreshPrices();
+
+      expect(component.price('palladium')).toBe(1200);
+      expect(component.pgmTotals.palladium.spotValue).toBeCloseTo(1140, 2);
+    });
+
+    it('should load platinum from a shared link but stay closed, with shared platinum prices offered', async () => {
+      const band: MetalListItem = { metal: 'platinum', type: 'Platinum (95%)', weight: 1, unit: 'toz' };
+      const at = new Date('2026-10-01T12:00:00Z');
+      await setup({
+        metals: encodeMetalList([band]),
+        spot: encodeSpotPrices({ gold: 1000, silver: 10, platinum: 800, timestamp: at })!,
+      }, withPlatinum);
+      render();
+
+      expect(component.pgmOpen).toBe(false);
+      expect(component.pgmRows.platinum.map(row => row.type)).toEqual(['Platinum (95%)']);
+      expect(el().querySelector('.shared-choice')?.textContent).toContain('Platinum $800.00');
+
+      (el().querySelector('.shared-choice') as HTMLButtonElement).click();
+
+      expect(component.pgmTotals.platinum.spotValue).toBeCloseTo(760, 2);
+      expect(component.overridden.platinum).toBe(true);
+    });
   });
 
   describe('saved lists', () => {

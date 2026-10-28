@@ -54,13 +54,13 @@
     <p id="priceChoiceTitle">This list was shared with spot prices from {{ sharedPrices.timestamp | date:'medium' }}. Which prices should it use?</p>
     <button class="choice shared-choice" (click)="useSharedPrices()">
       <strong>Shared prices · {{ sharedPrices.timestamp | date:'mediumDate' }}</strong>
-      <span>Gold ${{ sharedPrices.gold.toFixed(2) }} · Silver ${{ sharedPrices.silver.toFixed(2) }}</span>
+      <span>{{ priceSummary(sharedPrices) }}</span>
       <span class="choice-total">Total ${{ spotTotalAt(sharedPrices)?.toFixed(2) }}</span>
     </button>
     <button class="choice today-choice" (click)="useTodaysPrices()" [disabled]="loading || livePrices.gold <= 0">
       <strong>Today's prices</strong>
       @if (livePrices.gold > 0) {
-      <span>Gold ${{ livePrices.gold.toFixed(2) }} · Silver ${{ livePrices.silver.toFixed(2) }}</span>
+      <span>{{ priceSummary(livePrices) }}</span>
       <span class="choice-total">Total ${{ spotTotalAt(livePrices)?.toFixed(2) }}</span>
       } @else {
       <span>{{ loading ? 'Loading live prices…' : 'Live prices unavailable' }}</span>
@@ -169,6 +169,103 @@
     <app-precious-metal-breakdown [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
       totalsTitle="Silver Totals" totalsClass="silver-totals">
     </app-precious-metal-breakdown>
+  </div>
+
+  <!-- PLATINUM & PALLADIUM SECTION: closed until asked for -->
+  <div class="metal-section pgm-section">
+    <h3 class="pgm-heading">
+      <button class="pgm-toggle" (click)="togglePgm()" [attr.aria-expanded]="pgmOpen" aria-controls="pgmPanel">
+        <span class="pgm-caret" [class.open]="pgmOpen" aria-hidden="true">▸</span>
+        💍 Platinum &amp; Palladium
+        @if (!pgmOpen && pgmSummary) {
+        <span class="pgm-summary">{{ pgmSummary }}</span>
+        }
+      </button>
+    </h3>
+
+    @if (pgmOpen) {
+    <div id="pgmPanel" class="pgm-panel">
+      @for (metal of pgmMetals; track metal.key) {
+      <div class="pgm-metal">
+        <div class="section-header">
+          <span class="spot-price-card">
+            <span class="metal-name">{{ metal.label }}</span>
+            @if (editingMetal === metal.key) {
+            <span class="price-edit">
+              $<input #priceInput type="number" inputmode="decimal" min="0" step="0.01" [(ngModel)]="editPrice"
+                [attr.aria-label]="metal.label + ' spot price per oz'" (keydown.enter)="commitPriceEdit()"
+                (keydown.escape)="cancelPriceEdit()" (blur)="commitPriceEdit()">/oz
+            </span>
+            } @else {
+            <button class="price" [class.edited]="overridden[metal.key]" (click)="startPriceEdit(metal.key)"
+              [title]="'Edit ' + metal.label.toLowerCase() + ' spot price'">
+              {{ price(metal.key) > 0 ? '$' + price(metal.key).toFixed(2) + '/oz' : 'Set price' }}
+            </button>
+            }
+            @if (overridden[metal.key] && livePrice(metal.key) > 0 && editingMetal !== metal.key) {
+            <button class="reset-price" (click)="resetPrice(metal.key)"
+              [title]="'Reset to live $' + livePrice(metal.key).toFixed(2)"
+              [attr.aria-label]="'Reset ' + metal.label.toLowerCase() + ' to live price'">↺</button>
+            }
+          </span>
+          <button class="add-btn" (click)="addPgmRow(metal.key)">+ Add Row</button>
+        </div>
+
+        @if (price(metal.key) <= 0) {
+        <p class="pgm-no-price">No live {{ metal.label.toLowerCase() }} price. Set today's spot price to value these pieces.</p>
+        }
+
+        <div class="rows-container">
+          @for (row of pgmRows[metal.key]; track row.id) {
+          <div class="row">
+            <span class="type-cell">
+              <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" [attr.aria-label]="metal.label + ' type'">
+                @for (type of metal.types; track type.name) {
+                <option [value]="type.name">{{ type.name }} · {{ type.stamp }}</option>
+                }
+                <option [value]="customPurity">Custom %…</option>
+              </select>
+              @if (row.type === customPurity) {
+              <span class="purity-wrap">
+                <input type="number" [(ngModel)]="row.purity" (ngModelChange)="calculate()" class="purity-input"
+                  min="1" max="100" step="0.1" placeholder="95" [attr.aria-label]="metal.label + ' percent'">%
+              </span>
+              }
+            </span>
+
+            <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input"
+              step="0.01" min="0" [attr.aria-label]="metal.label + ' weight'">
+
+            <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
+              @for (unit of metalUnits; track unit.id) {
+              <option [value]="unit.id">{{ unit.label }}</option>
+              }
+            </select>
+
+            <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
+              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
+              {{ isNoteShown(row) ? '−' : '+' }} note
+            </button>
+
+            <button class="remove-btn" (click)="removePgmRow(metal.key, row.id)" aria-label="Remove row">
+              ×
+            </button>
+
+            @if (isNoteShown(row)) {
+            <input type="text" [(ngModel)]="row.note" (ngModelChange)="calculate()" class="note-input"
+              placeholder="Note, e.g. 950 band" maxlength="80" aria-label="Note for this piece">
+            }
+          </div>
+          }
+        </div>
+
+        <app-precious-metal-breakdown [title]="metal.label + ' Breakdown'" [breakdowns]="pgmBreakdowns[metal.key]"
+          [totals]="pgmTotals[metal.key]" [totalsTitle]="metal.label + ' Totals'" totalsClass="silver-totals">
+        </app-precious-metal-breakdown>
+      </div>
+      }
+    </div>
+    }
   </div>
 
   <div class="metal-section">

@@ -97,6 +97,16 @@ describe('MetalService', () => {
     });
   });
 
+  it('should value platinum at its spot, and palladium at nothing until it has a price', () => {
+    const prices = { ...spotPrices, platinum: 1000 };
+    const platinum = service.calculatePlatinumPrice(prices, [{ id: 1, type: 'Platinum (95%)', weight: 1, unit: 'toz' }]);
+    const palladium = service.calculatePalladiumPrice(prices, [{ id: 1, type: 'Palladium (95%)', weight: 1, unit: 'toz' }]);
+
+    expect(platinum.totals.spotValue).toBeCloseTo(950, 5);
+    expect(palladium.totals.totalPureToz).toBeCloseTo(0.95, 5);
+    expect(palladium.totals.spotValue).toBe(0);
+  });
+
   it('should apply purity when calculating pure weight', () => {
     const rows: MetalRow[] = [{ id: 1, type: '14K Gold (58.3%)', weight: 10, unit: 'grams' }];
 

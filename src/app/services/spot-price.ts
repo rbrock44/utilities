@@ -16,6 +16,8 @@ export class SpotPriceService {
       map(response => ({
         gold: response.gold,
         silver: response.silver,
+        platinum: response.platinum ?? -1,
+        palladium: response.palladium ?? -1,
         timestamp: new Date(response.timestamp || Date.now())
       })),
       catchError(error => {

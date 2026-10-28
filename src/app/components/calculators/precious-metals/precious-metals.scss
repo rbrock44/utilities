@@ -241,6 +241,58 @@
   box-shadow: var(--shadow-sm);
 }
 
+.pgm-heading {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.pgm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.15rem 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.pgm-caret {
+  display: inline-block;
+  transition: transform 0.15s;
+
+  &.open {
+    transform: rotate(90deg);
+  }
+}
+
+.pgm-summary {
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.pgm-panel {
+  margin-top: 0.5rem;
+}
+
+.pgm-metal + .pgm-metal {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.pgm-no-price {
+  margin: 0 0 0.4rem;
+  color: var(--warning-text);
+  font-size: 0.85rem;
+}
+
 .rows-container {
   display: flex;
   flex-direction: column;

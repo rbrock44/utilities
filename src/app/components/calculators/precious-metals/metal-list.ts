@@ -1,7 +1,22 @@
 import { findCoin } from '../../../constants/coin-options';
-import { CUSTOM_PURITY, findMetalUnit, goldTypes, METAL_UNITS, silverTypes } from '../../../constants/constants';
+import {
+  CUSTOM_PURITY, findMetalUnit, goldTypes, METAL_UNITS, palladiumTypes, platinumTypes, silverTypes,
+} from '../../../constants/constants';
 
-export type ListMetal = 'gold' | 'silver';
+export type ListMetal = 'gold' | 'silver' | 'platinum' | 'palladium';
+
+/** One letter per metal in a share link. */
+const METAL_CODES: Record<ListMetal, string> = { gold: 'g', silver: 's', platinum: 'p', palladium: 'd' };
+
+const METAL_TYPES: Record<ListMetal, MetalType[]> = {
+  gold: goldTypes, silver: silverTypes, platinum: platinumTypes, palladium: palladiumTypes,
+};
+
+/** Unset spot prices are -1 or missing; anything not above zero means there's no price. */
+export function priceOf(prices: SpotPrices, metal: ListMetal): number {
+  const price = prices[metal];
+  return price !== undefined && price > 0 ? price : -1;
+}
 
 /** One weighed piece as it's saved or shared: the row minus its on-screen id. */
 export interface MetalListItem {
@@ -36,8 +51,8 @@ export function isCoinItem(value: unknown): value is CoinListItem {
   );
 }
 
-function typesFor(metal: ListMetal): MetalType[] {
-  return metal === 'gold' ? goldTypes : silverTypes;
+export function typesFor(metal: ListMetal): MetalType[] {
+  return METAL_TYPES[metal];
 }
 
 function isPercent(value: unknown): value is number {
@@ -54,7 +69,7 @@ function hasValidType(item: MetalListItem): boolean {
 export function isMetalItem(value: unknown): value is MetalListItem {
   const item = value as MetalListItem;
   return (
-    (item?.metal === 'gold' || item?.metal === 'silver') &&
+    !!item && item.metal in METAL_CODES &&
     hasValidType(item) &&
     typeof item.weight === 'number' && Number.isFinite(item.weight) && item.weight > 0 &&
     !!findMetalUnit(item.unit) &&
@@ -69,7 +84,7 @@ export function isMetalItems(value: unknown): value is MetalListEntry[] {
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
- * `[g|s, type, weight, unit code, note?]` to keep links short; a custom percent row puts its
+ * `[g|s|p|d, type, weight, unit code, note?]` to keep links short; a custom percent row puts its
  * percent (a number) where the type name would be. A coin is `[c, coin id, quantity, note?]`.
  */
 export function encodeMetalList(items: MetalListEntry[]): string {
@@ -78,7 +93,7 @@ export function encodeMetalList(items: MetalListEntry[]): string {
       return item.note ? ['c', item.coin, item.quantity, item.note] : ['c', item.coin, item.quantity];
     }
     const type = item.type === CUSTOM_PURITY ? item.purity! : item.type;
-    const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, findMetalUnit(item.unit)!.code];
+    const row: (string | number)[] = [METAL_CODES[item.metal], type, item.weight, findMetalUnit(item.unit)!.code];
     if (item.note) {
       row.push(item.note);
     }
@@ -124,15 +139,16 @@ export function decodeMetalList(text: string): { items: MetalListEntry[]; skippe
       }
       continue;
     }
+    const listMetal = (Object.keys(METAL_CODES) as ListMetal[]).find(key => METAL_CODES[key] === metal);
     const item: MetalListItem = {
-      metal: metal === 'g' ? 'gold' : 'silver',
+      metal: listMetal!,
       type: typeof type === 'number' ? CUSTOM_PURITY : type,
       ...(typeof type === 'number' ? { purity: type } : {}),
       weight,
       unit: METAL_UNITS.find(known => known.code === unit)?.id as MetalUnitId,
       ...(typeof note === 'string' && note.trim() ? { note: note.trim() } : {}),
     };
-    if ((metal === 'g' || metal === 's') && isMetalItem(item)) {
+    if (listMetal && isMetalItem(item)) {
       items.push(item);
     } else {
       skipped++;
@@ -141,23 +157,32 @@ export function decodeMetalList(text: string): { items: MetalListEntry[]; skippe
   return { items, skipped };
 }
 
-/** Spot prices ride along in a share link as `gold_silver_time`, time in epoch milliseconds. */
+/**
+ * Spot prices ride along in a share link as `gold_silver_time`, time in epoch milliseconds, then
+ * `_platinum_palladium` when either is known, 0 standing in for the one that isn't.
+ */
 export function encodeSpotPrices(prices: SpotPrices): string | null {
   const time = new Date(prices.timestamp).getTime();
   if (!(prices.gold > 0 && prices.silver > 0 && Number.isFinite(time))) {
     return null;
   }
-  return `${prices.gold}_${prices.silver}_${time}`;
+  const base = `${prices.gold}_${prices.silver}_${time}`;
+  const platinum = Math.max(0, priceOf(prices, 'platinum'));
+  const palladium = Math.max(0, priceOf(prices, 'palladium'));
+  return platinum > 0 || palladium > 0 ? `${base}_${platinum}_${palladium}` : base;
 }
 
 export function decodeSpotPrices(text: string | null | undefined): SpotPrices | null {
   const parts = (text ?? '').split('_');
-  if (parts.length !== 3 || parts.some(part => part.trim() === '')) {
+  if ((parts.length !== 3 && parts.length !== 5) || parts.some(part => part.trim() === '')) {
     return null;
   }
-  const [gold, silver, time] = parts.map(Number);
+  const [gold, silver, time, platinum, palladium] = parts.map(Number);
   if (!(gold > 0 && silver > 0 && Number.isFinite(gold) && Number.isFinite(silver) && Number.isFinite(time))) {
     return null;
   }
-  return { gold, silver, timestamp: new Date(time) };
+  const prices: SpotPrices = { gold, silver, timestamp: new Date(time) };
+  if (platinum > 0) prices.platinum = platinum;
+  if (palladium > 0) prices.palladium = palladium;
+  return prices;
 }

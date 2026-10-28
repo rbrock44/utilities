@@ -88,6 +88,24 @@ describe('isMetalItems', () => {
   });
 });
 
+describe('platinum and palladium in links', () => {
+  const band: MetalListItem = { metal: 'platinum', type: 'Platinum (95%)', weight: 6, unit: 'grams', note: '950 band' };
+  const scrap: MetalListItem = { metal: 'palladium', type: 'Palladium (50%)', weight: 2, unit: 'dwt' };
+
+  it('should round-trip platinum and palladium rows next to gold and silver', () => {
+    const encoded = encodeMetalList([ring, band, scrap]);
+    expect(decodeMetalList(encoded)).toEqual({ items: [ring, band, scrap], skipped: 0 });
+  });
+
+  it('should skip a platinum row with a gold type', () => {
+    const tampered = btoa(JSON.stringify([['p', '14K Gold (58.3%)', 1, 'g'], ['d', 'Palladium (95%)', 1, 'g']]));
+    expect(decodeMetalList(tampered)).toEqual({
+      items: [{ metal: 'palladium', type: 'Palladium (95%)', weight: 1, unit: 'grams' }],
+      skipped: 1,
+    });
+  });
+});
+
 describe('spot prices in links', () => {
   const at = new Date('2026-10-10T21:10:00Z');
 
@@ -96,6 +114,15 @@ describe('spot prices in links', () => {
 
     expect(text).toBe(`3985.4_48.12_${at.getTime()}`);
     expect(decodeSpotPrices(text)).toEqual({ gold: 3985.4, silver: 48.12, timestamp: at });
+  });
+
+  it('should add platinum and palladium only when one is known, 0 for the other', () => {
+    const text = encodeSpotPrices({ gold: 4000, silver: 50, platinum: 1500, palladium: -1, timestamp: at });
+
+    expect(text).toBe(`4000_50_${at.getTime()}_1500_0`);
+    expect(decodeSpotPrices(text)).toEqual({ gold: 4000, silver: 50, platinum: 1500, timestamp: at });
+    expect(encodeSpotPrices({ gold: 4000, silver: 50, platinum: -1, timestamp: at })).toBe(`4000_50_${at.getTime()}`);
+    expect(decodeSpotPrices(`4000_50_${at.getTime()}_1500`)).toBeNull();
   });
 
   it('should leave prices out until both are known', () => {

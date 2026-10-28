@@ -21,6 +21,19 @@ export const silverTypes: MetalType[] = [
     { name: 'German/European (80%)', purity: 0.80, stamp: '800' },
 ];
 
+export const platinumTypes: MetalType[] = [
+    { name: 'Fine Platinum (99.95%)', purity: 0.9995, stamp: '999' },
+    { name: 'Platinum (95%)', purity: 0.95, stamp: '950' },
+    { name: 'Platinum (90%)', purity: 0.90, stamp: '900' },
+    { name: 'Platinum (85%)', purity: 0.85, stamp: '850' },
+];
+
+export const palladiumTypes: MetalType[] = [
+    { name: 'Fine Palladium (99.95%)', purity: 0.9995, stamp: '999' },
+    { name: 'Palladium (95%)', purity: 0.95, stamp: '950' },
+    { name: 'Palladium (50%)', purity: 0.50, stamp: '500' },
+];
+
 export const emptyMetalTotal: MetalTotals = {
     totalWeightGrams: 0,
     totalWeightToz: 0,
