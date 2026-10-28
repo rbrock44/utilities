@@ -84,6 +84,19 @@ describe('MetalService', () => {
     expect(result.totals.totalPureToz).toBeCloseTo(0.999, 5);
   });
 
+  it('should read every scale unit as the same troy ounce', () => {
+    const oneToz: [MetalUnitId, number][] = [
+      ['toz', 1], ['dwt', 20], ['grain', 480], ['lbt', 1 / 12], ['mg', TROY_OZ_IN_GRAMS * 1000],
+      ['kg', TROY_OZ_IN_GRAMS / 1000], ['oz', TROY_OZ_IN_GRAMS / 28.349523125],
+      ['lb', TROY_OZ_IN_GRAMS / 453.59237], ['tola', TROY_OZ_IN_GRAMS / 11.6638038],
+    ];
+
+    oneToz.forEach(([unit, weight]) => {
+      const result = service.calculateSilverPrice(spotPrices, [{ id: 1, type: 'Fine Silver (99.9%)', weight, unit }]);
+      expect(result.totals.totalWeightToz).toBeCloseTo(1, 5);
+    });
+  });
+
   it('should apply purity when calculating pure weight', () => {
     const rows: MetalRow[] = [{ id: 1, type: '14K Gold (58.3%)', weight: 10, unit: 'grams' }];
 

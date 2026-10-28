@@ -592,7 +592,7 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
         { name: 'Good', items: [ring, { metal: 'gold', type: 'Custom %', purity: 62.5, weight: 1, unit: 'toz' }], savedAt },
         { name: 'Unknown type', items: [{ ...ring, type: '13K Gold' }], savedAt },
         { name: 'Bad percent', items: [{ metal: 'gold', type: 'Custom %', purity: 150, weight: 1, unit: 'toz' }], savedAt },
-        { name: 'Bad unit', items: [{ ...bar, unit: 'lb' }], savedAt },
+        { name: 'Bad unit', items: [{ ...bar, unit: 'stone' }], savedAt },
         { name: 'No date', items: [bar] },
         'not a list',
       ]);

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
 import { PreciousMetalBreakdownComponent } from '../precious-metal-breakdown/precious-metal-breakdown';
-import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from '../../../constants/constants';
+import { CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS, silverTypes, TROY_OZ_IN_GRAMS } from '../../../constants/constants';
 import { MetalService } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
@@ -105,6 +105,7 @@ export class PreciousMetalsComponent implements OnInit {
 
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
+  readonly metalUnits = METAL_UNITS;
 
   private nextGoldId = 2;
   private nextSilverId = 2;

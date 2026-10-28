@@ -30,3 +30,20 @@ export const emptyMetalTotal: MetalTotals = {
 export const ASC: 'asc' = 'asc';
 export const DESC: 'desc' = 'desc';
 export const TROY_OZ_IN_GRAMS: number = 31.1035;
+/** Troy units are what dealers quote; the rest are what a kitchen or postal scale might read. */
+export const METAL_UNITS: MetalUnit[] = [
+    { id: 'grams', label: 'g', grams: 1, code: 'g' },
+    { id: 'toz', label: 'oz t', grams: TROY_OZ_IN_GRAMS, code: 't' },
+    { id: 'dwt', label: 'dwt', grams: TROY_OZ_IN_GRAMS / 20, code: 'dwt' },
+    { id: 'grain', label: 'gr', grams: TROY_OZ_IN_GRAMS / 480, code: 'gr' },
+    { id: 'lbt', label: 'lb t', grams: TROY_OZ_IN_GRAMS * 12, code: 'lbt' },
+    { id: 'mg', label: 'mg', grams: 0.001, code: 'mg' },
+    { id: 'kg', label: 'kg', grams: 1000, code: 'kg' },
+    { id: 'oz', label: 'oz', grams: 28.349523125, code: 'oz' },
+    { id: 'lb', label: 'lb', grams: 453.59237, code: 'lb' },
+    { id: 'tola', label: 'tola', grams: 11.6638038, code: 'tola' },
+];
+
+export function findMetalUnit(id: unknown): MetalUnit | undefined {
+    return METAL_UNITS.find(unit => unit.id === id);
+}

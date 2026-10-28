@@ -96,8 +96,7 @@
         <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
         <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
-          <option value="grams">g</option>
-          <option value="toz">oz t</option>
+          <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
         </select>
 
         <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
@@ -148,8 +147,7 @@
         <input type="number" [(ngModel)]="row.weight" (ngModelChange)="calculate()" placeholder="Weight" class="weight-input" step="0.01" min="0">
 
         <select [(ngModel)]="row.unit" (ngModelChange)="calculate()" class="unit-select">
-          <option value="grams">g</option>
-          <option value="toz">oz t</option>
+          <option *ngFor="let unit of metalUnits" [value]="unit.id">{{ unit.label }}</option>
         </select>
 
         <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"

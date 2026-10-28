@@ -1,4 +1,5 @@
 import { decodeMetalList, decodeSpotPrices, encodeMetalList, encodeSpotPrices, isMetalItems, MetalListItem } from './metal-list';
+import { METAL_UNITS } from '../../../constants/constants';
 
 const ring: MetalListItem = { metal: 'gold', type: '14K Gold (58.3%)', weight: 4.2, unit: 'grams', note: 'nugget ring' };
 const chain: MetalListItem = { metal: 'gold', type: '10K Gold (41.7%)', weight: 12, unit: 'grams' };
@@ -8,6 +9,11 @@ describe('metal list links', () => {
   it('should round-trip rows with and without notes', () => {
     const encoded = encodeMetalList([ring, chain, bar]);
     expect(decodeMetalList(encoded)).toEqual({ items: [ring, chain, bar], skipped: 0 });
+  });
+
+  it('should round-trip every weight unit', () => {
+    const items: MetalListItem[] = METAL_UNITS.map(unit => ({ ...chain, unit: unit.id }));
+    expect(decodeMetalList(encodeMetalList(items))).toEqual({ items, skipped: 0 });
   });
 
   it('should produce a link-safe value even with unicode and symbols in notes', () => {
@@ -20,7 +26,7 @@ describe('metal list links', () => {
       ['g', '14K Gold (58.3%)', 4.2, 'g', 'nugget ring'],
       ['g', '99K Unobtainium', 1, 'g'],
       ['s', 'Fine Silver (99.9%)', -3, 'g'],
-      ['s', 'Fine Silver (99.9%)', 1, 'kg'],
+      ['s', 'Fine Silver (99.9%)', 1, 'stone'],
       ['x', 'Fine Silver (99.9%)', 1, 'g'],
       'not a row',
     ]));

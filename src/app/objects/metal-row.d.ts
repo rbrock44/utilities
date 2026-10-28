@@ -2,7 +2,7 @@ interface MetalRow {
   id: number;
   type: string;
   weight: number;
-  unit: 'grams' | 'toz';
+  unit: MetalUnitId;
   note?: string;
   /** Percent fine, used only when `type` is the custom percent option. */
   purity?: number;

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CUSTOM_PURITY, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
+import { CUSTOM_PURITY, findMetalUnit, goldTypes, silverTypes, TROY_OZ_IN_GRAMS } from "../constants/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,10 @@ export class MetalService {
       const metalType = this.typeFor(row, types, label);
       if (!metalType) return;
 
-      const weightGrams = row.unit === 'grams' ? row.weight : row.weight * TROY_OZ_IN_GRAMS;
+      const unit = findMetalUnit(row.unit);
+      if (!unit) return;
+
+      const weightGrams = row.weight * unit.grams;
       const weightToz = weightGrams / TROY_OZ_IN_GRAMS;
       const pureWeightGrams = weightGrams * metalType.purity;
       const pureWeightToz = pureWeightGrams / TROY_OZ_IN_GRAMS;

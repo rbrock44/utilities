@@ -1,5 +1,5 @@
 import { findCoin } from '../../../constants/coin-options';
-import { CUSTOM_PURITY, goldTypes, silverTypes } from '../../../constants/constants';
+import { CUSTOM_PURITY, findMetalUnit, goldTypes, METAL_UNITS, silverTypes } from '../../../constants/constants';
 
 export type ListMetal = 'gold' | 'silver';
 
@@ -8,7 +8,7 @@ export interface MetalListItem {
   metal: ListMetal;
   type: string;
   weight: number;
-  unit: 'grams' | 'toz';
+  unit: MetalUnitId;
   note?: string;
   /** Percent fine, only for a custom percent row. */
   purity?: number;
@@ -57,7 +57,7 @@ export function isMetalItem(value: unknown): value is MetalListItem {
     (item?.metal === 'gold' || item?.metal === 'silver') &&
     hasValidType(item) &&
     typeof item.weight === 'number' && Number.isFinite(item.weight) && item.weight > 0 &&
-    (item.unit === 'grams' || item.unit === 'toz') &&
+    !!findMetalUnit(item.unit) &&
     (item.note === undefined || typeof item.note === 'string')
   );
 }
@@ -69,7 +69,7 @@ export function isMetalItems(value: unknown): value is MetalListEntry[] {
 /**
  * Notes are free text, so the link carries the rows as compact JSON in URL-safe base64
  * instead of a delimiter format that a note could break. Each row is
- * `[g|s, type, weight, g|t, note?]` to keep links short; a custom percent row puts its
+ * `[g|s, type, weight, unit code, note?]` to keep links short; a custom percent row puts its
  * percent (a number) where the type name would be. A coin is `[c, coin id, quantity, note?]`.
  */
 export function encodeMetalList(items: MetalListEntry[]): string {
@@ -78,7 +78,7 @@ export function encodeMetalList(items: MetalListEntry[]): string {
       return item.note ? ['c', item.coin, item.quantity, item.note] : ['c', item.coin, item.quantity];
     }
     const type = item.type === CUSTOM_PURITY ? item.purity! : item.type;
-    const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, item.unit === 'toz' ? 't' : 'g'];
+    const row: (string | number)[] = [item.metal === 'gold' ? 'g' : 's', type, item.weight, findMetalUnit(item.unit)!.code];
     if (item.note) {
       row.push(item.note);
     }
@@ -129,10 +129,10 @@ export function decodeMetalList(text: string): { items: MetalListEntry[]; skippe
       type: typeof type === 'number' ? CUSTOM_PURITY : type,
       ...(typeof type === 'number' ? { purity: type } : {}),
       weight,
-      unit: unit === 't' ? 'toz' : 'grams',
+      unit: METAL_UNITS.find(known => known.code === unit)?.id as MetalUnitId,
       ...(typeof note === 'string' && note.trim() ? { note: note.trim() } : {}),
     };
-    if ((metal === 'g' || metal === 's') && (unit === 'g' || unit === 't') && isMetalItem(item)) {
+    if ((metal === 'g' || metal === 's') && isMetalItem(item)) {
       items.push(item);
     } else {
       skipped++;
