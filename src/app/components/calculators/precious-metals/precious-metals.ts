@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
@@ -196,6 +196,12 @@ export class PreciousMetalsComponent implements OnInit {
   readonly savedLists = new SavedListStore<MetalListEntry[]>('utilities-metal-lists', isMetalItems);
   readonly describeList = describeEntries;
   private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Matches the stylesheet's phone breakpoint, where a row fits on one line. */
+  private readonly phoneQuery = typeof matchMedia === 'function' ? matchMedia('(max-width: 480px)') : null;
+  /** On a phone the type dropdown is narrow, so its names drop the metal and percent. */
+  narrow = this.phoneQuery?.matches ?? false;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -204,9 +210,22 @@ export class PreciousMetalsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    const onResize = (event: MediaQueryListEvent) => {
+      this.narrow = event.matches;
+      this.cdr.markForCheck();
+    };
+    this.phoneQuery?.addEventListener('change', onResize);
+    this.destroyRef.onDestroy(() => this.phoneQuery?.removeEventListener('change', onResize));
     migrateCoinStacks(this.savedLists);
     this.loadFromLink();
     this.loadSpotPrices();
+  }
+
+  /** "14K Gold (58.3%) · 585" in full, or "14K 58.3% · 585" on a phone, which drops the metal and parentheses. */
+  typeLabel(type: MetalType): string {
+    if (!this.narrow) return `${type.name} · ${type.stamp}`;
+    const short = type.name.replace(/\b(Gold|Silver|Platinum|Palladium)\b/, '').replace(/[()]/g, '');
+    return `${short.replace(/\s+/g, ' ').trim()} · ${type.stamp}`;
   }
 
   hasNote(row: NoteRow): boolean {

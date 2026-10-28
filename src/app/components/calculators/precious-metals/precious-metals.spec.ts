@@ -4,7 +4,7 @@ import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
 
 import { describeEntries, PreciousMetalsComponent } from './precious-metals';
-import { goldTypes, silverTypes } from '../../../constants/constants';
+import { goldTypes, platinumTypes, silverTypes } from '../../../constants/constants';
 import { COIN_OPTIONS } from '../../../constants/coin-options';
 import { SpotPriceService } from '../../../services/spot-price';
 import { encodeMetalList, encodeSpotPrices, MetalListItem } from './metal-list';
@@ -301,13 +301,13 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
     expect(el().querySelectorAll('.note-input').length).toBe(0);
     expect(toggles().length).toBe(2);
-    expect(toggles()[0].textContent!.trim()).toBe('+ note');
+    expect(toggles()[0].textContent!.trim()).toBe('📝');
 
     toggles()[0].click();
     render();
     expect(el().querySelectorAll('.note-input').length).toBe(1);
     expect(toggles()[0].getAttribute('aria-expanded')).toBe('true');
-    expect(toggles()[0].textContent!.trim()).toBe('− note');
+    expect(toggles()[0].textContent!.trim()).toBe('📝');
 
     toggles()[0].click();
     render();
@@ -507,6 +507,22 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
 
       expect(toggle('silver').querySelector('.section-summary')).toBeNull();
       expect(component.sectionSummary('silver')).toBeNull();
+    });
+  });
+
+  describe('type names', () => {
+    it('should give full names, and short ones on a phone', async () => {
+      await setup();
+      const label = (types: MetalType[], index: number) => component.typeLabel(types[index]);
+
+      expect(label(goldTypes, 3)).toBe('14K Gold (58.3%) · 585');
+
+      component.narrow = true;
+      expect(label(goldTypes, 3)).toBe('14K 58.3% · 585');
+      expect(label(silverTypes, 3)).toBe('Sterling 92.5% · 925');
+      expect(label(silverTypes, 7)).toBe('German/European 80% · 800');
+      expect(label(platinumTypes, 0)).toBe('Fine 99.95% · 999');
+      expect(label(platinumTypes, 1)).toBe('95% · 950');
     });
   });
 

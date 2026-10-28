@@ -94,7 +94,7 @@
           <span class="type-cell">
             <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Gold type">
               <option *ngFor="let type of goldMetalTypes" [value]="type.name">
-                {{ type.name }} · {{ type.stamp }}
+                {{ typeLabel(type) }}
               </option>
               <option [value]="customPurity">Custom %…</option>
             </select>
@@ -114,12 +114,13 @@
 
           <span class="row-toggles">
             <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-              {{ isNoteShown(row) ? '−' : '+' }} note
+              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)" aria-label="Note">
+              📝
             </button>
             <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
-              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
-              {{ isStoneShown(row) ? '−' : '+' }} stone
+              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)"
+              aria-label="Stone weight">
+              💎
             </button>
           </span>
 
@@ -177,7 +178,7 @@
           <span class="type-cell">
             <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" aria-label="Silver type">
               <option *ngFor="let type of silverMetalTypes" [value]="type.name">
-                {{ type.name }} · {{ type.stamp }}
+                {{ typeLabel(type) }}
               </option>
               <option [value]="customPurity">Custom %…</option>
             </select>
@@ -197,12 +198,13 @@
 
           <span class="row-toggles">
             <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-              {{ isNoteShown(row) ? '−' : '+' }} note
+              [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)" aria-label="Note">
+              📝
             </button>
             <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
-              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
-              {{ isStoneShown(row) ? '−' : '+' }} stone
+              [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)"
+              aria-label="Stone weight">
+              💎
             </button>
           </span>
 
@@ -288,7 +290,7 @@
             <span class="type-cell">
               <select [(ngModel)]="row.type" (ngModelChange)="calculate()" class="type-select" [attr.aria-label]="metal.label + ' type'">
                 @for (type of metal.types; track type.name) {
-                <option [value]="type.name">{{ type.name }} · {{ type.stamp }}</option>
+                <option [value]="type.name">{{ typeLabel(type) }}</option>
                 }
                 <option [value]="customPurity">Custom %…</option>
               </select>
@@ -311,12 +313,13 @@
 
             <span class="row-toggles">
               <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-                [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-                {{ isNoteShown(row) ? '−' : '+' }} note
+                [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)" aria-label="Note">
+                📝
               </button>
               <button class="stone-toggle" [class.open]="isStoneShown(row)" (click)="toggleStone(row)"
-                [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)">
-                {{ isStoneShown(row) ? '−' : '+' }} stone
+                [disabled]="hasStone(row)" [attr.aria-expanded]="isStoneShown(row)" [title]="stoneToggleTitle(row)"
+                aria-label="Stone weight">
+                💎
               </button>
             </span>
 
@@ -376,8 +379,8 @@
         <input type="number" class="weight-input" min="1" step="1" [(ngModel)]="row.quantity" (ngModelChange)="calculate()"
           [attr.aria-label]="'How many ' + row.coin.spec.name">
         <button class="note-toggle" [class.open]="isNoteShown(row)" (click)="toggleNote(row)" [disabled]="hasNote(row)"
-          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)">
-          {{ isNoteShown(row) ? '−' : '+' }} note
+          [attr.aria-expanded]="isNoteShown(row)" [title]="noteToggleTitle(row)" aria-label="Note">
+          📝
         </button>
         <button class="remove-btn" (click)="removeCoinRow(row)" [attr.aria-label]="'Remove ' + row.coin.spec.name">×</button>
         @if (isNoteShown(row)) {

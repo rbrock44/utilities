@@ -430,14 +430,13 @@
 
 .note-toggle,
 .stone-toggle {
+  width: 28px;
   height: 28px;
-  padding: 0 0.35rem;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
-  color: var(--text-faint);
-  font-size: 0.75rem;
-  white-space: nowrap;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 
@@ -623,12 +622,12 @@
     padding: 0.3rem 0.6rem;
   }
 
-  // The type (plus a custom percent) gets its own line so it never squeezes to nothing.
+  // One line: the type takes what the weight, unit, and icon buttons leave.
   .row {
-    grid-template-columns: minmax(0, 1fr) auto auto 28px;
+    grid-template-columns: minmax(0, 1fr) 3.5rem auto auto 28px;
+    gap: 0.3rem;
   }
 
-  .type-cell,
   .note-input,
   .stone-wrap {
     grid-column: 1 / -1;
