@@ -26,7 +26,7 @@ import {
   typesFor,
 } from './metal-list';
 import { migrateCoinStacks } from './coin-stack-migration';
-import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
+import { buildMetalQuote, MetalQuote, quoteFileName, quoteText } from './metal-quote';
 
 type SpotMetal = ListMetal;
 /** Platinum and palladium live in their own section, closed until asked for. */
@@ -754,6 +754,20 @@ export class PreciousMetalsComponent implements OnInit {
       grandTotals: this.grandTotals,
       offer,
     };
+  }
+
+  summaryCopied = false;
+  private summaryCopiedTimeout?: ReturnType<typeof setTimeout>;
+
+  async copySummary() {
+    await navigator.clipboard.writeText(quoteText(this.quote));
+    this.summaryCopied = true;
+    this.cdr.markForCheck();
+    clearTimeout(this.summaryCopiedTimeout);
+    this.summaryCopiedTimeout = setTimeout(() => {
+      this.summaryCopied = false;
+      this.cdr.markForCheck();
+    }, 2000);
   }
 
   /** jsPDF is loaded on demand so it stays out of the calculator's own chunk. */

@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 
-import { buildMetalQuote, MetalQuote, quoteFileName } from './metal-quote';
+import { buildMetalQuote, MetalQuote, quoteFileName, quoteText } from './metal-quote';
 
 const totals = (spotValue: number, grams: number, pureToz: number): MetalTotals => ({
   totalWeightGrams: grams,
@@ -41,6 +41,25 @@ const quote = (overrides: Partial<MetalQuote> = {}): MetalQuote => ({
 
 /** The uncompressed PDF source, where each line of text appears as a literal string. */
 const source = (q: MetalQuote) => buildMetalQuote(jsPDF, q).output();
+
+describe('metal quote text', () => {
+  it('should list the pieces by metal with totals, ready to paste', () => {
+    const text = quoteText(quote({ gold: [{ ...ring, stoneCarats: 0.5 }], offer: { amount: 300, percent: 80 } }));
+
+    expect(text.split('\n')).toEqual([
+      'Smith estate · Oct 10, 2026',
+      'Spot: Gold $2,000.00/oz t   ·   Silver $25.00/oz t (set by hand)',
+      '',
+      'Gold',
+      '- 14K Gold (58.3%) (nugget ring · less 0.5 ct stone): 10.00 g, $374.88',
+      'Gold total: $374.88',
+      '',
+      'Total spot value: $374.88',
+      '90%: $337.39 · 80%: $299.90 · 70%: $262.42',
+      'Offer: $300.00 (80% of spot)',
+    ]);
+  });
+});
 
 describe('metal quote', () => {
   it('should name the file after the list and the day', () => {

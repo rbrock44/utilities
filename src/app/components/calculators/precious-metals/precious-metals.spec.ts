@@ -510,6 +510,22 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     });
   });
 
+  describe('copy summary', () => {
+    it('should copy the quote as text and say so', async () => {
+      await setup();
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      Object.assign(component.goldRows[0], { type: goldTypes[0].name, weight: 1, unit: 'toz' });
+      component.spotPrices = { gold: 4000, silver: 50, timestamp: new Date() };
+      component.calculate();
+
+      await component.copySummary();
+
+      expect(writeText).toHaveBeenCalledWith(expect.stringContaining('- 24K Gold (99.9%): 31.10 g, $3,996.00'));
+      expect(component.summaryCopied).toBe(true);
+    });
+  });
+
   describe('type names', () => {
     it('should give full names, and short ones on a phone', async () => {
       await setup();

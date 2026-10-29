@@ -424,6 +424,7 @@
 
     <div class="totals-actions">
       <button class="offer-toggle" (click)="downloadQuote()">Download quote (PDF)</button>
+      <button class="offer-toggle" (click)="copySummary()">{{ summaryCopied ? 'Copied ✓' : 'Copy summary' }}</button>
       <button class="offer-toggle" (click)="toggleOffer()" [attr.aria-expanded]="offerOpen">
         {{ offerOpen ? 'Hide offer check' : 'Check an offer' }}
       </button>
