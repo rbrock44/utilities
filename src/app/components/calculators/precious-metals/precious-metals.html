@@ -146,6 +146,12 @@
         </div>
       </div>
 
+      @if (undo?.where === 'gold') {
+      <p class="coin-hint undo-line" role="status">
+        Removed {{ undo!.label }} · <button class="undo-btn" (click)="undoRemove()">Undo</button>
+      </p>
+      }
+
       <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="'Gold Breakdown'" [breakdowns]="goldBreakdowns" [totals]="goldTotals"
         totalsTitle="Gold Totals" totalsClass="gold-totals">
       </app-precious-metal-breakdown>
@@ -229,6 +235,12 @@
           }
         </div>
       </div>
+
+      @if (undo?.where === 'silver') {
+      <p class="coin-hint undo-line" role="status">
+        Removed {{ undo!.label }} · <button class="undo-btn" (click)="undoRemove()">Undo</button>
+      </p>
+      }
 
       <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="'Silver Breakdown'" [breakdowns]="silverBreakdowns" [totals]="silverTotals"
         totalsTitle="Silver Totals" totalsClass="silver-totals">
@@ -346,6 +358,12 @@
           }
         </div>
 
+        @if (undo?.where === metal.key) {
+        <p class="coin-hint undo-line" role="status">
+          Removed {{ undo!.label }} · <button class="undo-btn" (click)="undoRemove()">Undo</button>
+        </p>
+        }
+
         <app-precious-metal-breakdown [(unit)]="breakdownUnit" [title]="metal.label + ' Breakdown'" [breakdowns]="pgmBreakdowns[metal.key]"
           [totals]="pgmTotals[metal.key]" [totalsTitle]="metal.label + ' Totals'" totalsClass="silver-totals">
         </app-precious-metal-breakdown>
@@ -393,6 +411,11 @@
       </div>
       }
     </div>
+    @if (undo?.where === 'coins') {
+    <p class="coin-hint undo-line" role="status">
+      Removed {{ undo!.label }} · <button class="undo-btn" (click)="undoRemove()">Undo</button>
+    </p>
+    }
     <p class="coin-hint">Coins are added to the gold and silver breakdowns above.</p>
     }
   </div>

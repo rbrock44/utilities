@@ -42,6 +42,7 @@ export interface CoinRow {
 
 /** Anything with an optional note: a weighed row or a coin row. */
 type NoteRow = { note?: string };
+type UndoSection = ListMetal | 'coins';
 
 @Component({
   selector: 'app-precious-metals',
@@ -308,7 +309,48 @@ export class PreciousMetalsComponent implements OnInit {
   }
 
   removeCoinRow(row: CoinRow) {
+    const index = this.coinRows.indexOf(row);
     this.coinRows = this.coinRows.filter(r => r !== row);
+    this.calculate();
+    this.offerUndo('coins', row.coin.label, () => {
+      this.coinRows = [...this.coinRows.slice(0, index), row, ...this.coinRows.slice(index)];
+    });
+  }
+
+  /** What a removed row was, so the undo line can name it. */
+  private rowLabel(row: MetalRow): string {
+    return row.note?.trim() ? `${row.type} · ${row.note.trim()}` : row.type;
+  }
+
+  /** An untouched row isn't worth undoing; one with a weight, note, or stone is. */
+  private isFilled(row: MetalRow): boolean {
+    return row.weight > 0 || this.hasNote(row) || this.hasStone(row);
+  }
+
+  /**
+   * Puts a removed row back where it was. Removing the last row left one empty row in its place,
+   * so that one gives way if it's still empty.
+   */
+  private restoreRow(rows: MetalRow[], row: MetalRow, index: number): MetalRow[] {
+    const kept = rows.length === 1 && !this.isFilled(rows[0]) ? [] : rows;
+    return [...kept.slice(0, index), row, ...kept.slice(index)];
+  }
+
+  /** Each removal replaces the last one's undo, which fades after a few seconds. */
+  private offerUndo(where: UndoSection, label: string, restore: () => void) {
+    clearTimeout(this.undoTimeout);
+    this.undo = { where, label, restore };
+    this.undoTimeout = setTimeout(() => {
+      this.undo = null;
+      this.cdr.markForCheck();
+    }, 8000);
+  }
+
+  undoRemove() {
+    if (!this.undo) return;
+    clearTimeout(this.undoTimeout);
+    this.undo.restore();
+    this.undo = null;
     this.calculate();
   }
 
@@ -583,22 +625,32 @@ export class PreciousMetalsComponent implements OnInit {
 
   /** Removes the row, or resets it to defaults when it is the only one left. */
   removeGoldRow(id: number) {
+    const index = this.goldRows.findIndex(row => row.id === id);
+    const removed = this.goldRows[index];
     if (this.goldRows.length > 1) {
       this.goldRows = this.goldRows.filter(row => row.id !== id);
     } else {
       this.goldRows = [{ id: this.nextGoldId++, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
     }
     this.calculate();
+    if (removed && this.isFilled(removed)) {
+      this.offerUndo('gold', this.rowLabel(removed), () => this.goldRows = this.restoreRow(this.goldRows, removed, index));
+    }
   }
 
   /** Removes the row, or resets it to defaults when it is the only one left. */
   removeSilverRow(id: number) {
+    const index = this.silverRows.findIndex(row => row.id === id);
+    const removed = this.silverRows[index];
     if (this.silverRows.length > 1) {
       this.silverRows = this.silverRows.filter(row => row.id !== id);
     } else {
       this.silverRows = [{ id: this.nextSilverId++, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
     }
     this.calculate();
+    if (removed && this.isFilled(removed)) {
+      this.offerUndo('silver', this.rowLabel(removed), () => this.silverRows = this.restoreRow(this.silverRows, removed, index));
+    }
   }
 
   toggleSection(section: Section) {
@@ -613,10 +665,15 @@ export class PreciousMetalsComponent implements OnInit {
   /** Removes the row, or resets it to defaults when it is the only one left. */
   removePgmRow(metal: PgmMetal, id: number) {
     const rows = this.pgmRows[metal];
+    const index = rows.findIndex(row => row.id === id);
+    const removed = rows[index];
     this.pgmRows[metal] = rows.length > 1
       ? rows.filter(row => row.id !== id)
       : [{ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: 'grams' }];
     this.calculate();
+    if (removed && this.isFilled(removed)) {
+      this.offerUndo(metal, this.rowLabel(removed), () => this.pgmRows[metal] = this.restoreRow(this.pgmRows[metal], removed, index));
+    }
   }
 
   /**
@@ -755,6 +812,10 @@ export class PreciousMetalsComponent implements OnInit {
       offer,
     };
   }
+
+  /** The last removed row, offered back for a few seconds under its section. */
+  undo: { where: UndoSection; label: string; restore: () => void } | null = null;
+  private undoTimeout?: ReturnType<typeof setTimeout>;
 
   summaryCopied = false;
   private summaryCopiedTimeout?: ReturnType<typeof setTimeout>;

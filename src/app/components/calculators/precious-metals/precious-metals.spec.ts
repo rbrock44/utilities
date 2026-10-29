@@ -510,6 +510,55 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     });
   });
 
+  describe('undo remove', () => {
+    const el = () => fixture.nativeElement as HTMLElement;
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+
+    it('should offer a removed piece back in its place, with its note', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: goldTypes[3].name, weight: 4.2, note: 'nugget ring' });
+      component.addGoldRow();
+      component.goldRows[1].weight = 2;
+      const ring = component.goldRows[0];
+
+      component.removeGoldRow(ring.id);
+      render();
+      expect(component.goldRows.length).toBe(1);
+      expect(el().querySelector('.undo-line')?.textContent).toContain('Removed 14K Gold (58.3%) · nugget ring');
+
+      el().querySelector<HTMLButtonElement>('.undo-btn')!.click();
+      render();
+      expect(component.goldRows).toEqual([ring, expect.objectContaining({ weight: 2 })]);
+      expect(el().querySelector('.undo-line')).toBeNull();
+    });
+
+    it('should replace the empty row left by removing the last one', async () => {
+      await setup();
+      component.silverRows[0].weight = 31.1;
+      const bar = component.silverRows[0];
+
+      component.removeSilverRow(bar.id);
+      expect(component.silverRows[0]).not.toBe(bar);
+      component.undoRemove();
+
+      expect(component.silverRows).toEqual([bar]);
+    });
+
+    it('should not offer to undo an empty row, and bring back a coin', async () => {
+      await setup();
+      component.addSilverRow();
+      component.removeSilverRow(component.silverRows[1].id);
+      expect(component.undo).toBeNull();
+
+      component.addCoin('silver-morgan-dollar-1878-1921');
+      const coin = component.coinRows[0];
+      component.removeCoinRow(coin);
+      expect(component.undo?.label).toBe(coin.coin.label);
+      component.undoRemove();
+      expect(component.coinRows).toEqual([coin]);
+    });
+  });
+
   describe('copy summary', () => {
     it('should copy the quote as text and say so', async () => {
       await setup();

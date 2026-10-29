@@ -346,6 +346,20 @@
   }
 }
 
+.undo-line {
+  margin: 0.3rem 0;
+}
+
+.undo-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .coin-melt {
   display: block;
 }
