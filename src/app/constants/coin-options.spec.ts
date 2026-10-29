@@ -33,7 +33,7 @@ describe('COIN_OPTIONS', () => {
     const years = (name: string) => COIN_OPTIONS.find(c => c.spec.name === name)!.years;
     expect(years('Mercury Dime')).toEqual({ from: 1916, to: 1945 });
     expect(years('Roosevelt Dime')).toEqual({ from: 1946, to: 1964 });
-    expect(years('British Crown')).toEqual({ to: 1946 });
+    expect(years('British Crown')).toEqual({ to: 1919 });
     expect(findCoin('silver-roosevelt-dime-2019-s-silver-proof')!.years).toEqual({ from: 2019 });
     expect(findCoin('silver-eisenhower-dollar-1971-1976-s-40-silver')!.years).toEqual({ from: 1971, to: 1976 });
     expect(COIN_OPTIONS.find(c => c.spec.description === '30g (2016+)')!.years).toEqual({ from: 2016 });
@@ -50,6 +50,19 @@ describe('COIN_OPTIONS', () => {
     expect(coinStruckIn(morgan, 1922)).toBe(false);
     expect(coinStruckIn(COIN_OPTIONS.find(c => c.spec.name === 'Roosevelt Dime')!, 1950)).toBe(true);
     expect(coinStruckIn(findCoin('silver-generic-silver-round-1-toz')!, 2000)).toBe(false);
+  });
+
+  it('should split world silver by the years its fineness changed', () => {
+    const silver = (name: string, year: number) =>
+      COIN_OPTIONS.filter(c => c.metal === 'silver' && c.spec.name === name && coinStruckIn(c, year)).map(c => c.spec.purity);
+    expect(silver('British Half Crown', 1915)).toEqual([0.925]);
+    expect(silver('British Half Crown', 1935)).toEqual([0.5]);
+    expect(silver('Australian Florin', 1950)).toEqual([0.5]);
+    expect(silver('Mexican Silver Peso', 1910)).toEqual([0.903]);
+    expect(silver('Mexican Silver Peso', 1960)).toEqual([0.1]);
+    expect(findCoin('silver-british-crown-pre-1947')?.spec.purity).toBe(0.5);
+    expect(findCoin('silver-french-5-francs-1960-1969-hercules')?.spec.name).toBe('French 10 Francs');
+    expect(findCoin('silver-dutch-guilder-various-dates')?.years).toEqual({ from: 1922, to: 1945 });
   });
 
   it('should date the fractional gold coins from the year each size was first struck', () => {

@@ -76,6 +76,15 @@ const RENAMED_COIN_IDS: Record<string, string> = {
   'silver-washington-quarter-pre-1965': 'silver-washington-quarter-1932-1964',
   'silver-jefferson-nickel-war-nickel-1942-1945-35-silver':
     'silver-jefferson-nickel-war-nickel-1942-1945-35-silver-large-mint-mark-above-dome',
+  // British "pre-1947" coins split at 1920; the half-silver years are the ones most often found.
+  'silver-british-crown-pre-1947': 'silver-british-crown-1920-1946-50-silver',
+  'silver-british-half-crown-pre-1947': 'silver-british-half-crown-1920-1946-50-silver',
+  'silver-british-shilling-pre-1947': 'silver-british-shilling-1920-1946-50-silver',
+  'silver-british-sixpence-pre-1947': 'silver-british-sixpence-1920-1946-50-silver',
+  'silver-british-threepence-pre-1947': 'silver-british-threepence-1920-1944-50-silver',
+  // The 25 g "5 Francs Hercules" was really the 10 Francs.
+  'silver-french-5-francs-1960-1969-hercules': 'silver-french-10-francs-1965-1973-hercules',
+  'silver-dutch-guilder-various-dates': 'silver-dutch-guilder-1922-1945',
 };
 
 export function findCoin(id: string): CoinOption | undefined {

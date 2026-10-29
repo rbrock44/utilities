@@ -271,24 +271,67 @@ export const SILVER_COIN_DATABASE: CoinSpec[] = [
     // South African Bullion - Krugerrand
     { name: 'South African Silver Krugerrand', weightGrams: 31.103, purity: 0.999, description: '1 toz', years: { from: 2017 } },
     
-    // British Pre-Decimal Coins
-    { name: 'British Crown', weightGrams: 28.28, purity: 0.925, description: 'Pre-1947' },
-    { name: 'British Half Crown', weightGrams: 14.14, purity: 0.925, description: 'Pre-1947' },
-    { name: 'British Shilling', weightGrams: 5.66, purity: 0.925, description: 'Pre-1947' },
-    { name: 'British Sixpence', weightGrams: 2.83, purity: 0.925, description: 'Pre-1947' },
-    { name: 'British Threepence', weightGrams: 1.41, purity: 0.925, description: 'Pre-1947' },
+    // British Pre-Decimal Coins: sterling until 1920, then half silver until 1947
+    { name: 'British Crown', weightGrams: 28.28, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Crown', weightGrams: 28.28, purity: 0.500, description: '1920-1946 (50% silver)' },
+    { name: 'British Half Crown', weightGrams: 14.14, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Half Crown', weightGrams: 14.14, purity: 0.500, description: '1920-1946 (50% silver)' },
+    { name: 'British Florin', weightGrams: 11.31, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Florin', weightGrams: 11.31, purity: 0.500, description: '1920-1946 (50% silver)' },
+    { name: 'British Shilling', weightGrams: 5.66, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Shilling', weightGrams: 5.66, purity: 0.500, description: '1920-1946 (50% silver)' },
+    { name: 'British Sixpence', weightGrams: 2.83, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Sixpence', weightGrams: 2.83, purity: 0.500, description: '1920-1946 (50% silver)' },
+    { name: 'British Threepence', weightGrams: 1.41, purity: 0.925, description: 'Pre-1920' },
+    { name: 'British Threepence', weightGrams: 1.41, purity: 0.500, description: '1920-1944 (50% silver)' },
+
+    // Australian Pre-Decimal Coins: sterling until 1946, then half silver
+    { name: 'Australian Florin', weightGrams: 11.31, purity: 0.925, description: '1910-1945' },
+    { name: 'Australian Florin', weightGrams: 11.31, purity: 0.500, description: '1946-1963 (50% silver)' },
+    { name: 'Australian Shilling', weightGrams: 5.65, purity: 0.925, description: '1910-1944' },
+    { name: 'Australian Shilling', weightGrams: 5.65, purity: 0.500, description: '1946-1963 (50% silver)' },
+    { name: 'Australian Sixpence', weightGrams: 2.82, purity: 0.925, description: '1910-1945' },
+    { name: 'Australian Sixpence', weightGrams: 2.82, purity: 0.500, description: '1946-1963 (50% silver)' },
+    { name: 'Australian Threepence', weightGrams: 1.41, purity: 0.925, description: '1910-1944' },
+    { name: 'Australian Threepence', weightGrams: 1.41, purity: 0.500, description: '1947-1964 (50% silver)' },
+    { name: 'Australian 50 Cents', weightGrams: 13.28, purity: 0.800, description: '1966 (round)' },
     
     // British Modern
     { name: 'British Sovereign (Silver)', weightGrams: 28.28, purity: 0.925, description: 'Various years' },
     
     // European Coins
-    { name: 'French 5 Francs', weightGrams: 25.0, purity: 0.900, description: '1960-1969 (Hercules)' },
-    { name: 'German 5 Mark', weightGrams: 13.89, purity: 0.900, description: '1951-1974' },
+    { name: 'French 50 Centimes', weightGrams: 2.5, purity: 0.835, description: '1897-1920 (Semeuse)' },
+    { name: 'French 1 Franc', weightGrams: 5.0, purity: 0.835, description: '1898-1920 (Semeuse)' },
+    { name: 'French 2 Francs', weightGrams: 10.0, purity: 0.835, description: '1898-1920 (Semeuse)' },
+    { name: 'French 5 Francs', weightGrams: 12.0, purity: 0.835, description: '1960-1969 (Semeuse)' },
+    { name: 'French 10 Francs', weightGrams: 25.0, purity: 0.900, description: '1965-1973 (Hercules)' },
+    { name: 'French 50 Francs', weightGrams: 30.0, purity: 0.900, description: '1974-1980 (Hercules)' },
+    { name: 'German 5 Mark', weightGrams: 11.2, purity: 0.625, description: '1951-1974' },
+    { name: 'German 10 Mark', weightGrams: 15.5, purity: 0.625, description: '1972-1997 (commemorative)' },
+    { name: 'Swiss 1/2 Franc', weightGrams: 2.5, purity: 0.835, description: '1875-1967' },
+    { name: 'Swiss 1 Franc', weightGrams: 5.0, purity: 0.835, description: '1875-1967' },
+    { name: 'Swiss 2 Francs', weightGrams: 10.0, purity: 0.835, description: '1874-1967' },
     { name: 'Swiss 5 Francs', weightGrams: 15.0, purity: 0.835, description: '1931-1969' },
-    { name: 'Dutch Guilder', weightGrams: 10.0, purity: 0.720, description: 'Various dates' },
+    { name: 'Dutch Guilder', weightGrams: 10.0, purity: 0.720, description: '1922-1945' },
+    { name: 'Dutch Guilder', weightGrams: 6.5, purity: 0.720, description: '1954-1967' },
+    { name: 'Dutch 2 1/2 Guilders', weightGrams: 25.0, purity: 0.720, description: '1929-1940' },
+    { name: 'Dutch 2 1/2 Guilders', weightGrams: 15.0, purity: 0.720, description: '1959-1966' },
+    { name: 'Italian 500 Lire', weightGrams: 11.0, purity: 0.835, description: '1958-1967 (caravels)' },
+    { name: 'Spanish 100 Pesetas', weightGrams: 19.0, purity: 0.800, description: '1966 (Franco)' },
     
-    // Historical Mexican
-    { name: 'Mexican Silver Peso', weightGrams: 27.07, purity: 0.903, description: '1920-1945' },
+    // Historical Mexican: the silver in a peso fell from 90% to 10% over sixty years
+    { name: 'Mexican Silver Peso', weightGrams: 27.07, purity: 0.903, description: '1898-1914' },
+    { name: 'Mexican Silver Peso', weightGrams: 16.66, purity: 0.720, description: '1920-1945' },
+    { name: 'Mexican Silver Peso', weightGrams: 14.0, purity: 0.500, description: '1947-1949 (Morelos)' },
+    { name: 'Mexican Silver Peso', weightGrams: 13.0, purity: 0.300, description: '1950 (Morelos)' },
+    { name: 'Mexican Silver Peso', weightGrams: 16.0, purity: 0.100, description: '1957-1967 (Morelos)' },
+    { name: 'Mexican 50 Centavos', weightGrams: 6.65, purity: 0.300, description: '1950-1951 (Cuauhtemoc)' },
+    { name: 'Mexican 5 Pesos', weightGrams: 30.0, purity: 0.900, description: '1947-1948 (Cuauhtemoc)' },
+    { name: 'Mexican 5 Pesos', weightGrams: 27.78, purity: 0.720, description: '1950-1954' },
+    { name: 'Mexican 5 Pesos', weightGrams: 18.0, purity: 0.720, description: '1955-1957 (Hidalgo)' },
+    { name: 'Mexican 10 Pesos', weightGrams: 28.888, purity: 0.900, description: '1955-1960' },
+    { name: 'Mexican 25 Pesos', weightGrams: 22.5, purity: 0.720, description: '1968 (Olympics)' },
+    { name: 'Mexican 25 Pesos', weightGrams: 22.5, purity: 0.720, description: '1972 (Juarez)' },
     { name: 'Mexican Onza', weightGrams: 33.625, purity: 0.925, description: '1949-1980' },
 
     // Asian Coins
