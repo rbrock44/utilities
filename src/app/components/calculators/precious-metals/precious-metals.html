@@ -375,6 +375,9 @@
         <span class="coin-name">
           <span class="metal-tag" [class.gold]="row.coin.metal === 'gold'">{{ row.coin.metal === 'gold' ? 'Au' : 'Ag' }}</span>
           {{ row.coin.label }}
+          @if (coinMelt(row); as melt) {
+          <span class="coin-hint coin-melt">{{ melt }}</span>
+          }
         </span>
         <input type="number" class="weight-input" min="1" step="1" [(ngModel)]="row.quantity" (ngModelChange)="calculate()"
           [attr.aria-label]="'How many ' + row.coin.spec.name">

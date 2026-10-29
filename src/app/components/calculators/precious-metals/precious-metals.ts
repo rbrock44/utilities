@@ -8,7 +8,7 @@ import { CARAT_IN_GRAMS, CUSTOM_PURITY, emptyMetalTotal, goldTypes, METAL_UNITS,
 import { MetalService, validStone } from '../../../services/metal';
 import { SavedList, SavedListStore } from '../../../services/saved-lists';
 import { SaveShareComponent } from '../../save-share/save-share';
-import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin } from '../../../constants/coin-options';
+import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin, pureTozPerCoin } from '../../../constants/coin-options';
 import { KEY_DATES, KeyDate, keyDateLabel, keyDateMatches } from '../../../constants/key-dates';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
 import {
@@ -404,6 +404,15 @@ export class PreciousMetalsComponent implements OnInit {
 
   price(metal: SpotMetal): number {
     return priceOf(this.spotPrices, metal);
+  }
+
+  /** "$29.40 each · $88.20" at spot, or null until there's a price and a count. */
+  coinMelt(row: CoinRow): string | null {
+    const price = this.price(row.coin.metal);
+    const quantity = this.coinQuantity(row);
+    if (price <= 0 || quantity === 0) return null;
+    const each = pureTozPerCoin(row.coin.spec) * price;
+    return quantity === 1 ? `$${each.toFixed(2)} each` : `$${each.toFixed(2)} each · $${(each * quantity).toFixed(2)}`;
   }
 
   livePrice(metal: SpotMetal): number {

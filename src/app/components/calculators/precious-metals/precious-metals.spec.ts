@@ -954,6 +954,22 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
         .toBe('Loaded a shared list of 1 coin. Left out Eisenhower Dollar · 1971-1978 P/D (copper-nickel): no silver.');
     });
 
+    it('should show each coin\'s melt value in its row once there\'s a price', async () => {
+      await setup();
+      component.spotPrices = { gold: 4000, silver: 50, timestamp: new Date() };
+      component.addCoin(morgan);
+      const row = component.coinRows[0];
+
+      expect(component.coinMelt(row)).toBe(`$${(morganToz * 50).toFixed(2)} each`);
+      row.quantity = 3;
+      expect(component.coinMelt(row)).toBe(`$${(morganToz * 50).toFixed(2)} each · $${(morganToz * 50 * 3).toFixed(2)}`);
+      row.quantity = 0;
+      expect(component.coinMelt(row)).toBeNull();
+      component.spotPrices = { gold: -1, silver: -1, timestamp: new Date() };
+      row.quantity = 1;
+      expect(component.coinMelt(row)).toBeNull();
+    });
+
     it('should describe lists by pieces and coins', () => {
       expect(describeEntries([])).toBe('0 pieces');
       expect(describeEntries([ring, bar])).toBe('2 pieces');
