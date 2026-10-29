@@ -510,6 +510,22 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     });
   });
 
+  describe('breakdown unit', () => {
+    it('should start in oz t, remember a pick, and ignore a stored unit it does not know', async () => {
+      await setup();
+      expect(component.breakdownUnit).toBe('toz');
+
+      component.setBreakdownUnit('dwt');
+      expect(store['utilities-metal-breakdown-unit']).toBe('dwt');
+
+      const reopened = () => TestBed.createComponent(PreciousMetalsComponent).componentInstance.breakdownUnit;
+      expect(reopened()).toBe('dwt');
+
+      store['utilities-metal-breakdown-unit'] = 'cubit';
+      expect(reopened()).toBe('toz');
+    });
+  });
+
   describe('undo remove', () => {
     const el = () => fixture.nativeElement as HTMLElement;
     const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };

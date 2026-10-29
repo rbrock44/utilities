@@ -44,6 +44,18 @@ export interface CoinRow {
 type NoteRow = { note?: string };
 type UndoSection = ListMetal | 'coins';
 
+const BREAKDOWN_UNIT_KEY = 'utilities-metal-breakdown-unit';
+
+// localStorage is missing in the test runner and blocked outright in some privacy modes.
+function readBreakdownUnit(): MetalUnitId {
+  try {
+    const stored = globalThis.localStorage?.getItem(BREAKDOWN_UNIT_KEY);
+    return METAL_UNITS.some(unit => unit.id === stored) ? stored as MetalUnitId : 'toz';
+  } catch {
+    return 'toz';
+  }
+}
+
 @Component({
   selector: 'app-precious-metals',
   standalone: true,
@@ -180,8 +192,8 @@ export class PreciousMetalsComponent implements OnInit {
   goldMetalTypes: MetalType[] = goldTypes;
   silverMetalTypes: MetalType[] = silverTypes;
   readonly metalUnits = METAL_UNITS;
-  /** One weight unit for every breakdown, oz t until picked. */
-  breakdownUnit: MetalUnitId = 'toz';
+  /** One weight unit for every breakdown, oz t until picked; the pick is kept for next time. */
+  breakdownUnit: MetalUnitId = readBreakdownUnit();
 
   private nextGoldId = 2;
   private nextSilverId = 2;
@@ -650,6 +662,15 @@ export class PreciousMetalsComponent implements OnInit {
     this.calculate();
     if (removed && this.isFilled(removed)) {
       this.offerUndo('silver', this.rowLabel(removed), () => this.silverRows = this.restoreRow(this.silverRows, removed, index));
+    }
+  }
+
+  setBreakdownUnit(unit: MetalUnitId) {
+    this.breakdownUnit = unit;
+    try {
+      globalThis.localStorage?.setItem(BREAKDOWN_UNIT_KEY, unit);
+    } catch {
+      // ignore: the unit just won't be remembered
     }
   }
 
