@@ -18,10 +18,15 @@ export class SettingsDrawerComponent {
   @Output() closed = new EventEmitter<void>();
 
   private readonly closeButton = viewChild<ElementRef<HTMLButtonElement>>('closeButton');
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  /** Content can mark what should take focus, e.g. a search box; otherwise it's the × button. */
   constructor() {
     const opener = inject(DOCUMENT).activeElement as HTMLElement | null;
-    afterNextRender(() => this.closeButton()?.nativeElement.focus());
+    afterNextRender(() => {
+      const marked = this.host.nativeElement.querySelector<HTMLElement>('[data-autofocus]');
+      (marked ?? this.closeButton()?.nativeElement)?.focus();
+    });
     inject(DestroyRef).onDestroy(() => opener?.focus?.());
   }
 

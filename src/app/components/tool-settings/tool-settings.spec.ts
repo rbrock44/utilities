@@ -71,6 +71,19 @@ describe('ToolSettingsComponent', () => {
     expect(badges()).toBe(0);
   });
 
+  it('should follow a narrowed list and reset only what it shows', () => {
+    service.set('tool', 'unit', 'dwt');
+    service.set('tool', 'cols', [100, 95, 80]);
+    fixture.componentRef.setInput('definitions', [DEFINITIONS[1]]);
+    render();
+    expect(field('unit')).toBeNull();
+    expect(el().querySelectorAll('.changed').length).toBe(1);
+
+    (el().querySelector('.reset') as HTMLButtonElement).click();
+    expect(values()['cols']).toEqual([100, 90, 80]);
+    expect(values()['unit']).toBe('dwt');
+  });
+
   it('should title the form with the tool it belongs to', () => {
     fixture.componentRef.setInput('heading', 'Precious Metals');
     fixture.detectChanges();

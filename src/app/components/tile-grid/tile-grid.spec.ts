@@ -47,3 +47,60 @@ describe('TileGridComponent', () => {
     expect(toggle.textContent).toContain('1 changed');
   });
 });
+
+describe('TileGridComponent settings search', () => {
+  let fixture: ComponentFixture<TileGridComponent>;
+
+  const el = () => fixture.nativeElement as HTMLElement;
+  const headings = () => [...el().querySelectorAll('app-tool-settings h3')].map(h => h.textContent?.trim());
+  const search = (text: string) => {
+    const box = el().querySelector('.settings-search') as HTMLInputElement;
+    box.value = text;
+    box.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+  };
+
+  beforeEach(async () => {
+    vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => undefined });
+    await TestBed.configureTestingModule({ imports: [TileGridComponent], providers: [provideRouter([])] }).compileComponents();
+    fixture = TestBed.createComponent(TileGridComponent);
+    fixture.detectChanges();
+    (el().querySelector('.settings-toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('should narrow to matching settings, every word counting', () => {
+    search('kerf');
+    expect(headings()).toEqual(['Cut List Optimizer']);
+    expect(el().querySelectorAll('app-tool-settings .field').length).toBe(1);
+
+    search('cut unit');
+    expect(el().querySelector('[data-setting="unit"]')).toBeTruthy();
+    expect(el().querySelector('[data-setting="kerf"]')).toBeNull();
+  });
+
+  it('should match a tool name, an option name, and say when nothing matches', () => {
+    search('precious');
+    expect(headings()).toEqual(['Precious Metals']);
+
+    search('letter');
+    expect(headings()).toEqual(['Image to PDF']);
+
+    search('zzz');
+    expect(headings()).toEqual([]);
+    expect(el().querySelector('.settings-empty')?.textContent).toContain('zzz');
+  });
+
+  it('should start with an empty search each time it opens', () => {
+    search('kerf');
+    fixture.componentInstance.settingsOpen.set(false);
+    fixture.detectChanges();
+    (el().querySelector('.settings-toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(headings().length).toBe(fixture.componentInstance.settingsTools.length);
+  });
+});

@@ -97,6 +97,11 @@ export class ToolSettingsService {
     return computed(() => resolveSettings(definitions, this.stored()[param]));
   }
 
+  /** Read inside a computed to follow saved changes, like `values` without its own signal. */
+  current(param: string, definitions: SettingDefinition[]): SettingValues {
+    return resolveSettings(definitions, this.stored()[param]);
+  }
+
   /** Keys whose value differs from the default; saving a default back counts as unchanged. */
   changedKeys(param: string, definitions: SettingDefinition[]): string[] {
     const values = resolveSettings(definitions, this.stored()[param]);
@@ -108,9 +113,15 @@ export class ToolSettingsService {
     this.save({ ...current, [param]: { ...current[param], [key]: value } });
   }
 
-  reset(param: string): void {
-    const { [param]: _, ...rest } = this.stored();
-    this.save(rest);
+  /** Resets the given keys, or the whole tool without any. */
+  reset(param: string, keys?: string[]): void {
+    const { [param]: tool, ...rest } = this.stored();
+    if (!keys) {
+      this.save(rest);
+      return;
+    }
+    const kept = Object.fromEntries(Object.entries(tool ?? {}).filter(([key]) => !keys.includes(key)));
+    this.save(Object.keys(kept).length > 0 ? { ...rest, [param]: kept } : rest);
   }
 
   private save(next: Stored): void {

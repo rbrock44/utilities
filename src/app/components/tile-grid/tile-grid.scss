@@ -79,3 +79,25 @@ app-tool-settings + app-tool-settings {
         padding: 0 0.7rem;
     }
 }
+
+.settings-search {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+    padding: 0.55rem 0.7rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface-alt);
+    color: var(--text);
+    font: inherit;
+}
+
+.settings-search:focus {
+    outline: none;
+    border-color: var(--brand);
+}
+
+.settings-empty {
+    color: var(--text-soft);
+}

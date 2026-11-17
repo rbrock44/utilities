@@ -4,7 +4,7 @@
         <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" placeholder="Search by category, name, or description..."
             class="search-input" aria-label="Search widgets">
         @if (settingsTools.length > 0) {
-            <button type="button" class="settings-toggle" aria-haspopup="dialog" [attr.aria-expanded]="settingsOpen()" (click)="settingsOpen.set(!settingsOpen())">
+            <button type="button" class="settings-toggle" aria-haspopup="dialog" [attr.aria-expanded]="settingsOpen()" (click)="openSettings()">
                 <span aria-hidden="true">⚙</span>
                 Settings
                 @if (changedSettings() > 0) {
@@ -15,8 +15,12 @@
     </div>
     @if (settingsOpen()) {
         <app-settings-drawer heading="Tool settings" (closed)="settingsOpen.set(false)">
-            @for (tool of settingsTools; track tool.param) {
+            <input type="search" class="settings-search" data-autofocus placeholder="Search settings..." aria-label="Search settings"
+                [value]="settingsQuery()" (input)="settingsQuery.set($any($event.target).value)">
+            @for (tool of filteredSettingsTools(); track tool.param) {
                 <app-tool-settings [param]="tool.param" [definitions]="tool.definitions" [heading]="tool.title" />
+            } @empty {
+                <p class="settings-empty">No settings match “{{ settingsQuery() }}”</p>
             }
         </app-settings-drawer>
     }

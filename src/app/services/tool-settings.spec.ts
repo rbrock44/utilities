@@ -44,6 +44,16 @@ describe('ToolSettingsService', () => {
     expect(service.changedKeys('tool', DEFINITIONS)).toEqual([]);
   });
 
+  it('should reset only the keys given', () => {
+    const service = create();
+    service.set('tool', 'unit', 'dwt');
+    service.set('tool', 'cols', [100, 95, 80]);
+    service.reset('tool', ['cols']);
+    expect(service.changedKeys('tool', DEFINITIONS)).toEqual(['unit']);
+    service.reset('tool', ['unit']);
+    expect(JSON.parse(store['utilities-settings'])).toEqual({});
+  });
+
   it('should not count a value set back to its default as changed', () => {
     const service = create();
     service.set('tool', 'cols', [100, 95, 80]);

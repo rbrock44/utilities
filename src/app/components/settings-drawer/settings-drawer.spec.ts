@@ -9,12 +9,16 @@ import { SettingsDrawerComponent } from './settings-drawer';
   template: `
     <button class="opener" (click)="open.set(true)">open</button>
     @if (open()) {
-      <app-settings-drawer heading="Tool settings" (closed)="open.set(false)"><p class="content">form</p></app-settings-drawer>
+      <app-settings-drawer heading="Tool settings" (closed)="open.set(false)">
+        @if (search) { <input class="search" data-autofocus> }
+        <p class="content">form</p>
+      </app-settings-drawer>
     }
   `,
 })
 class HostComponent {
   readonly open = signal(false);
+  search = false;
 }
 
 describe('SettingsDrawerComponent', () => {
@@ -47,6 +51,12 @@ describe('SettingsDrawerComponent', () => {
     expect(dialog.querySelector('h2')?.textContent).toBe('Tool settings');
     expect(dialog.querySelector('.content')).toBeTruthy();
     expect(document.activeElement).toBe(el().querySelector('.close'));
+  });
+
+  it('should focus content marked for it instead of the close button', async () => {
+    fixture.componentInstance.search = true;
+    await openDrawer();
+    expect(document.activeElement).toBe(el().querySelector('.search'));
   });
 
   it('should close on Escape and give focus back to the opener', async () => {
