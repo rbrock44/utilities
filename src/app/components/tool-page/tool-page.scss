@@ -130,3 +130,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+.actions {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+app-tool-settings {
+  display: block;
+  padding: 0.5rem 1rem 0;
+}

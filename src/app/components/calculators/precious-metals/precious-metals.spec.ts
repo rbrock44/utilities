@@ -526,6 +526,35 @@ describe('PreciousMetalsComponent notes, saving, and sharing', () => {
     });
   });
 
+  describe('settings', () => {
+    it('should start blank rows in the set unit and leave filled rows alone', async () => {
+      await setup();
+      expect(component.goldRows[0].unit).toBe('grams');
+      Object.assign(component.silverRows[0], { weight: 2 });
+
+      component.settings = { rowUnit: 'dwt', breakdownColumns: [100, 95, 85] };
+      expect(component.goldRows[0].unit).toBe('dwt');
+      expect(component.pgmRows.platinum[0].unit).toBe('dwt');
+      expect(component.silverRows[0].unit).toBe('grams');
+
+      component.addGoldRow();
+      expect(component.goldRows[1].unit).toBe('dwt');
+    });
+
+    it('should show the set percent columns in the breakdown', async () => {
+      await setup();
+      Object.assign(component.goldRows[0], { type: '24K Gold (99.9%)', weight: 1, unit: 'toz' });
+      component.calculate();
+      component.settings = { rowUnit: 'grams', breakdownColumns: [100, 95, 85] };
+      fixture.detectChanges();
+
+      const header = (fixture.nativeElement as HTMLElement).querySelector('.breakdown-table-header')!.textContent;
+      expect(header).toContain('95%');
+      expect(header).toContain('85%');
+      expect(header).not.toContain('90%');
+    });
+  });
+
   describe('undo remove', () => {
     const el = () => fixture.nativeElement as HTMLElement;
     const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };

@@ -19,6 +19,8 @@ export class PreciousMetalBreakdownComponent {
   /** The unit weights are shown in; bind with `[(unit)]` to share one choice across breakdowns. */
   @Input() unit: MetalUnitId = 'toz';
   @Output() unitChange = new EventEmitter<MetalUnitId>();
+  /** Percent of spot for each value column; the table is laid out for three. */
+  @Input() columns: number[] = [100, 90, 80];
 
   readonly units = METAL_UNITS;
 
@@ -33,6 +35,14 @@ export class PreciousMetalBreakdownComponent {
   pickUnit(id: string) {
     this.unit = id as MetalUnitId;
     this.unitChange.emit(this.unit);
+  }
+
+  columnLabel(percent: number): string {
+    return percent === 100 ? 'Spot' : `${percent}%`;
+  }
+
+  ofSpot(spotValue: number, percent: number): string {
+    return (spotValue * percent / 100).toFixed(2);
   }
 
   /** Small units get fewer places so a grain or milligram count doesn't trail zeros. */

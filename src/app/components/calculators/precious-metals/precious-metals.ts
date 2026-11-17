@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SpotPriceService } from '../../../services/spot-price';
@@ -11,6 +11,7 @@ import { SaveShareComponent } from '../../save-share/save-share';
 import { COIN_OPTIONS, CoinOption, coinStruckAt, coinStruckIn, findCoin, pureTozPerCoin } from '../../../constants/coin-options';
 import { KEY_DATES, KeyDate, keyDateLabel, keyDateMatches } from '../../../constants/key-dates';
 import { ComboBoxComponent } from '../../combo-box/combo-box';
+import { SettingValues } from '../../../services/tool-settings';
 import {
   CoinListItem,
   decodeMetalList,
@@ -89,13 +90,30 @@ export class PreciousMetalsComponent implements OnInit {
   /** Whether the per-type price lists are dropped down; gold and silver open together. */
   typePricesOpen = false;
 
+  /** Unit new rows start in, from the tool's settings. */
+  rowUnit: MetalUnitId = 'grams';
+  /** Percent of spot for each breakdown value column. */
+  breakdownColumns: number[] = [100, 90, 80];
+
+  /** Resolved by the tool page, so values are already known units and in-range percents. */
+  @Input() set settings(values: SettingValues | undefined) {
+    const previous = this.rowUnit;
+    this.rowUnit = (values?.['rowUnit'] as MetalUnitId | undefined) ?? 'grams';
+    this.breakdownColumns = (values?.['breakdownColumns'] as number[] | undefined) ?? [100, 90, 80];
+    // Rows nobody has touched yet follow the new unit; anything typed keeps its own.
+    this.allMetalRows()
+      .filter(row => row.unit === previous && !this.isFilled(row))
+      .forEach(row => row.unit = this.rowUnit);
+    this.cdr.markForCheck();
+  }
+
   @ViewChild('priceInput') set priceInput(input: ElementRef<HTMLInputElement> | undefined) {
     input?.nativeElement.focus();
     input?.nativeElement.select();
   }
 
-  goldRows: MetalRow[] = [{ id: 1, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
-  silverRows: MetalRow[] = [{ id: 1, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
+  goldRows: MetalRow[] = [{ id: 1, type: goldTypes[0].name, weight: 0, unit: this.rowUnit }];
+  silverRows: MetalRow[] = [{ id: 1, type: silverTypes[0].name, weight: 0, unit: this.rowUnit }];
 
   goldBreakdowns: PreciousMetalBreakdown[] = [];
   silverBreakdowns: PreciousMetalBreakdown[] = [];
@@ -106,8 +124,8 @@ export class PreciousMetalsComponent implements OnInit {
   /** Gold and silver start open; platinum and palladium stay closed until asked for. */
   open: Record<Section, boolean> = { gold: true, silver: true, pgm: false };
   pgmRows: Record<PgmMetal, MetalRow[]> = {
-    platinum: [{ id: 1, type: typesFor('platinum')[0].name, weight: 0, unit: 'grams' }],
-    palladium: [{ id: 2, type: typesFor('palladium')[0].name, weight: 0, unit: 'grams' }],
+    platinum: [{ id: 1, type: typesFor('platinum')[0].name, weight: 0, unit: this.rowUnit }],
+    palladium: [{ id: 2, type: typesFor('palladium')[0].name, weight: 0, unit: this.rowUnit }],
   };
   pgmBreakdowns: Record<PgmMetal, PreciousMetalBreakdown[]> = { platinum: [], palladium: [] };
   pgmTotals: Record<PgmMetal, MetalTotals> = { platinum: emptyMetalTotal, palladium: emptyMetalTotal };
@@ -335,6 +353,10 @@ export class PreciousMetalsComponent implements OnInit {
   }
 
   /** An untouched row isn't worth undoing; one with a weight, note, or stone is. */
+  private allMetalRows(): MetalRow[] {
+    return [...this.goldRows, ...this.silverRows, ...Object.values(this.pgmRows).flat()];
+  }
+
   private isFilled(row: MetalRow): boolean {
     return row.weight > 0 || this.hasNote(row) || this.hasStone(row);
   }
@@ -574,7 +596,7 @@ export class PreciousMetalsComponent implements OnInit {
           ...(item.purity !== undefined ? { purity: item.purity } : {}),
           ...(item.stone !== undefined ? { stone: item.stone } : {}),
         }));
-      return rows.length > 0 ? rows : [{ id: nextId(), type: defaultType, weight: 0, unit: 'grams' }];
+      return rows.length > 0 ? rows : [{ id: nextId(), type: defaultType, weight: 0, unit: this.rowUnit }];
     };
 
     this.goldRows = toRows('gold', () => this.nextGoldId++, goldTypes[0].name);
@@ -620,7 +642,7 @@ export class PreciousMetalsComponent implements OnInit {
       id: this.nextGoldId++,
       type: goldTypes[0].name,
       weight: 0,
-      unit: 'grams'
+      unit: this.rowUnit
     });
     this.calculate();
   }
@@ -630,7 +652,7 @@ export class PreciousMetalsComponent implements OnInit {
       id: this.nextSilverId++,
       type: silverTypes[0].name,
       weight: 0,
-      unit: 'grams'
+      unit: this.rowUnit
     });
     this.calculate();
   }
@@ -642,7 +664,7 @@ export class PreciousMetalsComponent implements OnInit {
     if (this.goldRows.length > 1) {
       this.goldRows = this.goldRows.filter(row => row.id !== id);
     } else {
-      this.goldRows = [{ id: this.nextGoldId++, type: goldTypes[0].name, weight: 0, unit: 'grams' }];
+      this.goldRows = [{ id: this.nextGoldId++, type: goldTypes[0].name, weight: 0, unit: this.rowUnit }];
     }
     this.calculate();
     if (removed && this.isFilled(removed)) {
@@ -657,7 +679,7 @@ export class PreciousMetalsComponent implements OnInit {
     if (this.silverRows.length > 1) {
       this.silverRows = this.silverRows.filter(row => row.id !== id);
     } else {
-      this.silverRows = [{ id: this.nextSilverId++, type: silverTypes[0].name, weight: 0, unit: 'grams' }];
+      this.silverRows = [{ id: this.nextSilverId++, type: silverTypes[0].name, weight: 0, unit: this.rowUnit }];
     }
     this.calculate();
     if (removed && this.isFilled(removed)) {
@@ -679,7 +701,7 @@ export class PreciousMetalsComponent implements OnInit {
   }
 
   addPgmRow(metal: PgmMetal) {
-    this.pgmRows[metal].push({ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: 'grams' });
+    this.pgmRows[metal].push({ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: this.rowUnit });
     this.calculate();
   }
 
@@ -690,7 +712,7 @@ export class PreciousMetalsComponent implements OnInit {
     const removed = rows[index];
     this.pgmRows[metal] = rows.length > 1
       ? rows.filter(row => row.id !== id)
-      : [{ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: 'grams' }];
+      : [{ id: this.nextPgmId++, type: typesFor(metal)[0].name, weight: 0, unit: this.rowUnit }];
     this.calculate();
     if (removed && this.isFilled(removed)) {
       this.offerUndo(metal, this.rowLabel(removed), () => this.pgmRows[metal] = this.restoreRow(this.pgmRows[metal], removed, index));

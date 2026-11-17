@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
@@ -7,19 +7,24 @@ import { ToolPageComponent } from './tool-page';
 @Component({ selector: 'app-fake-widget', standalone: true, template: '<p class="fake">widget</p>' })
 class FakeWidgetComponent {}
 
+@Component({ selector: 'app-fake-settings-widget', standalone: true, template: '<p class="fake">{{ settings?.unit }}</p>' })
+class FakeSettingsWidgetComponent {
+  @Input() settings?: { unit?: string };
+}
+
 describe('ToolPageComponent', () => {
   let fixture: ComponentFixture<ToolPageComponent>;
   let session: Record<string, string>;
   let reload: ReturnType<typeof vi.fn<() => void>>;
 
-  const setup = async (load: () => Promise<unknown>) => {
+  const setup = async (load: () => Promise<unknown>, settings?: unknown[]) => {
     await TestBed.configureTestingModule({
       imports: [ToolPageComponent],
       providers: [
         provideRouter([]),
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { routeConfig: { path: 'jwt-decoder' }, data: { description: '', heading: 'JWT Decoder', tool: { load } } } },
+          useValue: { snapshot: { routeConfig: { path: 'jwt-decoder' }, data: { description: '', heading: 'JWT Decoder', tool: { load, settings } } } },
         },
       ],
     }).compileComponents();
@@ -99,5 +104,33 @@ describe('ToolPageComponent', () => {
 
     (page().querySelector('.retry') as HTMLButtonElement).click();
     expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('should have no settings button for a tool without settings', async () => {
+    await setup(() => Promise.resolve(FakeWidgetComponent));
+    expect(page().querySelector('.settings-toggle')).toBeNull();
+  });
+
+  it('should open settings and pass a change straight to the widget', async () => {
+    await setup(() => Promise.resolve(FakeSettingsWidgetComponent), [
+      { kind: 'select', key: 'unit', label: 'Unit', default: 'g', options: [{ value: 'g', label: 'g' }, { value: 'dwt', label: 'dwt' }] },
+    ]);
+    const render = () => { fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck(); fixture.detectChanges(); };
+    const toggle = page().querySelector('.settings-toggle') as HTMLButtonElement;
+    expect(page().querySelector('.fake')?.textContent).toBe('g');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    toggle.click();
+    render();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    const select = page().querySelector('app-tool-settings select') as HTMLSelectElement;
+    select.value = 'dwt';
+    select.dispatchEvent(new Event('change'));
+    render();
+    expect(page().querySelector('.fake')?.textContent).toBe('dwt');
+
+    (page().querySelector('app-tool-settings .close') as HTMLButtonElement).click();
+    render();
+    expect(page().querySelector('app-tool-settings')).toBeNull();
   });
 });

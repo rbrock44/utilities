@@ -4,11 +4,17 @@
     padding: 2rem 1rem;
 }
 
+.search-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
 .search-input {
     display: block;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     padding: 0.75rem;
-    margin-bottom: 1.5rem;
     border: 2px solid var(--border);
     border-radius: 6px;
     font-size: 1rem;
@@ -36,4 +42,81 @@
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
+}
+
+.settings-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.9rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.changed-count {
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--warning-soft);
+    color: var(--warning-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.all-settings {
+    max-width: 520px;
+    margin: -0.75rem 0 2rem auto;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    color: var(--text);
+
+    h2 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    app-tool-settings + app-tool-settings {
+        display: block;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+}
+
+.all-settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.all-settings .close {
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.all-settings .intro {
+    margin: 0.25rem 0 1rem;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+    .settings-toggle {
+        padding: 0 0.7rem;
+    }
+
+    .all-settings {
+        margin-left: 0;
+    }
 }

@@ -1,23 +1,40 @@
 <h1 class="visually-hidden">{{ heading }}</h1>
 <app-back-button>
-  @if (canPin) {
-    <button
-      type="button"
-      class="pin"
-      [class.pinned]="favorites.isPinned(param)"
-      [attr.aria-pressed]="favorites.isPinned(param)"
-      (click)="favorites.toggle(param)"
-    >
-      <span aria-hidden="true">{{ favorites.isPinned(param) ? '★' : '☆' }}</span>
-      {{ favorites.isPinned(param) ? 'Pinned' : 'Pin' }}
-    </button>
-  }
+  <span class="actions">
+    @if (canPin) {
+      <button
+        type="button"
+        class="pin"
+        [class.pinned]="favorites.isPinned(param)"
+        [attr.aria-pressed]="favorites.isPinned(param)"
+        (click)="favorites.toggle(param)"
+      >
+        <span aria-hidden="true">{{ favorites.isPinned(param) ? '★' : '☆' }}</span>
+        {{ favorites.isPinned(param) ? 'Pinned' : 'Pin' }}
+      </button>
+    }
+    @if (settingDefinitions.length > 0) {
+      <button
+        type="button"
+        class="pin settings-toggle"
+        [attr.aria-expanded]="settingsOpen()"
+        (click)="toggleSettings()"
+      >
+        <span aria-hidden="true">⚙</span>
+        Settings
+      </button>
+    }
+  </span>
 </app-back-button>
+
+@if (settingsOpen()) {
+  <app-tool-settings [param]="param" [definitions]="settingDefinitions" (closed)="settingsOpen.set(false)" />
+}
 
 <div class="tool-layout">
   <div class="tool-main">
     @if (component(); as component) {
-      <ng-container *ngComponentOutlet="component; inputs: inputs" />
+      <ng-container *ngComponentOutlet="component; inputs: inputs()" />
     } @else if (loadFailed()) {
       <div class="tool-loading" role="alert">
         <p>This tool couldn't load. Check your connection and try again.</p>

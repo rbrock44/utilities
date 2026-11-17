@@ -94,4 +94,14 @@ describe('PreciousMetalBreakdownComponent', () => {
     expect(totalsRow.textContent).toContain('Gold Totals');
     expect(totalsRow.textContent).toContain('$932.80');
   });
+
+  it('should value each column at its percent of spot, labelling 100% as Spot', async () => {
+    const element = await render({ breakdowns: [breakdown], totals, columns: [95, 100, 50] });
+    const header = [...element.querySelectorAll('.breakdown-table-header span')].map(span => span.textContent?.trim());
+    expect(header.slice(-3)).toEqual(['95%', 'Spot', '50%']);
+
+    const cells = [...element.querySelectorAll('.breakdown-table-row')[0].children].map(span => span.textContent?.trim());
+    expect(cells.slice(-3)).toEqual(['$1107.70', '$1166.00', '$583.00']);
+    expect(element.querySelector('.totals-row')?.textContent).toContain('$583.00');
+  });
 });

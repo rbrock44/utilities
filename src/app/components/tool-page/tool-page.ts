@@ -1,10 +1,12 @@
-import { afterNextRender, ChangeDetectionStrategy, Component, inject, signal, Type } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, inject, signal, Type } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BackButtonComponent } from '../back-button/back-button';
 import { PageData } from '../../constants/site';
 import { findTool, relatedTools } from '../../constants/tool-index';
 import { FavoritesService } from '../../services/favorites';
+import { ToolSettingsService } from '../../services/tool-settings';
+import { ToolSettingsComponent } from '../tool-settings/tool-settings';
 
 const RELOAD_KEY = 'utilities-chunk-reload';
 /** A second failure this soon after reloading means something other than a stale deploy. */
@@ -18,7 +20,7 @@ const RELOAD_WINDOW_MS = 30_000;
 @Component({
   selector: 'app-tool-page',
   standalone: true,
-  imports: [NgComponentOutlet, BackButtonComponent, RouterLink],
+  imports: [NgComponentOutlet, BackButtonComponent, RouterLink, ToolSettingsComponent],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,13 +38,27 @@ export class ToolPageComponent {
   readonly heading = this.data.heading ?? '';
   readonly component = signal<Type<unknown> | null>(null);
   readonly loadFailed = signal(false);
-  readonly inputs = this.data.tool?.inputs ?? {};
+  private readonly baseInputs = this.data.tool?.inputs ?? {};
+
+  readonly settingDefinitions = this.data.tool?.settings ?? [];
+  private readonly settingValues = this.settingDefinitions.length > 0
+    ? inject(ToolSettingsService).values(this.param, this.settingDefinitions)
+    : null;
+  readonly settingsOpen = signal(false);
+  /** Only tools with settings get the input; setting an undeclared one is an error. */
+  readonly inputs = computed(() => this.settingValues
+    ? { ...this.baseInputs, settings: this.settingValues() }
+    : this.baseInputs);
 
   constructor() {
     afterNextRender(() => {
       this.favorites.recordVisit(this.param);
       this.loadWidget();
     });
+  }
+
+  toggleSettings(): void {
+    this.settingsOpen.update(open => !open);
   }
 
   retry(): void {

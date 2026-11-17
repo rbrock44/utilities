@@ -1,0 +1,108 @@
+import { computed, Injectable, Signal, signal } from '@angular/core';
+
+export interface SelectSetting {
+  kind: 'select';
+  key: string;
+  label: string;
+  hint?: string;
+  default: string;
+  options: { value: string; label: string }[];
+}
+
+/** A fixed-length row of numbers, e.g. the three percent columns of a table. */
+export interface NumberListSetting {
+  kind: 'numbers';
+  key: string;
+  label: string;
+  hint?: string;
+  default: number[];
+  /** One label per number, read out by screen readers. */
+  labels: string[];
+  min: number;
+  max: number;
+  suffix?: string;
+}
+
+export type SettingDefinition = SelectSetting | NumberListSetting;
+export type SettingValue = string | number[];
+export type SettingValues = Record<string, SettingValue>;
+
+const STORAGE_KEY = 'utilities-settings';
+
+type Stored = Record<string, Record<string, unknown>>;
+
+export function isValidNumber(definition: NumberListSetting, value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= definition.min && value <= definition.max;
+}
+
+/** Each number is checked on its own, so one bad entry doesn't throw away the rest. */
+function validValue(definition: SettingDefinition, stored: unknown): SettingValue {
+  if (definition.kind === 'select') {
+    return definition.options.some(option => option.value === stored) ? stored as string : definition.default;
+  }
+  const list = Array.isArray(stored) ? stored : [];
+  return definition.default.map((fallback, i) => isValidNumber(definition, list[i]) ? list[i] : fallback);
+}
+
+export function isDefaultValue(definition: SettingDefinition, value: SettingValue): boolean {
+  return Array.isArray(definition.default)
+    ? Array.isArray(value) && definition.default.every((fallback, i) => value[i] === fallback)
+    : value === definition.default;
+}
+
+/** Stored values for one tool, with anything missing, stale, or out of range swapped for its default. */
+export function resolveSettings(definitions: SettingDefinition[], stored: unknown): SettingValues {
+  const raw = stored && typeof stored === 'object' ? stored as Record<string, unknown> : {};
+  return Object.fromEntries(definitions.map(definition => [definition.key, validValue(definition, raw[definition.key])]));
+}
+
+/**
+ * Per-tool preferences (default units, table columns, ...) kept in localStorage under one
+ * key, so a tool opens the way its user last set it up.
+ */
+@Injectable({
+  providedIn: 'root'
+})
+export class ToolSettingsService {
+  private readonly stored = signal<Stored>(this.read());
+
+  values(param: string, definitions: SettingDefinition[]): Signal<SettingValues> {
+    return computed(() => resolveSettings(definitions, this.stored()[param]));
+  }
+
+  /** Keys whose value differs from the default; saving a default back counts as unchanged. */
+  changedKeys(param: string, definitions: SettingDefinition[]): string[] {
+    const values = resolveSettings(definitions, this.stored()[param]);
+    return definitions.filter(definition => !isDefaultValue(definition, values[definition.key])).map(definition => definition.key);
+  }
+
+  set(param: string, key: string, value: SettingValue): void {
+    const current = this.stored();
+    this.save({ ...current, [param]: { ...current[param], [key]: value } });
+  }
+
+  reset(param: string): void {
+    const { [param]: _, ...rest } = this.stored();
+    this.save(rest);
+  }
+
+  private save(next: Stored): void {
+    this.stored.set(next);
+    try {
+      globalThis.localStorage?.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignore: the settings still apply until the page is closed
+    }
+  }
+
+  // localStorage is missing while prerendering and in the test runner, and blocked outright
+  // in some privacy modes.
+  private read(): Stored {
+    try {
+      const parsed: unknown = JSON.parse(globalThis.localStorage?.getItem(STORAGE_KEY) ?? '{}');
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Stored : {};
+    } catch {
+      return {};
+    }
+  }
+}

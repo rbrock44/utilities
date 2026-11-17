@@ -1,0 +1,69 @@
+<section class="settings" [class.embedded]="embedded" [attr.aria-labelledby]="headingId" (keydown.escape)="closed.emit()">
+  <div class="settings-header">
+    <h2 [id]="headingId">{{ heading }}</h2>
+    @if (!embedded) {
+      <button type="button" class="close" aria-label="Close settings" (click)="closed.emit()">×</button>
+    }
+  </div>
+  @if (!embedded) {
+    <p class="intro">Saved in this browser, so the tool opens this way next time.</p>
+  }
+
+  @for (definition of definitions; track definition.key) {
+    @switch (definition.kind) {
+      @case ('select') {
+        <label class="field">
+          <span class="label">
+            {{ definition.label }}
+            @if (isChanged(definition.key)) {
+              <span class="changed">Changed</span>
+            }
+          </span>
+          <select [attr.data-setting]="definition.key" (change)="pick(definition.key, $any($event.target).value)">
+            @for (option of definition.options; track option.value) {
+              <option [value]="option.value" [selected]="option.value === selectValue(definition.key)">{{ option.label }}</option>
+            }
+          </select>
+          @if (definition.hint) {
+            <span class="hint">{{ definition.hint }}</span>
+          }
+        </label>
+      }
+      @case ('numbers') {
+        <fieldset class="field">
+          <legend class="label">
+            {{ definition.label }}
+            @if (isChanged(definition.key)) {
+              <span class="changed">Changed</span>
+            }
+          </legend>
+          <div class="numbers">
+            @for (label of definition.labels; track $index; let i = $index) {
+              <span class="number">
+                <input
+                  #box
+                  type="number"
+                  inputmode="decimal"
+                  [attr.data-setting]="definition.key + '-' + i"
+                  [attr.aria-label]="label"
+                  [min]="definition.min"
+                  [max]="definition.max"
+                  [value]="numberValue(definition.key, i)"
+                  (change)="commitNumber(definition, i, box)"
+                />
+                @if (definition.suffix) {
+                  <span aria-hidden="true">{{ definition.suffix }}</span>
+                }
+              </span>
+            }
+          </div>
+          @if (definition.hint) {
+            <span class="hint">{{ definition.hint }} Each must be {{ definition.min }}–{{ definition.max }}.</span>
+          }
+        </fieldset>
+      }
+    }
+  }
+
+  <button type="button" class="reset" [disabled]="!customized()" (click)="reset()">Reset to defaults</button>
+</section>

@@ -3,6 +3,8 @@ import { LENGTH_UNITS } from './units/length-units';
 import { WEIGHT_UNITS } from './units/weight-units';
 import { VOLUME_UNITS } from './units/volume-units';
 import { TEMPERATURE_UNITS } from './units/temperature-units';
+import { SettingDefinition } from '../services/tool-settings';
+import { PRECIOUS_METALS_SETTINGS } from './tool-settings';
 
 export interface ToolDefinition {
   /** Short key from the old `?tile=` URLs, kept so those links still redirect. New tools have none. */
@@ -16,6 +18,11 @@ export interface ToolDefinition {
   related?: string[];
   /** Set for tools reachable by URL but not shown on the home page or in the sitemap. */
   unlisted?: { title: string; description: string };
+  /**
+   * Preferences behind the tool page's settings button. The resolved values reach the
+   * widget as a `settings` input, so a widget that lists any must declare that input.
+   */
+  settings?: SettingDefinition[];
 }
 
 const unitConverter = () =>
@@ -26,7 +33,8 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'precious-metals': {
     alias: 'pm',
     load: () => import('../components/calculators/precious-metals/precious-metals').then(m => m.PreciousMetalsComponent),
-    related: ['gold-in-coins', 'silver-in-coins', 'weight-converter']
+    related: ['gold-in-coins', 'silver-in-coins', 'weight-converter'],
+    settings: PRECIOUS_METALS_SETTINGS
   },
   'silver-in-coins': {
     alias: 'sic',
