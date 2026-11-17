@@ -4,7 +4,7 @@ import { WEIGHT_UNITS } from './units/weight-units';
 import { VOLUME_UNITS } from './units/volume-units';
 import { TEMPERATURE_UNITS } from './units/temperature-units';
 import { SettingDefinition } from '../services/tool-settings';
-import { PRECIOUS_METALS_SETTINGS } from './tool-settings';
+import { CUT_LIST_SETTINGS, IMAGE_TO_PDF_SETTINGS, INCH_FRACTION_SETTINGS, PAINT_DRYWALL_SETTINGS, PRECIOUS_METALS_SETTINGS } from './tool-settings';
 
 export interface ToolDefinition {
   /** Short key from the old `?tile=` URLs, kept so those links still redirect. New tools have none. */
@@ -67,7 +67,8 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'image-to-pdf': {
     alias: 'itp',
     load: () => import('../components/utilities/image-to-pdf/image-to-pdf').then(m => m.ImageToPdfComponent),
-    related: ['image-resizer', 'pdf-combiner']
+    related: ['image-resizer', 'pdf-combiner'],
+    settings: IMAGE_TO_PDF_SETTINGS
   },
   'pdf-combiner': {
     alias: 'pmc',
@@ -200,15 +201,18 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'cut-list-optimizer': {
     alias: 'clo',
     load: () => import('../components/calculators/cut-list-optimizer/cut-list-optimizer').then(m => m.CutListOptimizerComponent),
-    related: ['board-foot-calculator', 'divider-spacing-calculator', 'length-converter']
+    related: ['board-foot-calculator', 'divider-spacing-calculator', 'length-converter'],
+    settings: CUT_LIST_SETTINGS
   },
   'inch-fraction-converter': {
     load: () => import('../components/calculators/inch-fraction-converter/inch-fraction-converter').then(m => m.InchFractionConverterComponent),
-    related: ['length-converter', 'stair-stringer-calculator', 'board-foot-calculator', 'cut-list-optimizer']
+    related: ['length-converter', 'stair-stringer-calculator', 'board-foot-calculator', 'cut-list-optimizer'],
+    settings: INCH_FRACTION_SETTINGS
   },
   'paint-drywall-calculator': {
     load: () => import('../components/calculators/paint-drywall-calculator/paint-drywall-calculator').then(m => m.PaintDrywallCalculatorComponent),
-    related: ['inch-fraction-converter', 'board-foot-calculator', 'stair-stringer-calculator']
+    related: ['inch-fraction-converter', 'board-foot-calculator', 'stair-stringer-calculator'],
+    settings: PAINT_DRYWALL_SETTINGS
   },
   'compound-interest-calculator': {
     load: () => import('../components/calculators/compound-interest-calculator/compound-interest-calculator').then(m => m.CompoundInterestCalculatorComponent),

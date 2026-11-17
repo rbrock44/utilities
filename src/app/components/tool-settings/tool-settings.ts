@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Input, OnInit, Signal } from '@angular/core';
-import { isValidNumber, NumberListSetting, SettingDefinition, SettingValues, ToolSettingsService } from '../../services/tool-settings';
+import { isValidNumber, NumberListSetting, NumberSetting, SettingDefinition, SettingValues, ToolSettingsService } from '../../services/tool-settings';
 
 /**
  * One tool's settings form, shown in the settings drawer on its tool page or listed with
@@ -36,6 +36,20 @@ export class ToolSettingsComponent implements OnInit {
 
   selectValue(key: string): string {
     return this.values()[key] as string;
+  }
+
+  singleValue(key: string): number {
+    return this.values()[key] as number;
+  }
+
+  /** Same rules as a number in a list: saved on change, put back if invalid. */
+  commitSingle(definition: NumberSetting, input: HTMLInputElement): void {
+    const value = input.value.trim() === '' ? NaN : Number(input.value);
+    if (!isValidNumber(definition, value)) {
+      input.value = String(this.singleValue(definition.key));
+      return;
+    }
+    this.service.set(this.param, definition.key, value);
   }
 
   numberValue(key: string, index: number): number {

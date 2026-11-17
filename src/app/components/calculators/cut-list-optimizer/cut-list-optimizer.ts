@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { changedSettings, SettingValues } from '../../../services/tool-settings';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -84,6 +85,18 @@ export class CutListOptimizerComponent {
   errorMessage: string | null = null;
 
   private nextId = 3;
+  private appliedSettings?: SettingValues;
+
+  /** From the tool page; only a setting that changed overrides what's on screen. */
+  @Input() set settings(values: SettingValues) {
+    const changed = changedSettings(this.appliedSettings, values);
+    this.appliedSettings = values;
+    if (changed.has('unit')) this.unit = values['unit'] as LengthUnit;
+    if (changed.has('stockLength')) this.stockLength = values['stockLength'] as number;
+    if (changed.has('kerf')) this.kerf = values['kerf'] as number;
+    if (changed.has('trimPerEnd')) this.trimPerEnd = values['trimPerEnd'] as number;
+    this.recalculate();
+  }
 
   constructor(private cdr: ChangeDetectorRef) {
     this.recalculate();

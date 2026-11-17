@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { changedSettings, SettingValues } from '../../../services/tool-settings';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -136,6 +137,14 @@ export class InchFractionConverterComponent {
   input = '3 5/8 + 1 3/16';
   precision = 16;
   readonly precisions = PRECISIONS;
+  private appliedSettings?: SettingValues;
+
+  /** From the tool page; only a setting that changed overrides what's on screen. */
+  @Input() set settings(values: SettingValues) {
+    const changed = changedSettings(this.appliedSettings, values);
+    this.appliedSettings = values;
+    if (changed.has('precision')) this.precision = Number(values['precision']);
+  }
 
   /** 1/16 through 1, the marks on a standard tape measure. */
   readonly chart = Array.from({ length: 16 }, (_, i) => {

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { changedSettings, SettingValues } from '../../../services/tool-settings';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -93,6 +94,17 @@ export class ImageToPdfComponent {
     { value: 'fill', label: 'Fill (crop to fill page)' },
     { value: 'stretch', label: 'Stretch (ignore aspect ratio)' },
   ];
+
+  private appliedSettings?: SettingValues;
+
+  /** From the tool page; only a setting that changed overrides what's on screen. */
+  @Input() set settings(values: SettingValues) {
+    const changed = changedSettings(this.appliedSettings, values);
+    this.appliedSettings = values;
+    if (changed.has('pageSize')) this.pageSize = values['pageSize'] as PageSize;
+    if (changed.has('orientation')) this.orientation = values['orientation'] as Orientation;
+    if (changed.has('fitMode')) this.fitMode = values['fitMode'] as FitMode;
+  }
 
   constructor(private cdr: ChangeDetectorRef) {}
 

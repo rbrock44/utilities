@@ -9,6 +9,19 @@ export interface SelectSetting {
   options: { value: string; label: string }[];
 }
 
+export interface NumberSetting {
+  kind: 'number';
+  key: string;
+  label: string;
+  hint?: string;
+  default: number;
+  min: number;
+  max: number;
+  /** Whole numbers only, e.g. a count of coats. */
+  integer?: boolean;
+  suffix?: string;
+}
+
 /** A fixed-length row of numbers, e.g. the three percent columns of a table. */
 export interface NumberListSetting {
   kind: 'numbers';
@@ -20,25 +33,30 @@ export interface NumberListSetting {
   labels: string[];
   min: number;
   max: number;
+  integer?: boolean;
   suffix?: string;
 }
 
-export type SettingDefinition = SelectSetting | NumberListSetting;
-export type SettingValue = string | number[];
+export type SettingDefinition = SelectSetting | NumberSetting | NumberListSetting;
+export type SettingValue = string | number | number[];
 export type SettingValues = Record<string, SettingValue>;
 
 const STORAGE_KEY = 'utilities-settings';
 
 type Stored = Record<string, Record<string, unknown>>;
 
-export function isValidNumber(definition: NumberListSetting, value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= definition.min && value <= definition.max;
+export function isValidNumber(definition: NumberSetting | NumberListSetting, value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= definition.min && value <= definition.max
+    && (!definition.integer || Number.isInteger(value));
 }
 
 /** Each number is checked on its own, so one bad entry doesn't throw away the rest. */
 function validValue(definition: SettingDefinition, stored: unknown): SettingValue {
   if (definition.kind === 'select') {
     return definition.options.some(option => option.value === stored) ? stored as string : definition.default;
+  }
+  if (definition.kind === 'number') {
+    return isValidNumber(definition, stored) ? stored : definition.default;
   }
   const list = Array.isArray(stored) ? stored : [];
   return definition.default.map((fallback, i) => isValidNumber(definition, list[i]) ? list[i] : fallback);
@@ -48,6 +66,15 @@ export function isDefaultValue(definition: SettingDefinition, value: SettingValu
   return Array.isArray(definition.default)
     ? Array.isArray(value) && definition.default.every((fallback, i) => value[i] === fallback)
     : value === definition.default;
+}
+
+/**
+ * Keys whose value differs between two resolutions, or every key the first time. A widget
+ * applies only these, so changing one setting doesn't undo what's been typed in another field.
+ */
+export function changedSettings(previous: SettingValues | undefined, next: SettingValues): Set<string> {
+  return new Set(Object.keys(next).filter(key =>
+    !previous || JSON.stringify(previous[key]) !== JSON.stringify(next[key])));
 }
 
 /** Stored values for one tool, with anything missing, stale, or out of range swapped for its default. */

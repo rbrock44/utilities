@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ImageToPdfComponent } from './image-to-pdf';
+import { IMAGE_TO_PDF_SETTINGS } from '../../../constants/tool-settings';
+import { resolveSettings, SelectSetting } from '../../../services/tool-settings';
 
 type ImageEntry = ImageToPdfComponent['images'][number];
 
@@ -431,5 +433,27 @@ describe('ImageToPdfComponent', () => {
 
       expect(component.isDragging).toBe(false);
     });
+  });
+});
+
+describe('ImageToPdfComponent settings', () => {
+  it('should offer exactly the widget\'s own choices', () => {
+    const component = TestBed.configureTestingModule({ imports: [ImageToPdfComponent] }).createComponent(ImageToPdfComponent).componentInstance;
+    const options = (key: string) => (IMAGE_TO_PDF_SETTINGS.find(s => s.key === key) as SelectSetting).options;
+    expect(options('pageSize')).toEqual(component.pageSizes);
+    expect(options('orientation')).toEqual(component.orientations);
+    expect(options('fitMode')).toEqual(component.fitModes);
+  });
+
+  it('should start from the settings and only apply the one that changes', () => {
+    const component = TestBed.configureTestingModule({ imports: [ImageToPdfComponent] }).createComponent(ImageToPdfComponent).componentInstance;
+    const defaults = resolveSettings(IMAGE_TO_PDF_SETTINGS, {});
+    component.settings = { ...defaults, pageSize: 'letter' };
+    expect(component.pageSize).toBe('letter');
+
+    component.pageSize = 'legal';
+    component.settings = { ...defaults, pageSize: 'letter', orientation: 'landscape' };
+    expect(component.orientation).toBe('landscape');
+    expect(component.pageSize).toBe('legal');
   });
 });

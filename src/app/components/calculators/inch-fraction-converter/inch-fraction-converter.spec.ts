@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { INCH_FRACTION_SETTINGS } from '../../../constants/tool-settings';
+import { SelectSetting } from '../../../services/tool-settings';
 
 import {
+  PRECISIONS,
   evaluateLengths,
   formatFraction,
   InchFractionConverterComponent,
@@ -157,5 +160,16 @@ describe('InchFractionConverterComponent', () => {
     expect(component.chart.length).toBe(16);
     expect(component.chart[0]).toEqual({ fraction: '1/16″', decimal: '0.0625', mm: '1.59' });
     expect(component.chart[15].fraction).toBe('1″');
+  });
+});
+
+describe('InchFractionConverterComponent settings', () => {
+  it('should offer exactly the widget\'s precisions and round to the set one', () => {
+    const options = (INCH_FRACTION_SETTINGS[0] as SelectSetting).options.map(option => Number(option.value));
+    expect(options).toEqual(PRECISIONS);
+
+    const component = TestBed.configureTestingModule({ imports: [InchFractionConverterComponent] }).createComponent(InchFractionConverterComponent).componentInstance;
+    component.settings = { precision: '32' };
+    expect(component.precision).toBe(32);
   });
 });

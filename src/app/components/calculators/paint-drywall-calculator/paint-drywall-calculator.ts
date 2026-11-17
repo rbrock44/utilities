@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { changedSettings, SettingValues } from '../../../services/tool-settings';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -62,6 +63,17 @@ export class PaintDrywallCalculatorComponent {
   wastePercent: number | null = 10;
 
   readonly sheetSizes = SHEET_SIZES;
+  private appliedSettings?: SettingValues;
+
+  /** From the tool page; only a setting that changed overrides what's on screen. */
+  @Input() set settings(values: SettingValues) {
+    const changed = changedSettings(this.appliedSettings, values);
+    this.appliedSettings = values;
+    if (changed.has('coverage')) this.coverage = values['coverage'] as number;
+    if (changed.has('coats')) this.coats = values['coats'] as number;
+    if (changed.has('sheetSqft')) this.sheetSqft = Number(values['sheetSqft']);
+    if (changed.has('wastePercent')) this.wastePercent = values['wastePercent'] as number;
+  }
 
   get errorMessage(): string | null {
     const dimensions = [this.length, this.width, this.height];

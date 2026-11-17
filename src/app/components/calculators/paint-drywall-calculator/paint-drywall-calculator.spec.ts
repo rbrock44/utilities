@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { paintAmount, PaintDrywallCalculatorComponent } from './paint-drywall-calculator';
+import { paintAmount, PaintDrywallCalculatorComponent, SHEET_SIZES } from './paint-drywall-calculator';
+import { PAINT_DRYWALL_SETTINGS } from '../../../constants/tool-settings';
+import { resolveSettings, SelectSetting } from '../../../services/tool-settings';
 
 describe('paintAmount', () => {
   it('should round up to whole quarts', () => {
@@ -101,5 +103,26 @@ describe('PaintDrywallCalculatorComponent', () => {
 
   it('should format areas as whole square feet', () => {
     expect(component.formatArea(1234.4)).toBe('1,234 sq ft');
+  });
+});
+
+describe('PaintDrywallCalculatorComponent settings', () => {
+  it('should offer exactly the widget\'s sheet sizes', () => {
+    const sheets = PAINT_DRYWALL_SETTINGS.find(s => s.key === 'sheetSqft') as SelectSetting;
+    expect(sheets.options).toEqual(SHEET_SIZES.map(size => ({ value: String(size.sqft), label: size.label })));
+  });
+
+  it('should start from the settings and only apply the one that changes', () => {
+    const component = TestBed.configureTestingModule({ imports: [PaintDrywallCalculatorComponent] }).createComponent(PaintDrywallCalculatorComponent).componentInstance;
+    const defaults = resolveSettings(PAINT_DRYWALL_SETTINGS, {});
+    const mine = { ...defaults, coverage: 400, sheetSqft: '48' };
+    component.settings = mine;
+    expect(component.coverage).toBe(400);
+    expect(component.sheetSqft).toBe(48);
+
+    component.coverage = 300;
+    component.settings = { ...mine, coats: 3 };
+    expect(component.coats).toBe(3);
+    expect(component.coverage).toBe(300);
   });
 });

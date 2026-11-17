@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { resolveSettings, SettingDefinition, ToolSettingsService } from './tool-settings';
+import { changedSettings, resolveSettings, SettingDefinition, ToolSettingsService } from './tool-settings';
 
 const DEFINITIONS: SettingDefinition[] = [
   { kind: 'select', key: 'unit', label: 'Unit', default: 'g', options: [{ value: 'g', label: 'g' }, { value: 'dwt', label: 'dwt' }] },
@@ -75,5 +75,20 @@ describe('ToolSettingsService', () => {
     const service = create();
     service.set('tool', 'unit', 'dwt');
     expect(service.values('tool', DEFINITIONS)()['unit']).toBe('dwt');
+  });
+});
+
+describe('single number settings and changedSettings', () => {
+  const coats: SettingDefinition = { kind: 'number', key: 'coats', label: 'Coats', default: 2, min: 1, max: 10, integer: true };
+
+  it('should keep a valid whole number and default anything else', () => {
+    expect(resolveSettings([coats], { coats: 3 })).toEqual({ coats: 3 });
+    expect(resolveSettings([coats], { coats: 2.5 })).toEqual({ coats: 2 });
+    expect(resolveSettings([coats], { coats: 11 })).toEqual({ coats: 2 });
+  });
+
+  it('should report every key first, then only the ones that moved', () => {
+    expect([...changedSettings(undefined, { a: 'x', b: [1, 2] })]).toEqual(['a', 'b']);
+    expect([...changedSettings({ a: 'x', b: [1, 2] }, { a: 'x', b: [1, 3] })]).toEqual(['b']);
   });
 });

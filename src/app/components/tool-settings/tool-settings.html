@@ -21,6 +21,35 @@
           }
         </label>
       }
+      @case ('number') {
+        <label class="field">
+          <span class="label">
+            {{ definition.label }}
+            @if (isChanged(definition.key)) {
+              <span class="changed">Changed</span>
+            }
+          </span>
+          <span class="number">
+            <input
+              #single
+              type="number"
+              [attr.inputmode]="definition.integer ? 'numeric' : 'decimal'"
+              [attr.data-setting]="definition.key"
+              [min]="definition.min"
+              [max]="definition.max"
+              [step]="definition.integer ? 1 : 'any'"
+              [value]="singleValue(definition.key)"
+              (change)="commitSingle(definition, single)"
+            />
+            @if (definition.suffix) {
+              <span aria-hidden="true">{{ definition.suffix }}</span>
+            }
+          </span>
+          @if (definition.hint) {
+            <span class="hint">{{ definition.hint }}</span>
+          }
+        </label>
+      }
       @case ('numbers') {
         <fieldset class="field">
           <legend class="label">
@@ -40,6 +69,7 @@
                   [attr.aria-label]="label"
                   [min]="definition.min"
                   [max]="definition.max"
+                  [step]="definition.integer ? 1 : 'any'"
                   [value]="numberValue(definition.key, i)"
                   (change)="commitNumber(definition, i, box)"
                 />

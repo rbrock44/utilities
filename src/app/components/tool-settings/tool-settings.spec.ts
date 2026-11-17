@@ -77,3 +77,28 @@ describe('ToolSettingsComponent', () => {
     expect(el().querySelector('h3')?.textContent).toBe('Precious Metals');
   });
 });
+
+describe('ToolSettingsComponent single numbers', () => {
+  const COATS: SettingDefinition[] = [{ kind: 'number', key: 'coats', label: 'Coats', default: 2, min: 1, max: 10, integer: true }];
+
+  it('should save a whole number and put back a fraction', async () => {
+    vi.stubGlobal('localStorage', { getItem: () => null, setItem: () => undefined });
+    await TestBed.configureTestingModule({ imports: [ToolSettingsComponent] }).compileComponents();
+    const service = TestBed.inject(ToolSettingsService);
+    const fixture = TestBed.createComponent(ToolSettingsComponent);
+    fixture.componentRef.setInput('param', 'paint');
+    fixture.componentRef.setInput('definitions', COATS);
+    fixture.detectChanges();
+
+    const box = (fixture.nativeElement as HTMLElement).querySelector('[data-setting="coats"]') as HTMLInputElement;
+    expect(box.value).toBe('2');
+    box.value = '3';
+    box.dispatchEvent(new Event('change'));
+    expect(service.values('paint', COATS)()['coats']).toBe(3);
+
+    box.value = '2.5';
+    box.dispatchEvent(new Event('change'));
+    expect(box.value).toBe('3');
+    vi.unstubAllGlobals();
+  });
+});

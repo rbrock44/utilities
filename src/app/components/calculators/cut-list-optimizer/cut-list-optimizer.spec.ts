@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CutListOptimizerComponent } from './cut-list-optimizer';
+import { CUT_LIST_SETTINGS } from '../../../constants/tool-settings';
+import { resolveSettings } from '../../../services/tool-settings';
 
 describe('CutListOptimizerComponent', () => {
   let component: CutListOptimizerComponent;
@@ -136,5 +138,22 @@ describe('CutListOptimizerComponent', () => {
     ]);
 
     expect(component.plan.pieceCount).toBe(1);
+  });
+});
+
+describe('CutListOptimizerComponent settings', () => {
+  it('should start from the settings and only apply the one that changes', () => {
+    const component = TestBed.configureTestingModule({ imports: [CutListOptimizerComponent] }).createComponent(CutListOptimizerComponent).componentInstance;
+    const defaults = resolveSettings(CUT_LIST_SETTINGS, {});
+    const mine = { ...defaults, stockLength: 144, kerf: 0.09375 };
+    component.settings = mine;
+    expect(component.stockLength).toBe(144);
+    expect(component.kerf).toBe(0.09375);
+    expect(component.usableLength).toBe(144);
+
+    component.stockLength = 120;
+    component.settings = { ...mine, trimPerEnd: 1 };
+    expect(component.trimPerEnd).toBe(1);
+    expect(component.stockLength).toBe(120);
   });
 });
