@@ -1,0 +1,85 @@
+<section class="widget-container">
+  <h2>Specific Gravity Calculator</h2>
+  <p class="description">Weigh an item dry and in water, or enter a known SG, to see which metal it matches.</p>
+
+  <div class="modes" role="group" aria-label="Measurement method">
+    @for (m of modes; track m.value) {
+      <button type="button" [class.active]="mode === m.value" [attr.aria-pressed]="mode === m.value" (click)="setMode(m.value)">
+        {{ m.label }}
+      </button>
+    }
+  </div>
+
+  <div class="inputs">
+    @if (mode === 'direct') {
+      <label for="sgInput">
+        Specific gravity
+        <input id="sgInput" type="number" inputmode="decimal" min="0" step="0.01" [(ngModel)]="sgInput" />
+      </label>
+    } @else {
+      <label for="dryWeightInput">
+        Dry weight
+        <input id="dryWeightInput" type="number" inputmode="decimal" min="0" step="0.01" [(ngModel)]="dryWeight" />
+      </label>
+      <label for="secondWeightInput">
+        {{ secondLabel }}
+        <input id="secondWeightInput" type="number" inputmode="decimal" min="0" step="0.01" [(ngModel)]="secondWeight" />
+      </label>
+    }
+  </div>
+
+  <p class="hint">
+    @switch (mode) {
+      @case ('in-water') { Hang the item fully submerged, not touching the cup. Any unit works, as long as both match. }
+      @case ('displaced') { Tare a cup of water, then hang the item in it. The scale reading is the water displaced. }
+      @default { Enter an SG you already measured. }
+    }
+  </p>
+
+  @if (hasInputs) {
+    <button type="button" class="btn-clear" (click)="clear()">Clear</button>
+  }
+
+  @if (errorMessage) {
+    <p class="error" role="alert">{{ errorMessage }}</p>
+  }
+
+  <div aria-live="polite">
+    @if (sg != null) {
+      <div class="results">
+        <div class="sg-value">SG <strong>{{ sg.toFixed(2) }}</strong></div>
+        @if (matches.length) {
+          <p class="verdict">
+            Matches: <strong>{{ matches[0].name }}</strong>
+            @if (matches.length > 1) {
+              <span class="also">also {{ matches.length - 1 }} more below</span>
+            }
+          </p>
+          @if (hasNonPreciousMatch) {
+            <p class="warning">A base metal also fits this SG. Confirm with an acid or magnet test.</p>
+          }
+        } @else {
+          <p class="verdict">No match. Closest: <strong>{{ closest!.name }}</strong> ({{ closest!.nominal }})</p>
+        }
+      </div>
+    }
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Metal</th><th>SG</th><th>Range</th></tr>
+    </thead>
+    <tbody>
+      @for (m of materials; track m.name) {
+        <tr [class.match]="isMatch(m)" [class.base]="!m.precious">
+          <td>
+            {{ m.name }}
+            @if (m.note) { <small>{{ m.note }}</small> }
+          </td>
+          <td>{{ m.nominal }}</td>
+          <td>{{ m.min }}–{{ m.max }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

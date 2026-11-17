@@ -33,8 +33,12 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'precious-metals': {
     alias: 'pm',
     load: () => import('../components/calculators/precious-metals/precious-metals').then(m => m.PreciousMetalsComponent),
-    related: ['gold-in-coins', 'silver-in-coins', 'weight-converter'],
+    related: ['gold-in-coins', 'silver-in-coins', 'specific-gravity-calculator', 'weight-converter'],
     settings: PRECIOUS_METALS_SETTINGS
+  },
+  'specific-gravity-calculator': {
+    load: () => import('../components/calculators/specific-gravity-calculator/specific-gravity-calculator').then(m => m.SpecificGravityCalculatorComponent),
+    related: ['precious-metals', 'gold-in-coins', 'weight-converter']
   },
   'silver-in-coins': {
     alias: 'sic',
@@ -44,7 +48,7 @@ export const TOOLS: Record<string, ToolDefinition> = {
   'gold-in-coins': {
     alias: 'gic',
     load: () => import('../components/information/gold-in-coin/gold-in-coin').then(m => m.GoldInCoinComponent),
-    related: ['precious-metals', 'silver-in-coins', 'weight-converter']
+    related: ['precious-metals', 'silver-in-coins', 'specific-gravity-calculator', 'weight-converter']
   },
   'right-angle-calculator': {
     alias: 'rac',

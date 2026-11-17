@@ -108,6 +108,12 @@ export const CATEGORIES: Category[] = [
                 param: 'precious-metals'
             },
             {
+                title: 'Specific Gravity Calculator',
+                description: 'Identify gold, silver, or platinum from dry and in-water weight or SG',
+                icon: '💧',
+                param: 'specific-gravity-calculator'
+            },
+            {
                 title: 'Right Angle Calculator',
                 description: 'Calculate missing triangle side length',
                 icon: '📐',
