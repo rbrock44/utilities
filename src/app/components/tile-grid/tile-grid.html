@@ -4,7 +4,7 @@
         <input type="text" [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" placeholder="Search by category, name, or description..."
             class="search-input" aria-label="Search widgets">
         @if (settingsTools.length > 0) {
-            <button type="button" class="settings-toggle" [attr.aria-expanded]="settingsOpen()" (click)="settingsOpen.set(!settingsOpen())">
+            <button type="button" class="settings-toggle" aria-haspopup="dialog" [attr.aria-expanded]="settingsOpen()" (click)="settingsOpen.set(!settingsOpen())">
                 <span aria-hidden="true">⚙</span>
                 Settings
                 @if (changedSettings() > 0) {
@@ -14,16 +14,11 @@
         }
     </div>
     @if (settingsOpen()) {
-        <section class="all-settings" aria-labelledby="all-settings-heading" (keydown.escape)="settingsOpen.set(false)">
-            <div class="all-settings-header">
-                <h2 id="all-settings-heading">Tool settings</h2>
-                <button type="button" class="close" aria-label="Close settings" (click)="settingsOpen.set(false)">×</button>
-            </div>
-            <p class="intro">Saved in this browser. Each tool also has its own Settings button.</p>
+        <app-settings-drawer heading="Tool settings" (closed)="settingsOpen.set(false)">
             @for (tool of settingsTools; track tool.param) {
-                <app-tool-settings [param]="tool.param" [definitions]="tool.definitions" [heading]="tool.title" [embedded]="true" />
+                <app-tool-settings [param]="tool.param" [definitions]="tool.definitions" [heading]="tool.title" />
             }
-        </section>
+        </app-settings-drawer>
     }
     @if (!searchTerm().trim()) {
         @if (pinnedCategory().tiles.length > 0) {

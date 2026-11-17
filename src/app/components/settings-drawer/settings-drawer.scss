@@ -1,0 +1,72 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgb(0 0 0 / 0.45);
+  animation: fade 0.15s ease-out;
+}
+
+.drawer {
+  position: fixed;
+  z-index: 101;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, 100vw);
+  box-sizing: border-box;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  animation: slide 0.2s ease-out;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close {
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.intro {
+  margin: 0.25rem 0 1rem;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+@keyframes slide {
+  from { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .drawer {
+    animation: none;
+  }
+}

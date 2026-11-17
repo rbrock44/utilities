@@ -36,7 +36,8 @@ describe('TileGridComponent', () => {
 
     toggle.click();
     fixture.detectChanges();
-    const listed = [...el.querySelectorAll('app-tool-settings h2')].map(h => h.textContent?.trim());
+    expect(el.querySelector('[role="dialog"]')).toBeTruthy();
+    const listed = [...el.querySelectorAll('app-tool-settings h3')].map(h => h.textContent?.trim());
     expect(listed).toEqual(component.settingsTools.map(tool => tool.title));
 
     const select = el.querySelector('[data-setting="rowUnit"]') as HTMLSelectElement;

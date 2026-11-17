@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, EventEmitter, inject, Input, OnInit, Output, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input, OnInit, Signal } from '@angular/core';
 import { isValidNumber, NumberListSetting, SettingDefinition, SettingValues, ToolSettingsService } from '../../services/tool-settings';
 
 /**
- * One tool's settings form, on its tool page or listed with every other tool's on the home
- * page. Every change is saved as it's made.
+ * One tool's settings form, shown in the settings drawer on its tool page or listed with
+ * every other tool's on the home page. Every change is saved as it's made.
  */
 @Component({
   selector: 'app-tool-settings',
@@ -15,10 +15,7 @@ import { isValidNumber, NumberListSetting, SettingDefinition, SettingValues, Too
 export class ToolSettingsComponent implements OnInit {
   @Input({ required: true }) param = '';
   @Input({ required: true }) definitions: SettingDefinition[] = [];
-  @Input() heading = 'Settings';
-  /** Listed inside the home page's panel: no box, intro, or close button of its own. */
-  @Input() embedded = false;
-  @Output() closed = new EventEmitter<void>();
+  @Input() heading = '';
 
   private readonly service = inject(ToolSettingsService);
   values!: Signal<SettingValues>;

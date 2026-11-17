@@ -71,20 +71,9 @@ describe('ToolSettingsComponent', () => {
     expect(badges()).toBe(0);
   });
 
-  it('should drop its own box and close button when listed on the home page', () => {
+  it('should title the form with the tool it belongs to', () => {
     fixture.componentRef.setInput('heading', 'Precious Metals');
-    fixture.componentRef.setInput('embedded', true);
     fixture.detectChanges();
-    expect(el().querySelector('h2')?.textContent).toBe('Precious Metals');
-    expect(el().querySelector('.close')).toBeNull();
-    expect(el().querySelector('.intro')).toBeNull();
-  });
-
-  it('should close from the button and on Escape', () => {
-    let closed = 0;
-    fixture.componentInstance.closed.subscribe(() => closed++);
-    (el().querySelector('.close') as HTMLButtonElement).click();
-    el().querySelector('section')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    expect(closed).toBe(2);
+    expect(el().querySelector('h3')?.textContent).toBe('Precious Metals');
   });
 });

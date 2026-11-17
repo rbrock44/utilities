@@ -67,56 +67,15 @@
     font-weight: 600;
 }
 
-.all-settings {
-    max-width: 520px;
-    margin: -0.75rem 0 2rem auto;
-    padding: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: var(--surface);
-    box-shadow: var(--shadow-md);
-    color: var(--text);
-
-    h2 {
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    app-tool-settings + app-tool-settings {
-        display: block;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--border);
-    }
-}
-
-.all-settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.all-settings .close {
-    border: none;
-    background: transparent;
-    color: var(--text-soft);
-    font-size: 1.5rem;
-    line-height: 1;
-    cursor: pointer;
-}
-
-.all-settings .intro {
-    margin: 0.25rem 0 1rem;
-    color: var(--text-soft);
-    font-size: 0.85rem;
+app-tool-settings + app-tool-settings {
+    display: block;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
 }
 
 @media (max-width: 480px) {
     .settings-toggle {
         padding: 0 0.7rem;
-    }
-
-    .all-settings {
-        margin-left: 0;
     }
 }

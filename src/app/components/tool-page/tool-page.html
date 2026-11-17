@@ -17,6 +17,7 @@
       <button
         type="button"
         class="pin settings-toggle"
+        aria-haspopup="dialog"
         [attr.aria-expanded]="settingsOpen()"
         (click)="toggleSettings()"
       >
@@ -28,7 +29,9 @@
 </app-back-button>
 
 @if (settingsOpen()) {
-  <app-tool-settings [param]="param" [definitions]="settingDefinitions" (closed)="settingsOpen.set(false)" />
+  <app-settings-drawer (closed)="settingsOpen.set(false)">
+    <app-tool-settings [param]="param" [definitions]="settingDefinitions" [heading]="heading" />
+  </app-settings-drawer>
 }
 
 <div class="tool-layout">

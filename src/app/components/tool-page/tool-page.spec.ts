@@ -129,7 +129,7 @@ describe('ToolPageComponent', () => {
     render();
     expect(page().querySelector('.fake')?.textContent).toBe('dwt');
 
-    (page().querySelector('app-tool-settings .close') as HTMLButtonElement).click();
+    (page().querySelector('app-settings-drawer .close') as HTMLButtonElement).click();
     render();
     expect(page().querySelector('app-tool-settings')).toBeNull();
   });

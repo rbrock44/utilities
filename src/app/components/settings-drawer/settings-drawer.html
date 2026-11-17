@@ -1,0 +1,11 @@
+<div class="backdrop" (click)="close()"></div>
+<div class="drawer" role="dialog" aria-modal="true" aria-labelledby="settings-drawer-heading">
+  <div class="drawer-header">
+    <h2 id="settings-drawer-heading">{{ heading }}</h2>
+    <button #closeButton type="button" class="close" aria-label="Close settings" (click)="close()">×</button>
+  </div>
+  <p class="intro">Saved in this browser, so tools open this way next time.</p>
+  <div class="drawer-body">
+    <ng-content />
+  </div>
+</div>

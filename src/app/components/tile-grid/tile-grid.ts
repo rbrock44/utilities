@@ -8,6 +8,7 @@ import { TOOL_INDEX } from '../../constants/tool-index';
 import { TOOLS } from '../../constants/tools';
 import { ToolSettingsService } from '../../services/tool-settings';
 import { ToolSettingsComponent } from '../tool-settings/tool-settings';
+import { SettingsDrawerComponent } from '../settings-drawer/settings-drawer';
 
 /** Every home-page tool that has settings, in home-page order. */
 const SETTINGS_TOOLS = TOOL_INDEX
@@ -20,7 +21,8 @@ const SETTINGS_TOOLS = TOOL_INDEX
   imports: [
     CommonModule, 
     CategoryComponent,
-    ToolSettingsComponent
+    ToolSettingsComponent,
+    SettingsDrawerComponent
   ],
   templateUrl: './tile-grid.html',
   changeDetection: ChangeDetectionStrategy.Eager,

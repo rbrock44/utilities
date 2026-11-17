@@ -1,13 +1,5 @@
-<section class="settings" [class.embedded]="embedded" [attr.aria-labelledby]="headingId" (keydown.escape)="closed.emit()">
-  <div class="settings-header">
-    <h2 [id]="headingId">{{ heading }}</h2>
-    @if (!embedded) {
-      <button type="button" class="close" aria-label="Close settings" (click)="closed.emit()">×</button>
-    }
-  </div>
-  @if (!embedded) {
-    <p class="intro">Saved in this browser, so the tool opens this way next time.</p>
-  }
+<section class="settings" [attr.aria-labelledby]="headingId">
+  <h3 [id]="headingId">{{ heading }}</h3>
 
   @for (definition of definitions; track definition.key) {
     @switch (definition.kind) {

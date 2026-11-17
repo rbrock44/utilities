@@ -7,6 +7,7 @@ import { findTool, relatedTools } from '../../constants/tool-index';
 import { FavoritesService } from '../../services/favorites';
 import { ToolSettingsService } from '../../services/tool-settings';
 import { ToolSettingsComponent } from '../tool-settings/tool-settings';
+import { SettingsDrawerComponent } from '../settings-drawer/settings-drawer';
 
 const RELOAD_KEY = 'utilities-chunk-reload';
 /** A second failure this soon after reloading means something other than a stale deploy. */
@@ -20,7 +21,7 @@ const RELOAD_WINDOW_MS = 30_000;
 @Component({
   selector: 'app-tool-page',
   standalone: true,
-  imports: [NgComponentOutlet, BackButtonComponent, RouterLink, ToolSettingsComponent],
+  imports: [NgComponentOutlet, BackButtonComponent, RouterLink, ToolSettingsComponent, SettingsDrawerComponent],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
