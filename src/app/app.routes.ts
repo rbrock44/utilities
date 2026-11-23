@@ -35,7 +35,7 @@ export const redirectCoinStack: CanActivateFn = async route => {
 function toolRoute(param: string, title: string, description: string): Routes[number] {
   const tool = TOOLS[param];
   const data: PageData = { description, tool, heading: title, noindex: !!tool.unlisted };
-  return { path: param, component: ToolPageComponent, title: `${title} – Utilities`, data };
+  return { path: param, component: ToolPageComponent, title: `${title} – Utilities by Ryan Brock`, data };
 }
 
 const listedRoutes: Routes = CATEGORIES.flatMap(category =>

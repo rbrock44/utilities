@@ -111,7 +111,7 @@ describe('App', () => {
 
   it('should set per-tool title, description, and robots tags', async () => {
     await render('/jwt-decoder');
-    expect(document.title).toBe('JWT Decoder – Utilities');
+    expect(document.title).toBe('JWT Decoder – Utilities by Ryan Brock');
     expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBeTruthy();
     expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('index, follow');
   }, SLOW_TEST_MS);
